@@ -167,7 +167,8 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   }
 
   # Meter net specific stuff
-  if(sum(data_type %in% c("MN","2MN")) > 0) {
+  # MB added MN, 2MN, and TT
+  if(sum(data_type %in% c("MN","2MN", "TT")) > 0) {
     data <- compile_meter(data)
   }
 
@@ -219,8 +220,19 @@ compile_meter <- function(data) {
                                                   tow_volume),
                         .after = net_area)
 
-  data <- dplyr::mutate(data, biodens = as.numeric(zooplankton_biovol)/tow_volume, .after = zooplankton_biovol)
+  data <- dplyr::mutate(data, biodens = as.numeric(zooplankton_biovol)/tow_volume,
+                        .after = zooplankton_biovol)
 
+  #MB copy and paste from compile_neuston
+  data <- dplyr::rowwise(data)
+  data <- dplyr::mutate(data, total_100count = sum(dplyr::c_across(medusa:other3)))
+  #MB added a shannon_wiener calculation using the vegan package
+  data <- dplyr::mutate(data, shannon_wiener =
+                          (vegan::diversity(dplyr::c_across(medusa:other3),
+                                            index = "shannon", base = 10)))
+
+  #data <- dplyr::mutate(data, shannon_wiener = sum(dplyr::c_across(medusa:other3)/total_100count * log(dplyr::c_across(medusa:other3)/total_100count)))
+  data <- dplyr::ungroup(data)
 }
 
 
@@ -233,13 +245,18 @@ compile_neuston <- function(data) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")
   }
 
-  # calculate the biodensity
-  data <- dplyr::mutate(data, biodens = zooplankton_biovol/(station_distance/1000))
+  # MB delete station distance/1000 to keep units as mL/m2 or mL/m3
+  data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance)
   data <- dplyr::relocate(data, biodens, .after = zooplankton_biovol)
 
   # sum the total 100 count animals
   data <- dplyr::rowwise(data)
   data <- dplyr::mutate(data, total_100count = sum(dplyr::c_across(medusa:other3)))
+  #MB added a shannon_wiener calculation using the vegan package
+  data <- dplyr::mutate(data, shannon_wiener =
+                          (vegan::diversity(dplyr::c_across(medusa:other3),
+                                            index = "shannon", base = 10)))
+
   # data <- dplyr::mutate(data, shannon_wiener = sum(dplyr::c_across(medusa:other3)/total_100count * log(dplyr::c_across(medusa:other3)/total_100count)))
   data <- dplyr::ungroup(data)
 

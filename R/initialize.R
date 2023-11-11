@@ -45,6 +45,7 @@ initialize_master <- function(path, cruiseID = NULL,
   }
 
   # Create output paths
+  # MB TODO change elg file path to hourly
   if(!dir.exists(file.path("output"))) {
     dir.create(file.path(path,"output"))
     dir.create(file.path(path,"output","csv"))

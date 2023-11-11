@@ -10,7 +10,8 @@
 #'
 #' @examples
 format_odv <- function(data, odv_output, data_type = "CTD", cruiseID = NULL) {
-
+# MB added MN
+# MB TODO add in 2MN and TT to format_meter
   if("HC" %in% data_type | "B" %in% data_type ) {
     format_function <- format_bottle_odv
   } else if ("ctd" %in% data_type) {
@@ -21,8 +22,10 @@ format_odv <- function(data, odv_output, data_type = "CTD", cruiseID = NULL) {
     format_function <- format_elg_odv
   } else if ("adcp" %in% data_type) {
     format_function <- format_adcp_odv
+  } else if ("MN" %in% data_type) {
+    format_function <- format_meter_odv
   } else {
-    warning("No valid data tyoe specified to output odv. No output created.")
+    warning("No valid data type specified to output odv. No output created.")
     return()
   }
 
@@ -71,7 +74,10 @@ format_adcp_odv <- function(data, odv_output, cruiseID = NULL) {
 format_ctd_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- initialize_odv_tibble(data, cruiseID, type = "C")
-
+  # MB added "data$bat" for xmiss beam attenuation and "data$cdom" for CDOM flour
+  #   to be retained in the ctd odv output
+  # MB TODO check this function with other cruise data to make sure other sensors
+  #   dont mess things up
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = data$dep,
                                 `Temperature [~^oC]` = data$temp,
@@ -80,9 +86,9 @@ format_ctd_odv <- function(data,file,cruiseID = NULL) {
                                 `Chl a Fluorescence [V]` = data$fluor,
                                 `Oxygen,SBE43[~$m~#mol/kg]` = data$oxygen,
                                 `Oxygen [mL/L]` = data$oxygen2,
-                                `CDOM Fluorescence [mg/m~^3]` = " ",
+                                `CDOM Fluorescence [mg/m~^3]` = data$cdom,
                                 `PAR Irradience [~$m~#E/m~^2/s]` = data$par,
-                                `Transmittance [V]` = " ")
+                                `Transmittance [V]` = data$bat)
 
   readr::write_tsv(odv_out,file)
 
@@ -104,6 +110,7 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
   odv_out <- initialize_odv_tibble(data, cruiseID, type = "C")
 
   # create lookup table for field names as known to elg_read
+  # MB change "depth" to "bot_depth"
   odv_lookup <- tibble::tribble(~varname, ~odvname,
                           "sys_date", "System Date",
                           "sys_time", "System Time",
@@ -142,7 +149,7 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
                           "heading", "Ship's Heading [degrees true]",
                           "pitch", "Pitch [degrees]",
                           "roll", "Roll [degrees]",
-                          "depth", "CHIRP depth [m]",
+                          "bot_depth", "CHIRP depth [m]",
                           "wire_payout", "Wire Payout",
                           "wire_tension", "Wire Tension",
                           "wire_speed", "Wire Speed"
@@ -188,7 +195,7 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
 
 }
 
-#' Format Neuston Data for ODV inport
+#' Format Neuston Data for ODV import
 #'
 #' @param data
 #'
@@ -217,6 +224,36 @@ format_neuston_odv <- function(data,file,cruiseID = NULL) {
 
 }
 
+#MB copy and paste from format neuston
+
+#' Format Meter Net Data for ODV import
+#'
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+format_meter_odv <- function(data,file,cruiseID = NULL) {
+
+  odv_out <- initialize_odv_tibble(data, cruiseID, type = "B")
+
+  odv_out <- tibble::add_column(odv_out,
+                                `Depth [m]` = 0,
+                                `Temperature [~^oC]` = data$temp,
+                                `Salinity [PSU]` = data$sal,
+                                `Fluorescence` = data$fluor)
+
+  # Add the rest of the data
+  # TODO create look-up sheet to find real names
+  ii <- which(colnames(data) == "station_distance")
+  odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
+
+  readr::write_tsv(odv_out,file)
+
+  return(odv_out)
+
+}
 
 #' Format bottle datasheet for ODV
 #'

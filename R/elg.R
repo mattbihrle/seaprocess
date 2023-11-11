@@ -1,7 +1,7 @@
 # Series of functions that work to read in an event data file
 
 #' Read in SEA data from an ELG event file and return a well formatted output
-#' 
+#'
 #' SEA event files contain output from a number of instruments
 #' including GPS, flow-through, chirp, etc.
 #'
@@ -20,9 +20,9 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                      csv_output = NULL,
                      keep = c("dttm","lon","lat","temp","sal","fluor",
                               "cdom","xmiss","wind_sp","wind_dir",
-                              "heading","pitch","roll","bot_depth",
+                              "heading","pitch","roll", "wire_tension", "bot_depth",
                               "filename")) {
-
+  #MB add wire_tension to grab max tension
   # TODO: add in minor interpolation for short gaps of missing values
 
   # collects names if you need to be able to skip data lines
@@ -64,7 +64,9 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
 
   # Reassign names that have dashes in them to be referenced more easily
   names(df) <- stringr::str_replace_all(names(df),"-",".")
-
+  # MB remove additional regex elements on temp and sal lines
+  # MB add bot_depth and remove other tsal elements
+  # MB change "depth" to "bot_depth"
   # Construct a data frame of regular expressions and functions used to match col names
   args <- tibble::tribble(~name, ~regex, ~parse_fun,
                           "sys_date", "date", lubridate::mdy,
@@ -81,10 +83,10 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                           "lab_sog", "gps.*lab.*sog", readr::parse_double,
                           "lab_cog", "gps.*lab.*cog", readr::parse_double,
                           "lab_quality", "gps.*lab.*quality", readr::parse_integer,
-                          "temp", c("temp(?!.*[0-9])", "tsal.*temp"), readr::parse_double,
+                          "temp", "tsal.*temp", readr::parse_double,
                           "temp_1min", "temp.*1.*min", readr::parse_double,
                           "temp_60min", "temp.*60.*min", readr::parse_double,
-                          "sal", c("sal(?!.*[0-9])(?!.*vel)", "tsal.*sal"), readr::parse_double,
+                          "sal", "tsal.*sal", readr::parse_double,
                           "sal_1min", "sal.*1.*min", readr::parse_double,
                           "sal_60min", "sal.*60.*min", readr::parse_double,
                           "sound_vel", "tsal.*vel", readr::parse_double,
@@ -104,7 +106,7 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                           "heading", c("hdg","heading"), readr::parse_double,
                           "pitch", "pitch", readr::parse_double,
                           "roll", "roll", readr::parse_double,
-                          "depth", c("depth","dbt"), readr::parse_double,
+                          "bot_depth", c("depth","dbt"), readr::parse_double,
                           "wire_payout", "lci90.*payout", readr::parse_double,
                           "wire_tension", "lci90.*tension", readr::parse_double,
                           "wire_speed", "lci90.*spd", readr::parse_double
@@ -126,11 +128,11 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
   df$sys_dttm <- update(df$sys_date, hour = lubridate::hour(df$sys_time),
                         minute = lubridate::minute(df$sys_time),
                         second = lubridate::second(df$sys_time))
-  
+
   # Make datetimes from GPS using the system datetime
   df <- dplyr::mutate(df, lab_dttm = create_gps_dttm(lab_time,sys_dttm))
   df <- dplyr::mutate(df, nav_dttm = create_gps_dttm(nav_time,sys_dttm))
-  
+
   if (all(is.na(df$lab_time)) & all(is.na(df$nav_time))){
     warning("Datetime issue - no nav or lab GPS time found. Check elg.")
   }
@@ -156,8 +158,8 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
   # check dttm - if no gps time, revert to sys
   if (all(is.na(dttm))) {
     warning(paste("Datetime issue - no GPS time found for forceGPS option: ",
-     forceGPS, ". Reverting to system datetime (sys_dttm). 
-     Check GPS time availability in elg file. 
+     forceGPS, ". Reverting to system datetime (sys_dttm).
+     Check GPS time availability in elg file.
      Note lack of GPS time in EOC."))
     dttm <- df$sys_dttm
   }
@@ -433,7 +435,7 @@ average_elg <- function(data, average_window = 60) {
 
   # TODO need clause to test for crossing the antimeridian where the hourly average will be odd
   # could test for this before the averaging and then change back after
-
+  # MB TODO this could be a place to filter out other bad data before we average things
   # check for time gaps in average data and add them back in
   data_out <- fill_time_gaps(data_out, average_window = average_window)
 
