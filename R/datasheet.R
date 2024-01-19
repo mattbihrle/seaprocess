@@ -242,12 +242,12 @@ compile_meter <- function(data) {
 compile_neuston <- function(data) {
 
   # calculate biodensity
-  if(length(which(is.na(data$station_distance)))>0) {
+  if(length(which(is.na(data$station_distance_m)))>0) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")
   }
 
   # MB delete station distance/1000 to keep units as mL/m2 or mL/m3
-  data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance)
+  data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance_m)
   data <- dplyr::relocate(data, biodens, .after = zooplankton_biovol)
 
   # sum the total 100 count animals

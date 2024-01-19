@@ -80,9 +80,9 @@ create_summary <- function(summary_input, elg_input,
 
   # filter out rows for which there is data hand-entered
   # MB TODO add bot_depth
-  summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lon:station_distance,is.na))
-  summary <- dplyr::filter(summary, dplyr::if_all(lon:station_distance,is.na))
-  summary <- dplyr::select(summary, !c(lon,lat,temp,sal,fluor,station_distance))
+  summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lon:station_distance_m,is.na))
+  summary <- dplyr::filter(summary, dplyr::if_all(lon:station_distance_m,is.na))
+  summary <- dplyr::select(summary, !c(lon,lat,temp_c,sal_psu,fluor,station_distance_m))
 
   # find all the nearest date time values of summary sheet to the elg file and add these indeces
   # TODO: what happens if any of ii are blank or at beginning or end of the elg?
@@ -146,7 +146,7 @@ create_summary <- function(summary_input, elg_input,
   }
 
   #add tow length in meters to data
-  summary <- dplyr::mutate(summary, station_distance = tow_length*1000)
+  summary <- dplyr::mutate(summary, station_distance_m = tow_length*1000)
   #MB add max_tension column
   #MB TODO filter out values that are from resting tension (eg for NT)
   summary <- dplyr::mutate(summary, max_tension = max_tension)
@@ -156,20 +156,20 @@ create_summary <- function(summary_input, elg_input,
   # extract these values and add to the right of summary
   # TODO: make the outputs selectable when you run the function
   # MB added bot_depth
-  elg_to_add <- dplyr::select(elg[ii,], lon, lat, temp, sal, fluor, bot_depth)
+  elg_to_add <- dplyr::select(elg[ii,], lon, lat, temp_c, sal_psu, fluor, bot_depth_m)
   summary <- dplyr::bind_cols(summary, elg_to_add)
 
   # add back in the hand entered values
   if(nrow(summary_hand_enter)>0) {
-    summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(lon:station_distance,as.numeric))
+    summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(lon:station_distance_m,as.numeric))
     summary <- dplyr::bind_rows(summary, summary_hand_enter)
   }
 
   # sort by station and relocate distance to end
   summary <- dplyr::arrange(summary, dttm)
-  summary <- dplyr::relocate(summary, station_distance, .after = tidyselect::last_col())
+  summary <- dplyr::relocate(summary, station_distance_m, .after = tidyselect::last_col())
   #MB add max tension before station distance
-  summary <- dplyr::relocate(summary, max_tension, .before = station_distance)
+  summary <- dplyr::relocate(summary, max_tension, .before = station_distance_m)
   # check to ensure that there are no duplicate deployments for any one station
   duplicated_deployments <- dplyr::n_groups(dplyr::group_by(summary, station, deployment)) != nrow(summary)
   if(duplicated_deployments) {
@@ -232,11 +232,11 @@ format_csv_output <- function(df, dttm_format = "%Y-%m-%dT%H:%M", dttm_suffix = 
   df <- format_decimal(df, "lat", ll_dec)
 
   # Format temp, sal and fluor to set decimal lengths
-  df <- format_decimal(df, "temp", temp_dec)
-  df <- format_decimal(df, "sal", sal_dec)
+  df <- format_decimal(df, "temp_c", temp_dec)
+  df <- format_decimal(df, "sal_psu", sal_dec)
   df <- format_decimal(df, "fluor", fluor_dec)
   # MB change depth to bot_depth
-  df <- format_decimal(df, "bot_depth", 1)
+  df <- format_decimal(df, "bot_depth_m", 1)
 
   return(df)
 }
