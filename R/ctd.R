@@ -59,7 +59,7 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
   X <- read_cnv_latlon(cnv_file)
 
   line <- stringr::str_which(X$r,"Depth")[1]
-  depth <- as.numeric(strsplit(X$r[line],'h')[[1]][2])
+  depth_m <- as.numeric(strsplit(X$r[line],'h')[[1]][2])
 
   line <- stringr::str_which(X$r,"\\*{2}.*(T|t)ime")[1]
   time <- stringr::str_extract(X$r[line],"(?<=Time ).*")
@@ -94,7 +94,7 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
   ctd@metadata$longitude <- X$lon
   ctd@metadata$latitude <- X$lat
   ctd@metadata$station <- as.numeric(strsplit(cnv_file,'-')[[1]][2]) # have to do this to make makeSection work.
-  ctd@metadata$waterDepth <- depth
+  ctd@metadata$waterDepth <- depth_m
   ctd@metadata$time <- dttm
   ctd@metadata$filename <- cnv_file
 
@@ -422,7 +422,7 @@ ctd_to_tibble <- function(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_ste
   # finally create the output data frame
   # MB add dttm output to final tibble
   # MB added bat and cdom to include these in the final data output
-  ctd_tibble <- tibble::tibble(dep = ctd_data@data$depth,
+  ctd_tibble <- tibble::tibble(dep = ctd_data@data$depth_m,
                                pres = ctd_data@data$pressure,
                                temp = ctd_data@data$temperature,
                                theta = ctd_data@data$theta,
