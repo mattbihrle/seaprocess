@@ -9,9 +9,6 @@ read_cnv_latlon(cnv_file)
 \arguments{
 \item{cnv_file}{cnv file to read}
 }
-\value{
-
-}
 \description{
 Read lat and lon from CNV header
 }

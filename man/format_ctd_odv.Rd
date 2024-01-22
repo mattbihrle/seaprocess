@@ -9,9 +9,6 @@ format_ctd_odv(data, file, cruiseID = NULL)
 \arguments{
 \item{data}{}
 }
-\value{
-
-}
 \description{
 Format CTD Data for ODV inport
 }

@@ -9,9 +9,6 @@ import_odv(odv_txt)
 \arguments{
 \item{odv_txt}{path to the odv txt file you want to import}
 }
-\value{
-
-}
 \description{
 Import a txt file to ODV
 }

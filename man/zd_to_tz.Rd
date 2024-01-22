@@ -9,9 +9,6 @@ zd_to_tz(zd, format_out = FALSE)
 \arguments{
 \item{zd}{}
 }
-\value{
-
-}
 \description{
 Zone Description to Time Zone
 }

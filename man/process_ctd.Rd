@@ -37,9 +37,6 @@ data in meters. Default is 1m.}
 \item{add_cruise_ID}{If cruiseID is set, logical to specify whether cruiseID
 should be appended to beginning of filenames for csv and odv output}
 }
-\value{
-
-}
 \description{
 Function takes in a filepath to a folder containing the cruise cnv CTD files,
 reads them in, combines them into one data object and then exports to a

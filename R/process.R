@@ -61,7 +61,7 @@ process_adcp <- function(adcp_folder, cruiseID = NULL,
 #' reads them in, combines them into one data object and then exports to a
 #' comma-separated-file and an odv text file.
 #'
-#' Note that the elg folder doesn not have to solely contain elg files, the
+#' Note that the elg folder doesnt not have to solely contain elg files, the
 #' reading function will find all the elg files amoungst the other files
 #' exported by SCS
 #'

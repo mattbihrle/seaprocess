@@ -13,9 +13,6 @@ interp_adcp(
 \arguments{
 \item{vars}{}
 }
-\value{
-
-}
 \description{
 Interpolate an adcp field to different depths
 }

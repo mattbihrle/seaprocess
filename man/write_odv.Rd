@@ -9,9 +9,6 @@ write_odv(odv_out, odv_output = NULL)
 \arguments{
 \item{odv_output}{}
 }
-\value{
-
-}
 \description{
 Write formatted data to odv txt file
 }

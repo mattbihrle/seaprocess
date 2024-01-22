@@ -9,9 +9,6 @@ format_adcp_odv(data, odv_output, cruiseID = NULL)
 \arguments{
 \item{data}{}
 }
-\value{
-
-}
 \description{
 Format ADCP Data for ODV inport
 }

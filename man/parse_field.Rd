@@ -15,9 +15,6 @@ parse_field(df, regex, parse_fun, ...)
 
 \item{...}{optional arguments to be passed to parse_fun}
 }
-\value{
-
-}
 \description{
 Returns tibble with found column parsed and formatted
 }

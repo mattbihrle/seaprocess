@@ -9,9 +9,6 @@ format_elg_odv(data, odv_output = NULL, cruiseID = NULL)
 \arguments{
 \item{data}{}
 }
-\value{
-
-}
 \description{
 Format Hourly Data for ODV inport
 }

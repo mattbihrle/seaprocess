@@ -19,9 +19,6 @@ format_csv_output(
 
 \item{dttm_format}{dttm_format}
 }
-\value{
-
-}
 \description{
 This is a catch-all function to ensure that everytime a data-frame in this
 software is exported to a csv that certain fields are formatted correctly

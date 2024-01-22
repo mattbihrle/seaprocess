@@ -11,9 +11,6 @@ read_ctd_fold(fold, check_vars = TRUE, cruiseID = NULL, depth_vec = NULL, ...)
 
 \item{...}{}
 }
-\value{
-
-}
 \description{
 Read all CNV files in a folder
 }

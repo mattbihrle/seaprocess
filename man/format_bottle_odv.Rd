@@ -9,9 +9,6 @@ format_bottle_odv(data, file = NULL, cruiseID = NULL)
 \arguments{
 \item{cruiseID}{}
 }
-\value{
-
-}
 \description{
 Format bottle datasheet for ODV
 }

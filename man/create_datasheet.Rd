@@ -76,6 +76,6 @@ cases:
 \item "neuston" for neuston datasheets
 \item "bottle" for bottle datasheets
 \item "meter" for meter net datasheets
-\item "<custom>" for custom datasheets you've created and given a unique code to in station summary
+\item "\if{html}{\out{<custom>}}" for custom datasheets you've created and given a unique code to in station summary
 }
 }

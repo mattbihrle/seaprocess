@@ -9,9 +9,6 @@ compile_bottle(data, ros_input)
 \arguments{
 \item{datasheet_folder}{}
 }
-\value{
-
-}
 \description{
 Create bottle file sheet
 }

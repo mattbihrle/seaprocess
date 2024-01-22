@@ -18,9 +18,6 @@ read_adcp_fold(
 \arguments{
 \item{adcp_fold}{}
 }
-\value{
-
-}
 \description{
 Read all ADCP Ensemble files in a folder and combine
 }

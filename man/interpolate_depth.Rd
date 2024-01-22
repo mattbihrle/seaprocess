@@ -9,9 +9,6 @@ interpolate_depth(ctd_tibble, depth_vec = NULL, depth_step = 1)
 \arguments{
 \item{depth_vec}{}
 }
-\value{
-
-}
 \description{
 Interpolate a ctd tibble on a regular pressure grid to a regular dept grid
 }

@@ -9,9 +9,6 @@ ctd_to_tibble(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_step = 1)
 \arguments{
 \item{cruiseID}{}
 }
-\value{
-
-}
 \description{
 Convert a ctd profile from OCE class ctd to tibble
 }

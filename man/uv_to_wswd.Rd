@@ -9,9 +9,6 @@ uv_to_wswd(u, v)
 \arguments{
 \item{v}{}
 }
-\value{
-
-}
 \description{
 U and V to wind speed and wind direction
 }

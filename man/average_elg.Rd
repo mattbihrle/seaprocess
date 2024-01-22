@@ -9,9 +9,6 @@ average_elg(data, average_window = 60)
 \arguments{
 \item{average_window}{}
 }
-\value{
-
-}
 \description{
 Average time series data
 }

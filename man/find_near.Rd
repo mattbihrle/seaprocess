@@ -9,9 +9,6 @@ find_near(vec, vals)
 \arguments{
 \item{vals}{}
 }
-\value{
-
-}
 \description{
 Find index of nearest value in vector
 }

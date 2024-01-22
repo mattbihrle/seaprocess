@@ -6,7 +6,7 @@
 \usage{
 read_ctd(
   cnv_file,
-  pmin = 5,
+  pmin = 1,
   p = 1,
   to_tibble = TRUE,
   cruiseID = NULL,
@@ -23,9 +23,6 @@ read_ctd(
 \item{p}{pressure bins for ctdDecimate}
 
 \item{...}{additional arguments passed to called functions}
-}
-\value{
-
 }
 \description{
 Wrapper function for oce functions read.ctd, ctdTrim, and ctdDecimate.

@@ -9,9 +9,6 @@ format_odv(data, odv_output, data_type = "CTD", cruiseID = NULL)
 \arguments{
 \item{cruiseID}{}
 }
-\value{
-
-}
 \description{
 Wrapper function to format any odv file
 }

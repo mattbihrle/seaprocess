@@ -11,9 +11,6 @@ wswd_to_uv(ws, wd)
 
 \item{wd}{input wind direction vector}
 }
-\value{
-
-}
 \description{
 Convert wind speed and wind direction to u and v
 }

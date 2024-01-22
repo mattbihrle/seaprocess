@@ -1,6 +1,6 @@
 ---
 title: "Introduction to seaprocess"
-author: Ben Harden
+author: Ben Harden edited MBB
 date: lubridate::today()
 output: rmarkdown::html_vignette
 vignette: >
@@ -88,7 +88,7 @@ These data files are relatively simply read-in as they are in a comma-separated-
 
 To read in an elg file you can use:
 
-```{r, eval =F}
+```{r, eval = FALSE}
 
 
 elg_data <- read_elg(system.file("extdata", "example_data","Event60sec_012.elg", package="seaprocess"))
@@ -113,7 +113,7 @@ The starting point for all of this is to create an accurate station summary shee
 
 - Time and Date
 - Location
-- Environmental parameters recorded by system (surface temperature, salinity, fluoroesence. etc., and wind conditions)
+- Environmental parameters recorded by system (surface temperature, salinity, fluorescence. etc., and wind conditions)
 - Types of deployments undertaken
 
 Once we've created this table, we can then use the metadata to populate specific data sheets for the individual deployments using only the bare minimum of hand-entered data. This might include sensor IDs for a CTD cast or the 100 count values for a nueston tow.
@@ -154,7 +154,7 @@ With these inputs, the function reads in the elg information, looks at all the d
 - lat: Latitude of the deployment in degreees north (-90 to 90)
 - temp: Surface ocean temperature (°C)
 - sal: Surface ocean salinity
-- fluor: Surface ocean fluoroesence
+- fluor: Surface ocean chla fluorescence
 
 An example of these code in action and the output can be seen here.
 
@@ -177,7 +177,7 @@ create_summary(summary_input, elg_input, "<some-path-to-folder>/<C/SXXX>_station
 
 ## Other basic data sheets
 
-We can now employ a mostly universal concept of taking any deployment (even a non-standard, cruise specific one), creating a Excel sheet with station number and any hand-entered data, and then adding in the relevent station summary data from the CSV we've just created.
+We can now employ a mostly universal concept of taking any deployment (even a non-standard, cruise specific one), creating a Excel sheet with station number and any hand-entered data, and then adding in the relevant station summary data from the CSV we've just created.
 
 To do this we use the `create_datasheet()` function which takes in the following main arguments:
 
@@ -214,7 +214,66 @@ create_datasheet(data_input, summary_input, data_type, "<some-path-to-folder>/<C
 
 ### Neuston datasheet
 
-There is one additional (well, more right now) Neuston datasheet step which is to also calculate the biodensity of the tow by dividing the biovolume of zooplankton by the tow length.
+There are a few additional Neuston datasheet steps. First, is to also calculate the biodensity of the tow (mL/m2) by dividing the biovolume of zooplankton (mL) by the tow length (m2).
+
+```{r, eval=FALSE}
+data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance_m)
+  data <- dplyr::relocate(data, biodens, .after = zooplankton_biovol)
+```
+
+Next we sum the 100 count organisms and calculate Shannon-Weiner Diversity with the help of the vegan package. 
+
+```{r, eval=FALSE}
+  # sum the total 100 count animals
+  data <- dplyr::rowwise(data)
+  data <- dplyr::mutate(data, total_100count = sum(dplyr::c_across(medusa:other3)))
+  #Calculate shannon_wiener calculation using the vegan package
+  data <- dplyr::mutate(data, shannon_wiener =
+                          (vegan::diversity(dplyr::c_across(medusa:other3),
+                                            index = "shannon", base = 10)))
+```  
+
+
+Lastly, with the help of the oce package we use starting location of the tow to determine moon phase (%) and whether the moon was risen. 
+
+```{r, eval=FALSE}
+  # Calculate moon data
+  moon_data <- oce::moonAngle(data$dttm,data$lon,data$lat)
+
+  # Add moon info to dataset and set the decimal to zero
+  data <- dplyr::mutate(data,
+                        moon_phase = moon_data$illuminatedFraction * 100,
+                        moon_risen = moon_data$altitude > 0)
+  nodec <- 0
+  data <- format_decimal(data, "moon_phase", nodec)
+```
+
+### Meter net datasheet
+
+The Meter Net Datasheet performs the same basic functions as the Neuston datasheet with the exacet same code used to calculate biodensity and Shannon-Weiner diversity. It differs in it's calculation of tow distance, using flowmeter data instead of lat and long calculations. 
+
+```{r, eval=FALSE}
+data <- dplyr::mutate(data, total_flow = ifelse(is.na(total_flow),
+                                                  flow_out - flow_in,
+                                                  total_flow),
+                        .after = flow_in)
+
+  data <- dplyr::mutate(data, tow_length = ifelse(is.na(tow_length),
+                                                  total_flow * flow_constant,
+                                                  tow_length),
+                        .after = flow_constant)
+
+  data <- dplyr::mutate(data, tow_volume = ifelse(is.na(tow_volume),
+                                                  tow_length * net_area,
+                                                  tow_volume),
+                        .after = net_area)
+
+  data <- dplyr::mutate(data, biodens = as.numeric(zooplankton_biovol)/tow_volume,
+                        .after = zooplankton_biovol)
+```
+
+First we use flow out and flow in and apply a flow constant to find tow length (m). Multiplying by the net area gives tow volume (m3), and then we divide by zooplankton biovolume (mL) to get biodensity (mL/m3).  
+At each step, there is a fail-safe to hand enter total flow, tow length, or tow volume and overwrite the calculated value.
 
 ## Bottle datasheet
 

@@ -37,9 +37,6 @@ Set to NULL for no averaging. Default is 60 minutes.}
 \item{add_cruise_ID}{If cruiseID is set, logical to specify whether cruiseID
 should be appended to beginning of filenames for csv and odv output}
 }
-\value{
-
-}
 \description{
 Function takes in a filepath to a folder containing the cruise elg files,
 reads them in, combines them into one data object and then exports to a

@@ -9,9 +9,6 @@ parse_latlon(varin, var = "lon")
 \arguments{
 \item{var}{}
 }
-\value{
-
-}
 \description{
 Parse lon and lat strings
 }

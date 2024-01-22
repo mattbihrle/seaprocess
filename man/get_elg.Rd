@@ -9,9 +9,6 @@ get_elg(elg_input)
 \arguments{
 \item{elg_input}{}
 }
-\value{
-
-}
 \description{
 Get elg data from file or folder
 }

@@ -236,7 +236,13 @@ compile_meter <- function(data) {
   data <- dplyr::ungroup(data)
 }
 
-
+#' Create Neuston datasheet
+#'
+#' This function combines metadata from the station summary with the hand entered
+#' data from 'neuston_input.' Additionally it calculates biodensity (mL/m2) by dividing
+#' zooplankton biovolume (mL) by station distance (m).
+#'
+#' For more information on station distance calculation see \link[oce]{geodDist}
 #' @export
 #' @rdname compile_neuston
 compile_neuston <- function(data) {
