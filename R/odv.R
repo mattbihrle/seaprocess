@@ -126,10 +126,10 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
                           "lab_sog", "Lab Speed Over Ground [knots]",
                           "lab_cog", "Lab Course Over Ground [knots]",
                           "lab_quality", "Lab GPS Quality",
-                          "temp", "Temperature [deg C]",
+                          "temp_c", "Temperature [deg C]",
                           "temp_1min", "Temperature, 1 min avg [deg C]",
                           "temp_60min", "Temperature, 60 min avg [dec C]",
-                          "sal", "Salinity [psu]",
+                          "sal_psu", "Salinity [psu]",
                           "sal_1min", "Salinity, 1 min avg [psu]",
                           "sal_60min", "Salinity, 60 min avg [psu]",
                           "sound_vel", "Sound Velocity [m/s]",
@@ -142,14 +142,14 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
                           "xmiss", "Transmissometer [counts]",
                           "xmiss_1min", "Transmissometer, 1 min avg [counts]",
                           "xmiss_60min", "Transmissometer, 60 min avg [counts]",
-                          "wind_sp", "True Wind Speed [knots]",
+                          "wind_sp_kts", "True Wind Speed [knots]",
                           "wind_dir", "True Wind Direction [degrees]",
                           "wind_sp_rel", "Relative Wind Speed [knots]",
                           "wind_dir_rel", "Relative Wind Direction [degrees]",
                           "heading", "Ship's Heading [degrees true]",
                           "pitch", "Pitch [degrees]",
                           "roll", "Roll [degrees]",
-                          "bot_depth", "CHIRP depth [m]",
+                          "bot_depth_m", "CHIRP depth [m]",
                           "wire_payout", "Wire Payout",
                           "wire_tension", "Wire Tension",
                           "wire_speed", "Wire Speed"
@@ -173,8 +173,8 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
   # if wind speed and win dir, add E/W / N/S comp
   if(all(c("lat", "lon") %in% names(elg_names))){
     odv_out <- tibble::add_column(odv_out,
-                                `Wind-E/W Comp. [m/s]` = wswd_to_uv(data$wind_sp,data$wind_dir)$u,
-                                `Wind-N/S Comp. [m/s]` = wswd_to_uv(data$wind_sp,data$wind_dir)$v)
+                                `Wind-E/W Comp. [m/s]` = wswd_to_uv(data$wind_sp_kts,data$wind_dir)$u,
+                                `Wind-N/S Comp. [m/s]` = wswd_to_uv(data$wind_sp_kts,data$wind_dir)$v)
   }
 
   # odv_out <- tibble::add_column(odv_out,
@@ -182,7 +182,7 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
   #                               `Temperature [~^oC]` = data$temp,
   #                               `Salinity [PSU]` = data$sal,
   #                               `Fluorescence` = data$fluor,
-  #                               `Wind Speed [knots]` = data$wind_sp,
+  #                               `Wind Speed [knots]` = data$wind_sp_kts,
   #                               `Wind Direction [deg]` = data$wind_dir,
   #                               `Wind-E/W Comp. [m/s]` = wswd_to_uv(data$wind_sp,data$wind_dir)$u,
   #                               `Wind-N/S Comp. [m/s]` = wswd_to_uv(data$wind_sp,data$wind_dir)$v,
@@ -209,13 +209,13 @@ format_neuston_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp,
-                                `Salinity [PSU]` = data$sal,
+                                `Temperature [~^oC]` = data$temp_c,
+                                `Salinity [PSU]` = data$sal_psu,
                                 `Fluorescence` = data$fluor)
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "station_distance")
+  ii <- which(colnames(data) == "station_distance_m")
   odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
 
   readr::write_tsv(odv_out,file)
@@ -240,13 +240,13 @@ format_meter_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp,
-                                `Salinity [PSU]` = data$sal,
+                                `Temperature [~^oC]` = data$temp_c,
+                                `Salinity [PSU]` = data$sal_psu,
                                 `Fluorescence` = data$fluor)
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "station_distance")
+  ii <- which(colnames(data) == "station_distance_m")
   odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
 
   readr::write_tsv(odv_out,file)
@@ -307,7 +307,7 @@ initialize_odv_tibble <- function(data, cruiseID = NULL, type = "C") {
                             `hh:mm` = format(data$dttm,"%H:%M"),
                             `Lon [degrees_east]` = data$lon,
                             `Lat [degrees_north]` = data$lat,
-                            `Bot. Depth [m]` = " ")
+                            `Bot. Depth [m]` = data$bot_depth_m)
 
   return(odv_out)
 
