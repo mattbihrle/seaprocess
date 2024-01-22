@@ -211,13 +211,13 @@ compile_meter <- function(data) {
                                                   total_flow),
                         .after = flow_in)
 
-  data <- dplyr::mutate(data, tow_length_m = ifelse(is.na(tow_length_m),
+  data <- dplyr::mutate(data, tow_length = ifelse(is.na(tow_length),
                                                   total_flow * flow_constant,
-                                                  tow_length_m),
+                                                  tow_length),
                         .after = flow_constant)
 
   data <- dplyr::mutate(data, tow_volume = ifelse(is.na(tow_volume),
-                                                  tow_length_m * net_area,
+                                                  tow_length * net_area,
                                                   tow_volume),
                         .after = net_area)
 
@@ -242,12 +242,12 @@ compile_meter <- function(data) {
 compile_neuston <- function(data) {
 
   # calculate biodensity
-  if(length(which(is.na(data$station_distance_m)))>0) {
+  if(length(which(is.na(data$station_distance)))>0) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")
   }
 
   # MB delete station distance/1000 to keep units as mL/m2 or mL/m3
-  data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance_m)
+  data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance)
   data <- dplyr::relocate(data, biodens, .after = zooplankton_biovol)
 
   # sum the total 100 count animals
@@ -344,9 +344,9 @@ compile_bottle <- function(data, ros_input) {
       data_add <- dplyr::mutate(data_add,
                                 bottle = "B",
                                 depth = 0,
-                                temperature = bottle_lines$temp_c,
+                                temperature = bottle_lines$temp,
                                 pressure = 0,
-                                salinity = bottle_lines$sal_psu,
+                                salinity = bottle_lines$sal,
                                 theta = oce::swTheta(salinity = salinity,
                                                      temperature = temperature,
                                                      pressure = pressure),
@@ -361,9 +361,9 @@ compile_bottle <- function(data, ros_input) {
     } else {
       data_add <- tibble::tibble(bottle = "SS",
                                  depth = 0,
-                                 temperature = bottle_lines$temp_c,
+                                 temperature = bottle_lines$temp,
                                  pressure = 0,
-                                 salinity = bottle_lines$sal_psu,
+                                 salinity = bottle_lines$sal,
                                  theta = oce::swTheta(salinity = salinity,
                                                       temperature = temperature,
                                                       pressure = pressure),
