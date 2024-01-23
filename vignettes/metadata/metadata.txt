@@ -1,89 +1,64 @@
-field	name	format	description	units	decimals	calculations used	functions used	reference	deployment
-adcp_bin_1_dir									NT
-adcp_bin_1_mag									NT
-alk									
-backscat									ADCP
-beamAttenuation									"CTD, HC"
-biodens									"NT, MN"
-bot_depth	Bottom Depth	double	Depth of the seafloor measured by CHIRP	m	1				all
-cast_depth									"CTD, HC"
-cdom	CDOM	double	Color Dissolved Organic Matter	V	2				all
-chla									
-cloud_cover									NT
-conductivity									"CTD, HC"
-cruise									all
-date	Date	yyyy-mm-dd							all
-dep									
-depth									
-dir	Direction	double	Direction relative to true north (direction coming from)	T	1				ADCP
-dttm	Date and time	ISO 8601	Internation standard format for date and time (ISO 8601): yyyy-mm-ddTHH:MM{TZ} where yyyy is 4 digit year						all
-err									ADCP
-filename	Filename	character	Origin filename for data that takes in input datasets						all
-filename_first	First Filename	character	For time averaged data the first input file in the averaging window						
-filename_last	Last Filename	character	For time averaged data the last input file in the averaging window						
-flag									
-fluor	Fluoroesence	double	Fluoroescence	V	2				all
-fluorescence									"CTD, HC"
-fluorescence2									"CTD, HC"
-heading	Ship Heading	double	Direction the ship is pointing in relative to true north	T	1				NT
-lat	Latitude	double	Decimal latitude in degrees north	N	4				all
-lon	Longitude	double	Decimal longitude in degrees east	E	4				all
-max_tension									
-max_wire_out									
-moon_phase									NT
-moon_risen									NT
-no3									
-o2									
-oxygen									
-oxygen2									
-par									
-percent									ADCP
-ph									
-pitch	Ship Pitch	double	Pitch of the ship from vertical		1				hourly
-po4									
-pres									
-pressure									
-quality									ADCP
-roll 	Ship Roll	double	Roll of the ship from vertical		1				hourly
-sal	Salinity	double	Practical Salinity	PSU	3				all
-salinity									
-scan									
-sigma									
-sigtheta									
-sio2									
-sound_speed									ADCP
-sp	Speed	double	Speed	m/s	2				ADCP
-station	Station	character	ID for the station						all
-station_distance									all
-tar_ball									NT
-temp	Temperature	double	Temperature in degrees C	C	2				all
-theta									"CTD, HC"
-time	Time	HH:MM							all
-time_in									all
-time_out									all
-total_nekton_biovol									"NT, MN"
-total_nekton_count									"NT, MN"
-tow_description									"NT, MN"
-u	East-west velocity	double	E-W Component of a velocity vector (+ve eastwards) 	m/s	2				ADCP
-v	North-south velocity	double	N-S component of a velocity vector (+ve northwards)	m/s	2				ADCP
-v0									"CTD, HC"
-v1									"CTD, HC"
-v2									"CTD, HC"
-v3									"CTD, HC"
-v4									"CTD, HC"
-v5									"CTD, HC"
-voltage_0									"CTD, HC"
-voltage_1									"CTD, HC"
-voltage_2									"CTD, HC"
-voltage_3									"CTD, HC"
-voltage_4									"CTD, HC"
-voltage_5									"CTD, HC"
-w	Vertical velocity	double	Vertical velocity (+ve upwards)	m/s	2				ADCP
-wave_direction									NT
-wave_height									NT
-wind_dir	Wind Direction	double	Wind Direction - angle from true north that wind is coming from	T	1				"NT, hourly"
-wind_direction									NT
-wind_sp	Wind Speed	double	Wind speed	m/s	2				"NT, hourly"
-xmiss	Transmissivity	double	Transmissivity of seawater	XX	2				"CTD, hourly"
-zd									all
-zooplankton_biovol									"NT, MN"
+field	name	units	format	description	decimals	Notes	function used	deployment
+adcp_bin_1_dir	ADCP Direction Bin 1	T						NT
+adcp_bin_1_mag	ADCP Magnitude Bin1	m/s						NT
+alk	Total Alkalinity	meq/L						"CTD, HC"
+backscat	Backscatter							ADCP
+bat	Beam Attenuation	counts						"CTD, HC"
+biodens	Biodensity	mL/m3 or mL/m2		"Zooplankton biovolume (mL) divided by tow distance (m2), or tow area (m3)"				"NT, MN"
+bot_depth	Bottom Depth	m	double	Depth of the seafloor measured by CHIRP	1			all
+cast_depth	Cast Depth	m						"CTD, HC"
+cdom	CDOM	V	double	Color Dissolved Organic Matter	2			all
+chla	Chl-a Fluorescence	V		Extracted Chlorophyll-a fluoresence				HC
+cloud_cover		%						NT
+date	Date		yyyy-mm-dd					all
+dep	Depth	m		Depth bins  on CTD cast				"CTD, HC"
+shannon_weiner	Shannon Weiner Diversity					Shannon-Weiner using base 10	vegan::diversity()	
+depth	Depth	m		Depth of center of ADCP bin				ADCP
+dir	Direction	T	double	Direction relative to true north (direction coming from)	1			ADCP
+dttm	Date and time		ISO 8601	Internation standard format for date and time (ISO 8601): yyyy-mm-ddTHH:MM{TZ} where yyyy is 4 digit year				all
+err	Error							ADCP
+filename	Filename		character	Origin filename for data that takes in input datasets				all
+filename_first	First Filename		character	For time averaged data the first input file in the averaging window				
+filename_last	Last Filename		character	For time averaged data the last input file in the averaging window				
+fluor	Fluoroesence	V	double	Fluoroescence	2			all
+heading	Ship Heading	T	double	Direction the ship is pointing in relative to true north	1			NT
+lat	Latitude	N	double	Decimal latitude in degrees north	4			all
+lon	Longitude	E	double	Decimal longitude in degrees east	4			all
+max_tension	Max Tension	lbs						
+max_wire_out	Max Wire Out	m						
+moon_phase	Moon Phase	%						NT
+moon_risen	Moon Risen							NT
+no3	Nitrate Concentration							
+o2	Dissolved Oxygen							
+oxygen	Dissolved Oxygen	uM/kg						
+oxygen2	Dissolved Oxygen	mL/L						
+par	PAR/Irradiance							
+percent								ADCP
+ph	pH							
+pitch	Ship Pitch		double	Pitch of the ship from vertical	1			hourly
+po4	Phosphate Concentration	uM						
+pres	Pressure	db		Pressure used to bin CTD cast data				
+quality								ADCP
+roll 	Ship Roll		double	Roll of the ship from vertical	1			hourly
+sal	Salinity	PSU	double	Practical Salinity	3			all
+sigma	Density							
+sigtheta								"CTD, HC"
+sound_speed		m/s						ADCP
+sp	Speed	m/s	double	Speed	2			ADCP
+station	Station		character	ID for the station				all
+station_distance	Station Distance	m					oce::geodDist()	all
+temp	Temperature	C	double	Temperature in degrees C	2			all
+theta	Potential Temperature	C						"CTD, HC"
+time_in			HH:MM	In 24 hour time				all
+time_out			HH:MM	In 24 hour time				all
+tow_description								"NT, MN"
+u	East-west velocity	m/s	double	E-W Component of a velocity vector (+ve eastwards) 	2			ADCP
+v	North-south velocity	m/s	double	N-S component of a velocity vector (+ve northwards)	2			ADCP
+w	Vertical velocity	m/s	double	Vertical velocity (+ve upwards)	2			ADCP
+wave_direction	Wave Direction	T		Degrees from North waves are coming from				NT
+wave_height	Wave Height	ft						NT
+wind_dir	Wind Direction	T	double	Wind Direction - angle from true north that wind is coming from	1			"NT, hourly"
+wind_sp	Wind Speed	m/s	double	Wind speed	2			"NT, hourly"
+xmiss	Transmissivity	XX	double	Transmissivity of seawater	2			"CTD, hourly"
+zd	Zd			Zone Description. Negative values correspond with hours behind UTC and positive values hours ahead				all
+zooplankton_biovol	Zooplankton Biovolume	mL						"NT, MN"

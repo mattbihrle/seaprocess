@@ -1,168 +1,64 @@
-field,name,format,description,unit,decimals,calculation used,function used,reference
-dttm,Date and time,ISO 8601,Internation standard format for date and time (ISO 8601): yyyy-mm-ddTHH:MM{TZ} where yyyy is 4 digit year,,,,,
-date,Date,yyyy-mm-dd,,,,,,
-time,Time,HH:MM,,,,,,
-lon,Longitude,double,Decimal longitude in degrees east,E,4,,,
-lat,Latitude,double,Decimal latitude in degrees north,N,4,,,
-temp,Temperature,double,Temperature in degrees C,C,2,,,
-sal,Salinity,double,Practical Salinity,PSU,3,,,
-fluor,Fluoroesence,double,Fluoroescence,V,2,,,
-cdom,CDOM,double,Color Dissolved Organic Matter,V,2,,,
-xmiss,Transmissivity,double,Transmissivity of seawater,XX,2,,,
-wind_sp,Wind Speed,double,Wind speed,m/s,2,,,
-wind_dir,Wind Direction,double,Wind Direction - angle from true north that wind is coming from,T,1,,,
-heading,Ship Heading,double,Direction the ship is pointing in relative to true north,T,1,,,
-pitch,Ship Pitch,double,Pitch of the ship from vertical,,1,,,
-roll ,Ship Roll,double,Roll of the ship from vertical,,1,,,
-bot_depth,Bottom Depth,double,Depth of the seafloor measured by CHIRP,m,1,,,
-filename,Filename,character,Origin filename for data that takes in input datasets,,,,,
-filename_first,First Filename,character,For time averaged data the first input file in the averaging window,,,,,
-filename_last,Last Filename,character,For time averaged data the last input file in the averaging window,,,,,
-station,Station,character,ID for the station,,,,,
-u,East-west velocity,double,E-W Component of a velocity vector (+ve eastwards) ,m/s,2,,,
-v,North-south velocity,double,N-S component of a velocity vector (+ve northwards),m/s,2,,,
-w,Vertical velocity,double,Vertical velocity (+ve upwards),m/s,2,,,
-sp,Speed,double,Speed,m/s,2,,,
-dir,Direction,double,Direction relative to true north (direction coming from),T,1,,,
-err,,,,,,,,
-backscat,,,,,,,,
-quality,,,,,,,,
-percent,,,,,,,,
-temp,,,,,,,,
-sound_speed,,,,,,,,
-cruise,,,,,,,,
-station,,,,,,,,
-lon,,,,,,,,
-lat,,,,,,,,
-dep,,,,,,,,
-fluor,,,,,,,,
-oxygen,,,,,,,,
-oxygen2,,,,,,,,
-par,,,,,,,,
-pres,,,,,,,,
-sal,,,,,,,,
-sigtheta,,,,,,,,
-temp,,,,,,,,
-theta,,,,,,,,
-station,,,,,,,,
-deployment,,,,,,,,
-date,,,,,,,,
-time_in,,,,,,,,
-time_out,,,,,,,,
-zd,,,,,,,,
-dttm,,,,,,,,
-lon,,,,,,,,
-lat,,,,,,,,
-temp,,,,,,,,
-sal,,,,,,,,
-fluor,,,,,,,,
-station_distance,,,,,,,,
-max_tension,,,,,,,,
-max_wire_out,,,,,,,,
-bottom_depth,,,,,,,,
-cast_depth,,,,,,,,
-voltage_0,,,,,,,,
-voltage_1,,,,,,,,
-voltage_2,,,,,,,,
-voltage_3,,,,,,,,
-voltage_4,,,,,,,,
-voltage_5,,,,,,,,
-ctd_serial_number,,,,,,,,
-ctd_voltage_in,,,,,,,,
-ctd_voltage_out,,,,,,,,
-afm_voltage_in,,,,,,,,
-afm_voltage_out,,,,,,,,
-bottle,,,,,,,,
-chla,,,,,,,,
-no3,,,,,,,,
-po4,,,,,,,,
-sio2,,,,,,,,
-o2,,,,,,,,
-ph,,,,,,,,
-alk,,,,,,,,
-notes,,,,,,,,
-depth,,,,,,,,
-conductivity,,,,,,,,
-temperature,,,,,,,,
-pressure,,,,,,,,
-scan,,,,,,,,
-fluorescence,,,,,,,,
-oxygen,,,,,,,,
-oxygen2,,,,,,,,
-beamAttenuation,,,,,,,,
-fluorescence2,,,,,,,,
-par,,,,,,,,
-v0,,,,,,,,
-v1,,,,,,,,
-v2,,,,,,,,
-v3,,,,,,,,
-v4,,,,,,,,
-v5,,,,,,,,
-flag,,,,,,,,
-salinity,,,,,,,,
-theta,,,,,,,,
-sigma,,,,,,,,
-zooplankton_biovol,,,,,,,,
-biodens,,,,,,,,
-phylosoma_count,,,,,,,,
-phylosoma_biovol,,,,,,,,
-leptocephali_count,,,,,,,,
-leptocephali_biovol,,,,,,,,
-myctophid_count,,,,,,,,
-myctophid_biovol,,,,,,,,
-cephalopod_count,,,,,,,,
-cephalopod_biovol,,,,,,,,
-other_nekton_count,,,,,,,,
-other_nekton_biovol,,,,,,,,
-total_nekton_count,,,,,,,,
-total_nekton_biovol,,,,,,,,
-nekton_notes,,,,,,,,
-gelatinous_count,,,,,,,,
-gelatinous_biovol,,,,,,,,
-gelatinous_notes,,,,,,,,
-plastic_pellets,,,,,,,,
-plastic_pieces,,,,,,,,
-tar_ball,,,,,,,,
-halobates_count,,,,,,,,
-tow_description,,,,,,,,
-bottom_depth,,,,,,,,
-cloud_cover,,,,,,,,
-wave_height,,,,,,,,
-wave_direction,,,,,,,,
-wind_speed,,,,,,,,
-wind_direction,,,,,,,,
-adcp_bin_1_mag,,,,,,,,
-adcp_bin_1_dir,,,,,,,,
-heading,,,,,,,,
-medusa,,,,,,,,
-siphonophores,,,,,,,,
-ctenophore,,,,,,,,
-salp/doliolids,,,,,,,,
-pteropods,,,,,,,,
-nudibranch,,,,,,,,
-heteropods,,,,,,,,
-other_snails,,,,,,,,
-squid_larvae,,,,,,,,
-polycheate_worms,,,,,,,,
-chaetognaths,,,,,,,,
-copepods,,,,,,,,
-gammarid,,,,,,,,
-hyperiid,,,,,,,,
-megalopae,,,,,,,,
-zoea,,,,,,,,
-shrimp,,,,,,,,
-lobster_larvae,,,,,,,,
-mysid,,,,,,,,
-euphausid,,,,,,,,
-stomatopod,,,,,,,,
-ostracods,,,,,,,,
-cladocera,,,,,,,,
-isopods,,,,,,,,
-fish_larvae,,,,,,,,
-fish_eggs,,,,,,,,
-other1,,,,,,,,
-other2,,,,,,,,
-other3,,,,,,,,
-other_description,,,,,,,,
-moon_phase,,,,,,,,
-moon_risen,,,,,,,,
+﻿field,name,units,format,description,decimals,Notes,function used,deployment
+adcp_bin_1_dir,ADCP Direction Bin 1,T,,,,,,NT
+adcp_bin_1_mag,ADCP Magnitude Bin1,m/s,,,,,,NT
+alk,Total Alkalinity,meq/L,,,,,,"CTD, HC"
+backscat,Backscatter,,,,,,,ADCP
+bat,Beam Attenuation,counts,,,,,,"CTD, HC"
+biodens,Biodensity,mL/m3 or mL/m2,,"Zooplankton biovolume (mL) divided by tow distance (m2), or tow area (m3)",,,,"NT, MN"
+bot_depth,Bottom Depth,m,double,Depth of the seafloor measured by CHIRP,1,,,all
+cast_depth,Cast Depth,m,,,,,,"CTD, HC"
+cdom,CDOM,V,double,Color Dissolved Organic Matter,2,,,all
+chla,Chl-a Fluorescence,V,,Extracted Chlorophyll-a fluoresence,,,,HC
+cloud_cover,,%,,,,,,NT
+date,Date,,yyyy-mm-dd,,,,,all
+dep,Depth,m,,Depth bins  on CTD cast,,,,"CTD, HC"
+shannon_weiner,Shannon Weiner Diversity,,,,,Shannon-Weiner using base 10,vegan::diversity(),
+depth,Depth,m,,Depth of center of ADCP bin,,,,ADCP
+dir,Direction,T,double,Direction relative to true north (direction coming from),1,,,ADCP
+dttm,Date and time,,ISO 8601,Internation standard format for date and time (ISO 8601): yyyy-mm-ddTHH:MM{TZ} where yyyy is 4 digit year,,,,all
+err,Error,,,,,,,ADCP
+filename,Filename,,character,Origin filename for data that takes in input datasets,,,,all
+filename_first,First Filename,,character,For time averaged data the first input file in the averaging window,,,,
+filename_last,Last Filename,,character,For time averaged data the last input file in the averaging window,,,,
+fluor,Fluoroesence,V,double,Fluoroescence,2,,,all
+heading,Ship Heading,T,double,Direction the ship is pointing in relative to true north,1,,,NT
+lat,Latitude,N,double,Decimal latitude in degrees north,4,,,all
+lon,Longitude,E,double,Decimal longitude in degrees east,4,,,all
+max_tension,Max Tension,lbs,,,,,,
+max_wire_out,Max Wire Out,m,,,,,,
+moon_phase,Moon Phase,%,,,,,,NT
+moon_risen,Moon Risen,,,,,,,NT
+no3,Nitrate Concentration,,,,,,,
+o2,Dissolved Oxygen,,,,,,,
+oxygen,Dissolved Oxygen,uM/kg,,,,,,
+oxygen2,Dissolved Oxygen,mL/L,,,,,,
+par,PAR/Irradiance,,,,,,,
+percent,,,,,,,,ADCP
+ph,pH,,,,,,,
+pitch,Ship Pitch,,double,Pitch of the ship from vertical,1,,,hourly
+po4,Phosphate Concentration,uM,,,,,,
+pres,Pressure,db,,Pressure used to bin CTD cast data,,,,
+quality,,,,,,,,ADCP
+roll ,Ship Roll,,double,Roll of the ship from vertical,1,,,hourly
+sal,Salinity,PSU,double,Practical Salinity,3,,,all
+sigma,Density,,,,,,,
+sigtheta,,,,,,,,"CTD, HC"
+sound_speed,,m/s,,,,,,ADCP
+sp,Speed,m/s,double,Speed,2,,,ADCP
+station,Station,,character,ID for the station,,,,all
+station_distance,Station Distance,m,,,,,oce::geodDist(),all
+temp,Temperature,C,double,Temperature in degrees C,2,,,all
+theta,Potential Temperature,C,,,,,,"CTD, HC"
+time_in,,,HH:MM,In 24 hour time,,,,all
+time_out,,,HH:MM,In 24 hour time,,,,all
+tow_description,,,,,,,,"NT, MN"
+u,East-west velocity,m/s,double,E-W Component of a velocity vector (+ve eastwards) ,2,,,ADCP
+v,North-south velocity,m/s,double,N-S component of a velocity vector (+ve northwards),2,,,ADCP
+w,Vertical velocity,m/s,double,Vertical velocity (+ve upwards),2,,,ADCP
+wave_direction,Wave Direction,T,,Degrees from North waves are coming from,,,,NT
+wave_height,Wave Height,ft,,,,,,NT
+wind_dir,Wind Direction,T,double,Wind Direction - angle from true north that wind is coming from,1,,,"NT, hourly"
+wind_sp,Wind Speed,m/s,double,Wind speed,2,,,"NT, hourly"
+xmiss,Transmissivity,XX,double,Transmissivity of seawater,2,,,"CTD, hourly"
+zd,Zd,,,Zone Description. Negative values correspond with hours behind UTC and positive values hours ahead,,,,all
+zooplankton_biovol,Zooplankton Biovolume,mL,,,,,,"NT, MN"
