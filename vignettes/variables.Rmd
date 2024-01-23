@@ -1,9 +1,11 @@
 ---
-title: "SeaProcess Variables"
-author: "Matt Bihrle, Ben Harden"
-date: "`r Sys.Date()`"
-output:
-  html_document: default
+title: "variables"
+author: "Matt Bihrle"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Variables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
