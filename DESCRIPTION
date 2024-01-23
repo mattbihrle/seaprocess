@@ -10,8 +10,10 @@ LazyData: true
 RoxygenNote: 7.3.0
 Imports: oce,
     readxl,
-    tidyverse
+    tidyverse,
+    vegan
 Suggests: 
     rmarkdown,
-    knitr
+    knitr,
+    kableExtra
 VignetteBuilder: knitr

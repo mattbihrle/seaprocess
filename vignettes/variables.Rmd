@@ -1,0 +1,70 @@
+---
+title: "SeaProcess Variables"
+author: "Matt Bihrle, Ben Harden"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(seaprocess)
+library(knitr)
+library(kableExtra)
+metadata <- readr::read_delim("vignettes/metadata/metadata.txt")
+```
+
+# SeaProcess Variables
+
+Overview of all variables used in the SeaProcess package organized by deployment type. Just run the code chunk below your desired deployment to generate a table. A master table is located at the end of the document.
+
+## Neuston Tow
+
+```{r, eval=TRUE}
+neuston <- dplyr::filter(metadata, (stringr::str_detect(deployment, "NT") | deployment == "all"))
+kable_material(kable(neuston, col.names = stringr::str_to_title(names(neuston))), fixed_thead = T)
+```
+
+For more information on calculations related to neuston tows, see: `?seaprocess::compile_neuston`
+
+## Meter Net
+
+```{r, eval=TRUE}
+meter <- dplyr::filter(metadata, (stringr::str_detect(deployment, "MN") | deployment == "all"))
+kable_material(kable(meter, col.names = stringr::str_to_title(names(meter))), fixed_thead = T)
+```
+
+For more information on calculations related to meter nets and other nets deployed on the wire, see: `?seaprocess::compile_meter` 
+
+## Hydrocast
+
+```{r, eval=TRUE}
+hydro <- dplyr::filter(metadata, (stringr::str_detect(deployment, "HC") |  stringr::str_detect(deployment, "CTD") | deployment == "all"))
+kable_material(kable(hydro, col.names = stringr::str_to_title(names(hydro))), fixed_thead = T)
+```
+
+For more information on hydrocast data processing see `?seaprocess::compile_bottle` <!-- MB TODO, expand this section to point towards info on ctd processing as well -->
+
+## ADCP
+
+```{r, eval=TRUE}
+adcp <- dplyr::filter(metadata, (stringr::str_detect(deployment, "ADCP") | deployment == "all"))
+kable_material(kable(adcp, col.names = stringr::str_to_title(names(adcp))), fixed_thead = T)
+```
+
+For more information on ADCP processing see: `?seaprocess::read_adcp`, `?seaprocess::calc_echo_amp`
+
+## Hourly
+
+```{r, eval=TRUE}
+hourly <- dplyr::filter(metadata, (stringr::str_detect(deployment, "hourly") | deployment == "all"))
+kable_material(kable(hourly, col.names = stringr::str_to_title(names(hourly))), fixed_thead = T)
+```
+
+For more information on hourly/elg processing see `?seaprocess::process_elg`
+
+### Master Variables Table
+
+```{r, eval=TRUE}
+kable_material(kable(metadata, col.names = stringr::str_to_title(names(metadata))), fixed_thead = T)
+```
