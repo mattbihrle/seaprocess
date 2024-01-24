@@ -1,33 +1,33 @@
-﻿field,name,units,format,description,decimals,Notes,function used,deployment
+﻿field,name,units,description,decimals,Notes,function used,format,deployment
 adcp_bin_1_dir,ADCP Direction Bin 1,T,,,,,,NT
 adcp_bin_1_mag,ADCP Magnitude Bin1,m/s,,,,,,NT
 alk,Total Alkalinity,meq/L,,,,,,"CTD, HC"
 backscat,Backscatter,,,,,,,ADCP
 bat,Beam Attenuation,counts,,,,,,"CTD, HC"
-biodens,Biodensity,mL/m3 or mL/m2,,"Zooplankton biovolume (mL) divided by tow distance (m2), or tow area (m3)",,,,"NT, MN"
-bot_depth,Bottom Depth,m,double,Depth of the seafloor measured by CHIRP,1,,,all
+biodens,Biodensity,mL/m3 or mL/m2,"Zooplankton biovolume (mL) divided by tow distance (m2), or tow area (m3)",,,,,"NT, MN"
+bot_depth,Bottom Depth,m,Depth of the seafloor measured by CHIRP,1,,,double,all
 cast_depth,Cast Depth,m,,,,,,"CTD, HC"
-cdom,CDOM,V,double,Color Dissolved Organic Matter,2,,,all
-chla,Chl-a Fluorescence,V,,Extracted Chlorophyll-a fluoresence,,,,HC
+cdom,CDOM,V,Color Dissolved Organic Matter,2,,,double,all
+chla,Chl-a Fluorescence,V,Extracted Chlorophyll-a fluoresence,,,,,HC
 cloud_cover,,%,,,,,,NT
-date,Date,,yyyy-mm-dd,,,,,all
-dep,Depth,m,,Depth bins  on CTD cast,,,,"CTD, HC"
-shannon_weiner,Shannon Weiner Diversity,,,,,Shannon-Weiner using base 10,vegan::diversity(),
-depth,Depth,m,,Depth of center of ADCP bin,,,,ADCP
-dir,Direction,T,double,Direction relative to true north (direction coming from),1,,,ADCP
-dttm,Date and time,,ISO 8601,Internation standard format for date and time (ISO 8601): yyyy-mm-ddTHH:MM{TZ} where yyyy is 4 digit year,,,,all
+date,Date,,,,,,yyyy-mm-dd,all
+dep,Depth,m,Depth bins  on CTD cast,,,,,"CTD, HC"
+shannon_weiner,Shannon Weiner Diversity,,,,Shannon-Weiner using base 10,vegan::diversity(),,
+depth,Depth,m,Depth of center of ADCP bin,,,,,ADCP
+dir,Direction,T,Direction relative to true north (direction coming from),1,,,double,ADCP
+dttm,Date and time,,Internation standard format for date and time (ISO 8601): yyyy-mm-ddTHH:MM{TZ} where yyyy is 4 digit year,,,,ISO 8601,all
 err,Error,,,,,,,ADCP
-filename,Filename,,character,Origin filename for data that takes in input datasets,,,,all
-filename_first,First Filename,,character,For time averaged data the first input file in the averaging window,,,,
-filename_last,Last Filename,,character,For time averaged data the last input file in the averaging window,,,,
-fluor,Fluoroesence,V,double,Fluoroescence,2,,,all
-heading,Ship Heading,T,double,Direction the ship is pointing in relative to true north,1,,,NT
-lat,Latitude,N,double,Decimal latitude in degrees north,4,,,all
-lon,Longitude,E,double,Decimal longitude in degrees east,4,,,all
+filename,Filename,,Origin filename for data that takes in input datasets,,,,character,all
+filename_first,First Filename,,For time averaged data the first input file in the averaging window,,,,character,
+filename_last,Last Filename,,For time averaged data the last input file in the averaging window,,,,character,
+fluor,Fluoroesence,V,Fluoroescence,2,,,double,all
+heading,Ship Heading,T,Direction the ship is pointing in relative to true north,1,,,double,NT
+lat,Latitude,N,Decimal latitude in degrees north,4,,,double,all
+lon,Longitude,E,Decimal longitude in degrees east,4,,,double,all
 max_tension,Max Tension,lbs,,,,,,
 max_wire_out,Max Wire Out,m,,,,,,
-moon_phase,Moon Phase,%,,,,,,NT
-moon_risen,Moon Risen,,,,,,,NT
+moon_phase,Moon Phase,%,Uses location and UTC time along with calculations from Meesus (1982) to calculate Moon Illuminated Fraction. Illuminated Fraction*100 = Moon Phase,,,oce::moonAngle(),,NT
+moon_risen,Moon Risen,,Uses location and UTC time along with calculations from Meesus (1982) to calculate Moon Altitude. Positive altitudes give a TRUE result.,,,oce::moonAngle(),,NT
 no3,Nitrate Concentration,,,,,,,
 o2,Dissolved Oxygen,,,,,,,
 oxygen,Dissolved Oxygen,uM/kg,,,,,,
@@ -35,30 +35,29 @@ oxygen2,Dissolved Oxygen,mL/L,,,,,,
 par,PAR/Irradiance,,,,,,,
 percent,,,,,,,,ADCP
 ph,pH,,,,,,,
-pitch,Ship Pitch,,double,Pitch of the ship from vertical,1,,,hourly
+pitch,Ship Pitch,,Pitch of the ship from vertical,1,,,double,hourly
 po4,Phosphate Concentration,uM,,,,,,
-pres,Pressure,db,,Pressure used to bin CTD cast data,,,,
+pres,Pressure,db,Pressure used to bin CTD cast data,,,,,
 quality,,,,,,,,ADCP
-roll ,Ship Roll,,double,Roll of the ship from vertical,1,,,hourly
-sal,Salinity,PSU,double,Practical Salinity,3,,,all
-sigma,Density,,,,,,,
-sigtheta,,,,,,,,"CTD, HC"
+roll ,Ship Roll,,Roll of the ship from vertical,1,,,double,hourly
+sal,Salinity,PSU,Practical Salinity,3,,,double,all
+sigma,Density,kg/m3,TEOS-10 based calculation for seawater density,,Sigma is a measure of density with 1000 kg/m3 subtracted. Often is reported as unitless.,oce::swSigma0(),,
+sigtheta,Density,,TEOS-10 based calculation for potential density,,"Sigma Theta is calculated with in situ salinity, potential temperature, and pressure equal to 0, then subtracting 1000 kg/m3",,,"CTD, HC"
 sound_speed,,m/s,,,,,,ADCP
-sp,Speed,m/s,double,Speed,2,,,ADCP
-station,Station,,character,ID for the station,,,,all
-station_distance,Station Distance,m,,,,,oce::geodDist(),all
-temp,Temperature,C,double,Temperature in degrees C,2,,,all
-theta,Potential Temperature,C,,,,,,"CTD, HC"
-time_in,,,HH:MM,In 24 hour time,,,,all
-time_out,,,HH:MM,In 24 hour time,,,,all
-tow_description,,,,,,,,"NT, MN"
-u,East-west velocity,m/s,double,E-W Component of a velocity vector (+ve eastwards) ,2,,,ADCP
-v,North-south velocity,m/s,double,N-S component of a velocity vector (+ve northwards),2,,,ADCP
-w,Vertical velocity,m/s,double,Vertical velocity (+ve upwards),2,,,ADCP
-wave_direction,Wave Direction,T,,Degrees from North waves are coming from,,,,NT
+sp,Speed,m/s,Speed,2,,,double,ADCP
+station,Station,,ID for the station,,,,character,all
+station_distance,Station Distance,m,,,,oce::geodDist(),,all
+temp,Temperature,C,Temperature in degrees C,2,,,double,all
+theta,Potential Temperature,C,TEOS-10 based calculation for potential temperature,,,,,"CTD, HC"
+time_in,,,In 24 hour time,,,,HH:MM,all
+time_out,,,In 24 hour time,,,,HH:MM,all
+u,East-west velocity,m/s,E-W Component of a velocity vector (+ve eastwards) ,2,,,double,ADCP
+v,North-south velocity,m/s,N-S component of a velocity vector (+ve northwards),2,,,double,ADCP
+w,Vertical velocity,m/s,Vertical velocity (+ve upwards),2,,,double,ADCP
+wave_direction,Wave Direction,T,Degrees from North waves are coming from,,,,,NT
 wave_height,Wave Height,ft,,,,,,NT
-wind_dir,Wind Direction,T,double,Wind Direction - angle from true north that wind is coming from,1,,,"NT, hourly"
-wind_sp,Wind Speed,m/s,double,Wind speed,2,,,"NT, hourly"
-xmiss,Transmissivity,XX,double,Transmissivity of seawater,2,,,"CTD, hourly"
-zd,Zd,,,Zone Description. Negative values correspond with hours behind UTC and positive values hours ahead,,,,all
+wind_dir,Wind Direction,T,Wind Direction - angle from true north that wind is coming from,1,,,double,"NT, hourly"
+wind_sp,Wind Speed,m/s,Wind speed,2,,,double,"NT, hourly"
+xmiss,Transmissivity,XX,Transmissivity of seawater,2,,,double,"CTD, hourly"
+zd,Zd,,Zone Description. Negative values correspond with hours behind UTC and positive values hours ahead,,,,,all
 zooplankton_biovol,Zooplankton Biovolume,mL,,,,,,"NT, MN"
