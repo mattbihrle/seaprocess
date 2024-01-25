@@ -24,7 +24,6 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                               "filename")) {
   #MB add wire_tension to grab max tension
   # TODO: add in minor interpolation for short gaps of missing values
-
   # collects names if you need to be able to skip data lines
   if(skip > 0) {
     col_names <- names(readr::read_csv(filein, n_max = 0))
@@ -317,7 +316,6 @@ parse_field <- function(df, regex, parse_fun, ...) {
 #'
 #' @examples
 read_elg_fold <- function(root_folder, sort_elg = TRUE, ...) {
-
   # get all file names in folder
   files <- list.files(root_folder,pattern = '\\.elg$')
 
@@ -424,6 +422,8 @@ average_elg <- function(data, average_window = 60) {
 
   data <- dplyr::mutate(data, roundtime = lubridate::round_date(dttm, unit = paste(average_window,"minute")))
   data <- dplyr::group_by(data, roundtime)
+ #Filter out erroneous values in minute to minute elg data
+   data <- filter_elg(data)
   data_out <- dplyr::summarise(data,
                                dplyr::across(tidyselect::vars_select_helpers$where(is.numeric), ~mean(.x, na.rm = TRUE)),
                                n = dplyr::n(),
@@ -456,7 +456,7 @@ fill_time_gaps <- function(data, average_window) {
   # test to see which places are missing
   time_gaps_i <- test_time_vector %in% data$dttm
 
-  # if gaps ae found, plug them with NAs
+  # if gaps are found, plug them with NAs
   if(length(which(!time_gaps_i)) > 0) {
 
     # create vector of missing times
@@ -488,3 +488,37 @@ fill_time_gaps <- function(data, average_window) {
 #   tidyselect::vars_select_helpers$where(lubridate::is.POSIXct) |
 #   tidyselect::vars_select_helpers$where(lubridate::is.difftime),
 
+#' Filter out elg data
+#'
+#'SEA techs regularly backflush or clean components of our flow-through system
+#'while under way. When this happens, the most telling value is salinity
+#'however, all of our flow-through data is innacurate for the time freshwater
+#'is running through the system. This function takes a minimum salinity and filters
+#'out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor) while the
+#'salinity is below the minimum acceptable threshold.
+#'
+#' @param data compiled minute to minute elg data, created by average_elg
+#' @param min_sal minimum acceptable salinity
+#' @param custom default to FALSE. if TRUE, user will have the option to set ranges for all flow through instruments
+#' @param flow_thr names of instruments on the flow through.
+#'
+#'
+#' @return
+#' @export
+#'
+#' @examples
+filter_elg <- function(data, min_sal = 35.0, custom = FALSE, flow_thr = c("temp", "sal", "fluor", "cdom", "xmiss")) {
+
+  if(custom) {
+    return(data)
+  }
+  else{
+    # Turn the salinity, temp, cdom, xmiss and fluor values to NA when sal drops
+    # below the min_sal defined in process_elg
+    data <-
+      data |>
+      dplyr::mutate(across(any_of(flow_thr), ~ifelse(sal < min_sal, NA, .)))
+    return(data)
+  }
+
+}
