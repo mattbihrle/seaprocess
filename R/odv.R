@@ -215,7 +215,7 @@ format_neuston_odv <- function(data,file,cruiseID = NULL) {
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "station_distance_m")
+  ii <- which(colnames(data) == "station_distance")
   odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
 
   readr::write_tsv(odv_out,file)
@@ -246,7 +246,7 @@ format_meter_odv <- function(data,file,cruiseID = NULL) {
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "station_distance_m")
+  ii <- which(colnames(data) == "station_distance")
   odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
 
   readr::write_tsv(odv_out,file)
