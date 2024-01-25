@@ -403,12 +403,12 @@ create_gps_dttm <- function(gps_time, sys_dttm) {
 #'
 #' @param data
 #' @param average_window
-#'
+#' @param min_sal minimum acceptable salinity. see filter_elg for more
 #' @return
 #' @export
 #'
 #' @examples
-average_elg <- function(data, average_window = 60) {
+average_elg <- function(data, average_window = 60, min_sal = 30) {
 
   if(is.null(average_window)) {
     message("No time averaging applied to elg output data")
@@ -422,8 +422,8 @@ average_elg <- function(data, average_window = 60) {
 
   data <- dplyr::mutate(data, roundtime = lubridate::round_date(dttm, unit = paste(average_window,"minute")))
   data <- dplyr::group_by(data, roundtime)
- #Filter out erroneous values in minute to minute elg data
-   data <- filter_elg(data)
+ #Filter out erroneous values in minute to minute elg data before averaging
+   data <- filter_elg(data, min_sal)
   data_out <- dplyr::summarise(data,
                                dplyr::across(tidyselect::vars_select_helpers$where(is.numeric), ~mean(.x, na.rm = TRUE)),
                                n = dplyr::n(),
@@ -488,17 +488,20 @@ fill_time_gaps <- function(data, average_window) {
 #   tidyselect::vars_select_helpers$where(lubridate::is.POSIXct) |
 #   tidyselect::vars_select_helpers$where(lubridate::is.difftime),
 
-#' Filter out elg data
+#' Filter elg data
+#'
+#' Filter out flow through data based on min salinity threshold
 #'
 #'SEA techs regularly backflush or clean components of our flow-through system
 #'while under way. When this happens, the most telling value is salinity
 #'however, all of our flow-through data is innacurate for the time freshwater
 #'is running through the system. This function takes a minimum salinity and filters
 #'out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor) while the
-#'salinity is below the minimum acceptable threshold.
+#'salinity is below the minimum acceptable threshold. NOTE: if instruments on the flow through,
+#'the parameter 'flow_thr' will need to be updated.
 #'
 #' @param data compiled minute to minute elg data, created by average_elg
-#' @param min_sal minimum acceptable salinity
+#' @param min_sal minimum acceptable salinity default to 30 psu
 #' @param custom default to FALSE. if TRUE, user will have the option to set ranges for all flow through instruments
 #' @param flow_thr names of instruments on the flow through.
 #'
@@ -507,10 +510,12 @@ fill_time_gaps <- function(data, average_window) {
 #' @export
 #'
 #' @examples
-filter_elg <- function(data, min_sal = 35.0, custom = FALSE, flow_thr = c("temp", "sal", "fluor", "cdom", "xmiss")) {
+filter_elg <- function(data, min_sal = 30, custom = FALSE,
+                       flow_thr = c("temp", "sal", "fluor", "cdom", "xmiss")) {
 
   if(custom) {
     return(data)
+    #Option to create a more customizable filter function here in the future
   }
   else{
     # Turn the salinity, temp, cdom, xmiss and fluor values to NA when sal drops

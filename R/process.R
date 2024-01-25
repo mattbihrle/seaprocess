@@ -77,6 +77,8 @@ process_adcp <- function(adcp_folder, cruiseID = NULL,
 #'   should be appended to beginning of filenames for csv and odv output
 #' @param average_window the averaging window in minutes for the exported file.
 #'   Set to NULL for no averaging. Default is 60 minutes.
+#' @param min_sal minimum acceptable salinity. Default is 30 psu, will remove
+#'  flow through data when salinity drops below this level.
 #'
 #' @return
 #' @export
@@ -85,14 +87,14 @@ process_adcp <- function(adcp_folder, cruiseID = NULL,
 process_elg <- function(elg_folder, cruiseID = NULL,
                         csv_folder = "output/csv", csv_filename = "elg.csv",
                         odv_folder = "output/odv/elg", odv_filename = "elg.txt",
-                        add_cruiseID = TRUE, average_window = 60, ...) {
+                        add_cruiseID = TRUE, average_window = 60, min_sal = 30, ...) {
 
   # Read in all the ELG files in the folder
   elg <- read_elg_fold(elg_folder, ...)
 
   # Average the elg data (default is to 60 mins)
   if(average_window > 1) {
-    elg <- average_elg(elg, average_window = average_window)
+    elg <- average_elg(elg, average_window = average_window, min_sal = min_sal)
   }
 
   # Output csv file
