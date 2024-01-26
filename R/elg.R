@@ -423,7 +423,9 @@ average_elg <- function(data, average_window = 60, min_sal = 30) {
   data <- dplyr::mutate(data, roundtime = lubridate::round_date(dttm, unit = paste(average_window,"minute")))
   data <- dplyr::group_by(data, roundtime)
  #Filter out erroneous values in minute to minute elg data before averaging
-   data <- filter_elg(data, min_sal)
+  data <- filter_elg(data, min_sal)
+  #Adjust for crossing the antimeridian
+  data <- fix_dateline(data)
   data_out <- dplyr::summarise(data,
                                dplyr::across(tidyselect::vars_select_helpers$where(is.numeric), ~mean(.x, na.rm = TRUE)),
                                n = dplyr::n(),
@@ -527,3 +529,53 @@ filter_elg <- function(data, min_sal = 30, custom = FALSE,
   }
 
 }
+
+#' fix_dateline
+#'
+#'Function to adjust mean longitude while crossing dateline.
+#'
+#'This first creates a new variable "difflon" of the first lon - last lon in the
+#'averaging window. This variable will shoot up to around 360 when the
+#'antimeridian(dateline) is crossed. Next we filter out those time windows,
+#'apply a correction, and then average *just* those specific lons. This allows
+#'the rest of the averaging to happen through average_elg.
+#'
+#' @param data
+#'
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fix_dateline <- function(data) {
+
+  #create "difflon" variable
+  data <-
+    data |>
+    dplyr::mutate(difflon = abs(dplyr::first(lon)-dplyr::last(lon)))
+  #test for if anti meridian is crossed.
+  if(length(which(abs(data$difflon) > 1)) != 0){
+
+    #find each row within in an hour that crosses the anti-meridian
+    ii <- which(abs(data$difflon) > 1)
+    for (i in ii){
+      if(data$lon[i] > 0) {
+        data$lon[i] <- data$lon[i]
+      } else {
+        data$lon[i] <- data$lon[i] +360
+      }
+    }
+
+    #outside of for loop now calculate lon means where the difflon is greater than 1
+    data <-
+      dplyr::mutate(data, lon = ifelse(abs(difflon) > 1,
+                                       mean(lon) - 360,
+                                       lon))
+    return(data)
+  } else{
+    return(data)
+  }
+  #remove our column created at the start
+  data <- dplyr::select(data, -difflon)
+}
+
