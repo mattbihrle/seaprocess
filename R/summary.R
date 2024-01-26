@@ -77,7 +77,7 @@ create_summary <- function(summary_input, elg_input,
 
   # Test to see whether elg_input is a file or a folder and read elg file(s) accordingly
   elg <- get_elg(elg_input)
-
+  elg <- filter_elg(elg)
   # filter out rows for which there is data hand-entered
   # MB TODO add bot_depth
   summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lon:station_distance,is.na))
