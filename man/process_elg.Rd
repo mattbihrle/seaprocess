@@ -13,6 +13,7 @@ process_elg(
   odv_filename = "elg.txt",
   add_cruiseID = TRUE,
   average_window = 60,
+  min_sal = 30,
   ...
 )
 }
@@ -34,6 +35,9 @@ no odv output.}
 \item{average_window}{the averaging window in minutes for the exported file.
 Set to NULL for no averaging. Default is 60 minutes.}
 
+\item{min_sal}{minimum acceptable salinity. Default is 30 psu, will remove
+flow through data when salinity drops below this level.}
+
 \item{add_cruise_ID}{If cruiseID is set, logical to specify whether cruiseID
 should be appended to beginning of filenames for csv and odv output}
 }
@@ -43,7 +47,7 @@ reads them in, combines them into one data object and then exports to a
 comma-separated-file and an odv text file.
 }
 \details{
-Note that the elg folder doesn not have to solely contain elg files, the
+Note that the elg folder doesnt not have to solely contain elg files, the
 reading function will find all the elg files amoungst the other files
 exported by SCS
 }

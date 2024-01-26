@@ -10,9 +10,8 @@ read_elg(
   preCheck = TRUE,
   skip = 0,
   csv_output = NULL,
-  keep = c("dttm", "lon", "lat", "temp_c", "sal_psu", "fluor", "cdom", "xmiss",
-    "wind_sp_kts", "wind_dir", "heading", "pitch", "roll", "wire_tension", "bot_depth_m",
-    "filename")
+  keep = c("dttm", "lon", "lat", "temp", "sal", "fluor", "cdom", "xmiss", "wind_sp",
+    "wind_dir", "heading", "pitch", "roll", "wire_tension", "bot_depth", "filename")
 )
 }
 \arguments{

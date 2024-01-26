@@ -4,10 +4,10 @@
 \alias{average_elg}
 \title{Average time series data}
 \usage{
-average_elg(data, average_window = 60)
+average_elg(data, average_window = 60, min_sal = 30)
 }
 \arguments{
-\item{average_window}{}
+\item{min_sal}{minimum acceptable salinity. see filter_elg for more}
 }
 \description{
 Average time series data
