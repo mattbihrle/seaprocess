@@ -490,26 +490,29 @@ fill_time_gaps <- function(data, average_window) {
 #   tidyselect::vars_select_helpers$where(lubridate::is.POSIXct) |
 #   tidyselect::vars_select_helpers$where(lubridate::is.difftime),
 
-#' Filter elg data
+#'Filter elg data
 #'
-#' Filter out flow through data based on min salinity threshold
+#'Filter out flow through data based on min salinity threshold
 #'
 #'SEA techs regularly backflush or clean components of our flow-through system
 #'while under way. When this happens, the most telling value is salinity
-#'however, all of our flow-through data is innacurate for the time freshwater
-#'is running through the system. This function takes a minimum salinity and filters
-#'out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor) while the
-#'salinity is below the minimum acceptable threshold. NOTE: if instruments on the flow through,
-#'the parameter 'flow_thr' will need to be updated.
+#'however, all of our flow-through data is innacurate for the time freshwater is
+#'running through the system. This function takes a minimum salinity and filters
+#'out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor)
+#'while the salinity is below the minimum acceptable threshold. NOTE: if
+#'instruments on the flow through change, the parameter 'flow_thr' will need to be
+#'updated.
 #'
-#' @param data compiled minute to minute elg data, created by average_elg
-#' @param min_sal minimum acceptable salinity default to 30 psu
-#' @param custom default to FALSE. if TRUE, user will have the option to set ranges for all flow through instruments
-#' @param flow_thr names of instruments on the flow through.
+#'@param data compiled minute to minute elg data, created by average_elg
+#'@param min_sal minimum acceptable salinity default to 30 psu
+#'@param custom default to FALSE. if TRUE, user will have the option to set
+#'  ranges for all flow through instruments *NOTE* This feature still in
+#'  development
+#'@param flow_thr names of instruments on the flow through.
 #'
 #'
-#' @return
-#' @export
+#'@return
+#'@export
 #'
 #' @examples
 filter_elg <- function(data, min_sal = 30, custom = FALSE,
@@ -530,15 +533,26 @@ filter_elg <- function(data, min_sal = 30, custom = FALSE,
 
 }
 
-#' fix_dateline
+#'fix_dateline
 #'
 #'Function to adjust mean longitude while crossing dateline.
 #'
 #'This first creates a new variable "difflon" of the first lon - last lon in the
-#'averaging window. This variable will shoot up to around 360 when the
-#'antimeridian(dateline) is crossed. Next we filter out those time windows,
-#'apply a correction, and then average *just* those specific lons. This allows
-#'the rest of the averaging to happen through average_elg.
+#'averaging window. This variable will shoot up to around +/- 360 when the
+#'antimeridian(dateline) is crossed otherwise will be much less than 1.
+#'
+#'Next we filter out those time windows, and apply a correction to them. For
+#'each negative longitude in these windows, we add 360, find the mean of all the
+#'longitudes, and then subtract 360. Then, we average *just* those specific lons
+#'(eg 09:00-10:00). This allows the rest of the averaging to happen through
+#'average_elg.
+#'
+#'NOTE: Because this functions relies on not travelling more than 1 degree of
+#'longitude over the averaging window, there is potential for some weird things
+#'to happen if it was used with a very long averaging window, in polar regions,
+#'with a much faster moving vessel. If errors occur, the 1 degree longitude
+#'threshold can be adjusted or the function can be commented out in the base
+#'script.
 #'
 #' @param data
 #'
