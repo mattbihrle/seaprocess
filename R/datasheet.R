@@ -273,10 +273,11 @@ compile_neuston <- function(data) {
   # Add moon info to dataset and set the decimal to zero
   data <- dplyr::mutate(data,
                         moon_phase = moon_data$illuminatedFraction * 100,
-                        moon_risen = moon_data$altitude > 0)
+                        moon_risen = moon_data$altitude > 0, .before = cloud_cover)
   nodec <- 0
   data <- format_decimal(data, "moon_phase", nodec)
-
+  #move station distance to after "heading
+  data <- dplyr::relocate(data, station_distance, .after = heading)
   return(data)
 }
 
