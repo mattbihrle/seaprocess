@@ -14,8 +14,19 @@ Function to adjust mean longitude while crossing dateline.
 }
 \details{
 This first creates a new variable "difflon" of the first lon - last lon in the
-averaging window. This variable will shoot up to around 360 when the
-antimeridian(dateline) is crossed. Next we filter out those time windows,
-apply a correction, and then average *just* those specific lons. This allows
-the rest of the averaging to happen through average_elg.
+averaging window. This variable will shoot up to around +/- 360 when the
+antimeridian(dateline) is crossed otherwise will be much less than 1.
+
+Next we filter out those time windows, and apply a correction to them. For
+each negative longitude in these windows, we add 360, find the mean of all the
+longitudes, and then subtract 360. Then, we average *just* those specific lons
+(eg 09:00-10:00). This allows the rest of the averaging to happen through
+average_elg.
+
+NOTE: Because this functions relies on not travelling more than 1 degree of
+longitude over the averaging window, there is potential for some weird things
+to happen if it was used with a very long averaging window, in polar regions,
+with a much faster moving vessel. If errors occur, the 1 degree longitude
+threshold can be adjusted or the function can be commented out in the base
+script.
 }

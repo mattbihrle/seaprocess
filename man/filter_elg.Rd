@@ -16,7 +16,9 @@ filter_elg(
 
 \item{min_sal}{minimum acceptable salinity default to 30 psu}
 
-\item{custom}{default to FALSE. if TRUE, user will have the option to set ranges for all flow through instruments}
+\item{custom}{default to FALSE. if TRUE, user will have the option to set
+ranges for all flow through instruments *NOTE* This feature still in
+development}
 
 \item{flow_thr}{names of instruments on the flow through.}
 }
@@ -26,9 +28,10 @@ Filter out flow through data based on min salinity threshold
 \details{
 SEA techs regularly backflush or clean components of our flow-through system
 while under way. When this happens, the most telling value is salinity
-however, all of our flow-through data is innacurate for the time freshwater
-is running through the system. This function takes a minimum salinity and filters
-out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor) while the
-salinity is below the minimum acceptable threshold. NOTE: if instruments on the flow through,
-the parameter 'flow_thr' will need to be updated.
+however, all of our flow-through data is innacurate for the time freshwater is
+running through the system. This function takes a minimum salinity and filters
+out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor)
+while the salinity is below the minimum acceptable threshold. NOTE: if
+instruments on the flow through change, the parameter 'flow_thr' will need to be
+updated.
 }
