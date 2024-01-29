@@ -80,9 +80,9 @@ create_summary <- function(summary_input, elg_input,
   elg <- filter_elg(elg)
   # filter out rows for which there is data hand-entered
   # MB TODO add bot_depth
-  summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lon:station_distance,is.na))
-  summary <- dplyr::filter(summary, dplyr::if_all(lon:station_distance,is.na))
-  summary <- dplyr::select(summary, !c(lon,lat,temp,sal,fluor,station_distance))
+  summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lat:station_distance,is.na))
+  summary <- dplyr::filter(summary, dplyr::if_all(lat:station_distance,is.na))
+  summary <- dplyr::select(summary, !c(lat,lon,temp,fluor,sal,station_distance))
 
   # find all the nearest date time values of summary sheet to the elg file and add these indeces
   # TODO: what happens if any of ii are blank or at beginning or end of the elg?
@@ -156,12 +156,12 @@ create_summary <- function(summary_input, elg_input,
   # extract these values and add to the right of summary
   # TODO: make the outputs selectable when you run the function
   # MB added bot_depth
-  elg_to_add <- dplyr::select(elg[ii,], lon, lat, temp, sal, fluor, bot_depth)
+  elg_to_add <- dplyr::select(elg[ii,], lat, lon, temp, fluor, sal, bot_depth)
   summary <- dplyr::bind_cols(summary, elg_to_add)
 
   # add back in the hand entered values
   if(nrow(summary_hand_enter)>0) {
-    summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(lon:station_distance,as.numeric))
+    summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(lat:station_distance,as.numeric))
     summary <- dplyr::bind_rows(summary, summary_hand_enter)
   }
 

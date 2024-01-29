@@ -305,8 +305,8 @@ initialize_odv_tibble <- function(data, cruiseID = NULL, type = "C") {
                             Type = type,
                             `mon/day/yr` = format(data$dttm,"%m/%d/%Y"),
                             `hh:mm` = format(data$dttm,"%H:%M"),
-                            `Lon [degrees_east]` = data$lon,
                             `Lat [degrees_north]` = data$lat,
+                            `Lon [degrees_east]` = data$lon,
                             `Bot. Depth [m]` = data$bot_depth)
 
   return(odv_out)
