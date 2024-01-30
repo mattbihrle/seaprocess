@@ -63,8 +63,8 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
 
   # Reassign names that have dashes in them to be referenced more easily
   names(df) <- stringr::str_replace_all(names(df),"-",".")
-  # MB remove additional regex elements on temp and sal lines
-  # MB add bot_depth and remove other tsal elements
+
+  # MB add bot_depth
   # MB change "depth" to "bot_depth"
   # Construct a data frame of regular expressions and functions used to match col names
   args <- tibble::tribble(~name, ~regex, ~parse_fun,
@@ -82,10 +82,10 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                           "lab_sog", "gps.*lab.*sog", readr::parse_double,
                           "lab_cog", "gps.*lab.*cog", readr::parse_double,
                           "lab_quality", "gps.*lab.*quality", readr::parse_integer,
-                          "temp", "tsal.*temp", readr::parse_double,
+                          "temp", c("temp(?!.*[0-9])", "tsal.*temp"), readr::parse_double,
                           "temp_1min", "temp.*1.*min", readr::parse_double,
                           "temp_60min", "temp.*60.*min", readr::parse_double,
-                          "sal", "tsal.*sal", readr::parse_double,
+                          "sal", c("sali(?!.*[0-9])(?!.*vel)", "tsal.*sal"), readr::parse_double,
                           "sal_1min", "sal.*1.*min", readr::parse_double,
                           "sal_60min", "sal.*60.*min", readr::parse_double,
                           "sound_vel", "tsal.*vel", readr::parse_double,
@@ -95,7 +95,7 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                           "cdom", "cdom.*raw", readr::parse_double,
                           "cdom_1min", "cdom.*1.*min", readr::parse_double,
                           "cdom_60min", "cdom.*60.*min", readr::parse_double,
-                          "xmiss", c("trans.*raw","xmiss.*raw","xmiss.*[^m]"), readr::parse_double,
+                          "xmiss", c("trans.*raw","xmiss.*raw","xmiss.*[^m]", "trans.*1\\.*min"), readr::parse_double,
                           "xmiss_1min", c("trans.*1\\.*min","xmiss.*1\\.*min"), readr::parse_double,
                           "xmiss_60min", c("trans.*60.*min","xmiss.*60.*min"), readr::parse_double,
                           "wind_sp", "true.*wind.*sp", readr::parse_double,
