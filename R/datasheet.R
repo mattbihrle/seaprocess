@@ -75,7 +75,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     if(add_deployment_subfold) {
       odv_folder <- file.path(odv_folder,"bottle")
     }
-    data_type <- c("HC","B")
+    data_type <- c("HC","SS")
 
   } else if (data_type == "neuston") {
 
@@ -147,11 +147,12 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   summary <- dplyr::filter(summary, deployment %in% data_type)
 
   # Bottle specific stuff for combining summary, otherwise right join
-  if(sum(data_type %in% c("HC", "B")) > 1) {
-
+  if(sum(data_type %in% c("HC", "SS")) > 1) {
     data <- dplyr::mutate(data, bottle = as.character(bottle))
-    # add a new column to aid the joining later
-    data <- dplyr::mutate(data, deployment = ifelse(is.na(as.numeric(bottle)) | as.numeric(bottle) > 12, "B", "HC"))
+
+      # add a new column to aid the joining later
+    data <- dplyr::mutate(data,
+                          deployment = ifelse(is.na(as.numeric(bottle)), "SS", "HC"))
 
     data <- dplyr::right_join(summary, data, by=c("station","deployment"))
 
@@ -339,8 +340,11 @@ compile_bottle <- function(data, ros_input) {
     ros_output$bottle <- as.character(ros_output$bottle)
   }
 
-  # Now that we have our depths and metadata for each bottle in a hydrocast, add all the bucket samples to this
-  bottle_lines <- dplyr::filter(data, deployment == "B")
+  # Now that we have our depths and metadata for each bottle in a hydrocast,
+  # add all the surface station samples to this
+
+#Sort out SS and bottle 13s
+bottle_lines <- dplyr::filter(data, bottle == "SS" | bottle == "13")
   if(nrow(bottle_lines) > 0) {
     if(!is.null(ros_output)) {
       data_add <- purrr::quietly(tibble::as_tibble)(t(rep(NA_real_, ncol(ros_output))))$result
@@ -349,7 +353,7 @@ compile_bottle <- function(data, ros_input) {
       data_add <- tidyr::uncount(data_add, count)
 
       data_add <- dplyr::mutate(data_add,
-                                bottle = "B",
+                                bottle = bottle_lines$bottle,
                                 depth = 0,
                                 temperature = bottle_lines$temp,
                                 pressure = 0,
@@ -376,7 +380,8 @@ compile_bottle <- function(data, ros_input) {
                                                       pressure = pressure),
                                  sigma = oce::swSigma0(salinity = salinity,
                                                        temperature = temperature,
-                                                       pressure = pressure))
+                                                       pressure = pressure),
+                                 station = bottle_lines$station)
 
       # set to be the total output as no ros data exists
       all_output <- data_add
@@ -385,9 +390,16 @@ compile_bottle <- function(data, ros_input) {
     all_output <- ros_output
   }
 
-  output <- dplyr::left_join(data,all_output, by = c("station","bottle"))
+  output <- dplyr::left_join(data, all_output, by = c("station","bottle"))
 
-
+# MB reorder bottles to output shallow to deep
+output <- dplyr::group_by(output, station, bottle)
+output <- dplyr::mutate(output,
+                         bottle = factor(bottle,
+                                         levels = c("SS", "13", "12", "11", "10", "9",
+                                                    "8", "7", "6", "5", "4", "3", "2", "1")))
+output <- dplyr::arrange(output, desc(bottle), .by_group = T)
+output <- dplyr::ungroup(output)
 return(output)
 
 }
