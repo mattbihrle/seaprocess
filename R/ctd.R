@@ -58,7 +58,7 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
 
   X <- read_cnv_latlon(cnv_file)
 
-  line <- stringr::str_which(X$r,"Depth")[1]
+  line <- stringr::str_which(X$r,"(D|d)epth")[1]
   depth <- as.numeric(strsplit(X$r[line],'h')[[1]][2])
 
   line <- stringr::str_which(X$r,"\\*{2}.*(T|t)ime")[1]
