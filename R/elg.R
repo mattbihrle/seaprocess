@@ -165,8 +165,8 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
 
   # add the chosen, lon, lat and dttm
   df <- dplyr::mutate(df,
-                      lon = lon,
                       lat = lat,
+                      lon = lon,
                       dttm = dttm)
 
   # rearrange the columns into correct order
