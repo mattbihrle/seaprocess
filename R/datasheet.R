@@ -122,6 +122,8 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   colnames(data) <- stringr::str_to_lower(colnames(data))
   #replace spaces with _
   colnames(data) <- stringr::str_replace_all(colnames(data), " ", "_")
+  # replace - with _
+  colnames(data) <- stringr::str_replace_all(colnames(data), "-", "_")
   #remove unit identifiers inside ()
   colnames(data) <- stringr::str_remove_all(colnames(data), "_\\(.*\\)")
   colnames(data) <- stringr::str_remove_all(colnames(data), "_%")
@@ -253,17 +255,26 @@ compile_neuston <- function(data) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")
   }
 
-  # MB delete station distance/1000 to keep units as mL/m2 or mL/m3
-  data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance)
-  data <- dplyr::relocate(data, biodens, .after = zooplankton_biovol)
+  # MB delete station distance/1000 to keep units as mL/m2
+  data <- dplyr::mutate(data, zooplankton_biodens =
+                          ifelse(is.na(zooplankton_biodens),
+
+                                  zooplankton_biovol/station_distance,
+
+                                 zooplankton_biodens)
+  )
+  data <- dplyr::relocate(data, zooplankton_biodens, .after = zooplankton_biovol)
 
   # sum the total 100 count animals
   data <- dplyr::rowwise(data)
-  data <- dplyr::mutate(data, total_100count = sum(dplyr::c_across(medusa:other3)))
+  data <- dplyr::mutate(data, total_100_count = ifelse(is.na(total_100_count),
+                                                      sum(dplyr::c_across(medusa:other3)),
+                                                      total_100_count))
+
   #MB added a shannon_wiener calculation using the vegan package
-  data <- dplyr::mutate(data, shannon_wiener =
-                          (vegan::diversity(dplyr::c_across(medusa:other3),
-                                            index = "shannon", base = 10)))
+  data <- dplyr::mutate(data, shannon_wiener = ifelse(is.na(shannon_wiener),
+                          vegan::diversity(dplyr::c_across(medusa:other3),
+                                            index = "shannon", base = 10), shannon_wiener))
 
   # data <- dplyr::mutate(data, shannon_wiener = sum(dplyr::c_across(medusa:other3)/total_100count * log(dplyr::c_across(medusa:other3)/total_100count)))
   data <- dplyr::ungroup(data)
@@ -273,8 +284,11 @@ compile_neuston <- function(data) {
 
   # Add moon info to dataset and set the decimal to zero
   data <- dplyr::mutate(data,
-                        moon_phase = moon_data$illuminatedFraction * 100,
-                        moon_risen = moon_data$altitude > 0, .before = cloud_cover)
+                        moon_phase = ifelse(is.na(moon_phase),
+                                            moon_data$illuminatedFraction * 100,
+                                            moon_phase),
+                        moon_risen = ifelse(is.na(moon_risen), moon_data$altitude > 0,
+                                            moon_risen), .before = cloud_cover)
   nodec <- 0
   data <- format_decimal(data, "moon_phase", nodec)
   #move station distance to after "heading
