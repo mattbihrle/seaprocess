@@ -183,7 +183,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     if(add_cruiseID == TRUE & !is.null(cruiseID)) {
       csv_output <- add_file_cruiseID(csv_output, cruiseID)
     }
-    readr::write_csv(format_csv_output(data),csv_output, na = "")
+    readr::write_csv(format_csv_output(data),csv_output, na = "NA")
   }
 
   # export to odv

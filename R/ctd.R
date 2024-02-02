@@ -55,11 +55,12 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
 # Extract metadata --------------------------------------------------------
 
   # TODO make this more comprehensive
-
+  #MB TODO: Look into warning messages here
   X <- read_cnv_latlon(cnv_file)
 
   line <- stringr::str_which(X$r,"(D|d)epth")[1]
-  depth <- as.numeric(strsplit(X$r[line],'h')[[1]][2])
+  depth <- strsplit(X$r[line],'h')[[1]][2]
+  depth <- as.numeric(stringr::str_extract(depth, "[0-9]+"))
 
   line <- stringr::str_which(X$r,"\\*{2}.*(T|t)ime")[1]
   time <- stringr::str_extract(X$r[line],"(?<=Time ).*")
@@ -369,7 +370,7 @@ ctd_to_tibble <- function(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_ste
   if(length(ii)>0) {
     for (iii in ii) {
       original <- ctd_data@metadata$dataNamesOriginal[[iii]]
-      if(stringr::str_detect(original,"sbeox0Mm")) {
+      if(stringr::str_detect(original,"sb(|e)ox0Mm")) {
         oxygen_mM <- ctd_data@data[[iii]]
       }
       if(stringr::str_detect(original,"sbeox0ML")) {
@@ -396,7 +397,7 @@ ctd_to_tibble <- function(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_ste
                                         ctd_data@data$pressure)
   }
 
-  # Check for fluoroesence fields and make sure we care selecting the right onw
+  # Check for fluorescence fields and make sure we care selecting the right one
   ii <- stringr::str_which(all_fields,"fluor")
   if(length(ii) > 0) {
     for (iii in ii) {
@@ -434,6 +435,7 @@ ctd_to_tibble <- function(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_ste
                                cdom = ctd_data@data$fluorescence2,
                                oxygen = ctd_data@data$oxygen,
                                oxygen2 = ctd_data@data$oxygen2,
+                               bot_depth = ctd_data@metadata$waterDepth,
                                lon = ctd_data@metadata$longitude,
                                lat = ctd_data@metadata$latitude,
                                station = station,
@@ -465,8 +467,8 @@ interpolate_depth <- function(ctd_tibble, depth_vec = NULL, depth_step = 1) {
                       by = depth_step)
     }
 
-    ctd_tibble <- tidyr::pivot_longer(ctd_tibble,!c(lat, lon, dttm, cruise, dep, station))
-    ctd_tibble <- dplyr::group_by(ctd_tibble, cruise, station, lat, lon, dttm, name)
+    ctd_tibble <- tidyr::pivot_longer(ctd_tibble,!c(lat, lon, dttm, bot_depth, cruise, dep, station))
+    ctd_tibble <- dplyr::group_by(ctd_tibble, cruise, station, lat, lon, dttm, bot_depth, name)
     ctd_tibble <- dplyr::filter(ctd_tibble, any(!is.na(value)))
     ctd_tibble <- dplyr::summarise(ctd_tibble, h = list(depth_vec), a = list(approx(x = dep, y = value, xout = depth_vec)$y))
     ctd_tibble <- tidyr::unnest(ctd_tibble, cols = c(h,a))
