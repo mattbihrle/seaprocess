@@ -224,16 +224,24 @@ compile_meter <- function(data) {
                                                   tow_volume),
                         .after = net_area)
 
-  data <- dplyr::mutate(data, biodens = as.numeric(zooplankton_biovol)/tow_volume,
+  data <- dplyr::mutate(data,
+                        zooplankton_biodens = ifelse(is.na(zooplankton_biodens),
+                                      as.numeric(zooplankton_biovol)/tow_volume,
+                                      zooplankton_biodens),
                         .after = zooplankton_biovol)
+
+
 
   #MB copy and paste from compile_neuston
   data <- dplyr::rowwise(data)
-  data <- dplyr::mutate(data, total_100count = sum(dplyr::c_across(medusa:other3)))
+  data <- dplyr::mutate(data, total_100_count = ifelse(is.na(total_100_count),
+                                                       sum(dplyr::c_across(medusa:other3)),
+                                                       total_100_count))
+
   #MB added a shannon_wiener calculation using the vegan package
-  data <- dplyr::mutate(data, shannon_wiener =
-                          (vegan::diversity(dplyr::c_across(medusa:other3),
-                                            index = "shannon", base = 10)))
+  data <- dplyr::mutate(data, shannon_wiener = ifelse(is.na(shannon_wiener),
+                                                      vegan::diversity(dplyr::c_across(medusa:other3),
+                                                                       index = "shannon", base = 10), shannon_wiener))
 
   #data <- dplyr::mutate(data, shannon_wiener = sum(dplyr::c_across(medusa:other3)/total_100count * log(dplyr::c_across(medusa:other3)/total_100count)))
   data <- dplyr::ungroup(data)
