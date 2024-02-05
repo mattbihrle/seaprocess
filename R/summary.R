@@ -78,11 +78,10 @@ create_summary <- function(summary_input, elg_input,
   # Test to see whether elg_input is a file or a folder and read elg file(s) accordingly
   elg <- get_elg(elg_input)
   elg <- filter_elg(elg)
+
   # filter out rows for which there is data hand-entered
-  # MB TODO add bot_depth
   summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lat:station_distance,is.na))
-  summary <- dplyr::filter(summary, dplyr::if_all(lat:station_distance,is.na))
-  summary <- dplyr::select(summary, !c(lat,lon,temp,fluor,sal,station_distance))
+  summary <- dplyr::select(summary, !c(lat,lon,temp,fluor,sal,bot_depth,max_tension,station_distance))
 
   # find all the nearest date time values of summary sheet to the elg file and add these indeces
   # TODO: what happens if any of ii are blank or at beginning or end of the elg?
@@ -90,15 +89,15 @@ create_summary <- function(summary_input, elg_input,
   ii <- find_near(elg$dttm, summary$dttm)
 
   # find which values align closer than 60 seconds
-  diff_time <- elg$dttm[ii] - summary$dttm
-  iii <- which(diff_time > magdiff)
+  diff_time <- as.numeric(elg$dttm[ii] - summary$dttm)
+  iii <- which(abs(diff_time) > magdiff)
 
   if(length(iii) > 0) {
-    message <- paste("The following stations are more than",
+    message <- paste("The following station is more than",
                      magdiff,
                      "seconds from nearest elg reading:",
-                     paste0(summary$station[iii], "-", summary$deployment[iii], ": ", diff_time[iii], " seconds"),
-                     sep = "\n")
+                     paste0(summary$station[iii], "-", summary$deployment[iii],
+                            ": ", diff_time[iii], " seconds"), sep = "\n")
 
     if(force_stations) {
       warning(paste(message,
@@ -123,6 +122,7 @@ create_summary <- function(summary_input, elg_input,
   sti <- find_near(elg$dttm, summary$dttm)
   eni <- find_near(elg$dttm, summary$dttm_out)
   sti[iii] <- NA
+  eni[iii] <- NA
 
   #MB add max_tension
   max_tension <- rep(NA, length(sti))
@@ -162,7 +162,13 @@ create_summary <- function(summary_input, elg_input,
   # add back in the hand entered values
   if(nrow(summary_hand_enter)>0) {
     summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(lat:station_distance,as.numeric))
-    summary <- dplyr::bind_rows(summary, summary_hand_enter)
+    #add in all calculated values where there is an NA
+    summary_hand_enter <-
+      dplyr::rows_patch(summary_hand_enter, summary,
+                        by = c("station", "deployment"), unmatched = "ignore")
+    #combine updated values with the full summary sheet
+    summary <- dplyr::rows_update(summary, summary_hand_enter,
+                                  by = c("station", "deployment"))
   }
 
   # sort by station and relocate distance to end
