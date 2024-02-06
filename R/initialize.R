@@ -19,14 +19,10 @@ initialize_example <- function(path, ...) {
 initialize_master <- function(path, cruiseID = NULL,
                               initial_folder =  "initial_dir",
                               ...) {
-
   if(is.null(cruiseID)) {
     cruiseID <- basename(path)
   }
 
- if(isTRUE(dots$check)) {
-  initial_folder = "initial_dir_sarg"
- }
 
   # ensure path exists but don't overwrite project
   if(!dir.exists(path)) {
