@@ -24,7 +24,7 @@ initialize_master <- function(path, cruiseID = NULL,
     cruiseID <- basename(path)
   }
 
- if(isTRUE(check)) {
+ if(isTRUE(dots$check)) {
   initial_folder = "initial_dir_sarg"
  }
 
