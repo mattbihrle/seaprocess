@@ -24,6 +24,10 @@ initialize_master <- function(path, cruiseID = NULL,
     cruiseID <- basename(path)
   }
 
+ if(isTRUE(check)) {
+  initial_folder = "initial_dir_sarg"
+ }
+
   # ensure path exists but don't overwrite project
   if(!dir.exists(path)) {
     dir.create(path, recursive = TRUE, showWarnings = FALSE)

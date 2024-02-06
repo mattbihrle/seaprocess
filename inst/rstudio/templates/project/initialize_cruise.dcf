@@ -1,2 +1,8 @@
 Binding: initialize_cruise
 Title: Initialize Cruise Project
+
+Parameter: check
+Widget: CheckboxInput
+Label: Process Sargassum?
+Default: Off
+Position: left
