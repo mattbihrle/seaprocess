@@ -187,3 +187,85 @@ safely_write_csv <- function(data, csv_filepath = NULL) {
   }
 
 }
+
+#' EOC Process
+#'
+#' Process EOC files
+#'
+#' A simple function to copy relevant files to the "raw/" directory within the
+#' cruise project. It's goal is to have a package of cruise data that is easy to
+#' share with students and future scientists without requiring them to wade
+#' through heaps of miscellaneous files. In it's current state will only copy
+#' files needed to run the cruise processing scripts (.cnv, .ros .elg, .LTA (or
+#' STA)).
+#'
+#' Future improvements could include automatic outputs of cruise track,
+#' distance traveled, deployment types etc.
+#'
+#' @param elg_folder filepath to the folder containing elg files
+#' @param ctd_folder filepath to the folder containing ctd cnv files
+#' @param ros_folder filepath to the folder containing ros files
+#' @param adcp_folder filepath to the folder containing adcp files
+#' @param adcp_file_type  type of ADCP data to copy. Defaults to "LTA" but can
+#'   accept "STA"
+#'
+#' @return
+#' @export
+#'
+#' @examples
+eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
+                         ros_folder = ros_folder, adcp_folder = adcp_folder,
+                         adcp_file_type = "LTA" ) {
+
+  elg_files <- list.files(elg_folder, pattern = "\\.elg$", full.names = T)
+
+  if (length(elg_files) > 0){
+    files <- file.copy(elg_files, "raw/event", overwrite = T)
+  } else {
+    warning("No elg files found. Check elg_folder filepath.")
+  }
+  if (length(which(!files)) > 0)  {
+    error <- which(!files)
+    warning("One or more elg files failed to copy to raw/event: ",
+            paste(elg_files[error], collapse = "\n"))
+  }
+  ctd_files <- list.files(ctd_folder, pattern = "\\.cnv", full.names = T)
+
+  if (length(ctd_files) > 0){
+    files <- file.copy(ctd_files, "raw/ctd", overwrite = T)
+  } else {
+    warning("No cnv files found. Check ctd_folder filepath.")
+  }
+  if (length(which(!files)) > 0)  {
+    error <- which(!files)
+    warning("One or more cnv files failed to copy to raw/ctd: ",
+            paste(ctd_files[error], collapse = "\n"))
+  }
+
+  ros_files <- list.files(ros_folder, pattern = "\\.ros", full.names = T)
+
+  if (length(ros_files) > 0){
+    files <-  file.copy(ros_files, "raw/ctd", overwrite = T)
+  } else {
+    warning("No ros files found. Check ros_folder filepath.")
+  }
+
+  if (length(which(!files)) > 0)  {
+    error <- which(!files)
+    warning("One or more ros files failed to copy to raw/ctd: ",
+            paste(ros_files[error], collapse = "\n"))
+  }
+  adcp_files <- list.files(adcp_folder, pattern = stringr::str_c("\\.",
+                                                                 adcp_file_type), full.names = T)
+
+  if (length(adcp_files) > 0){
+    files <- file.copy(adcp_files, "raw/adcp", overwrite = T)
+  } else {
+    warning("No adcp files found. Check adcp_folder filepath and verify adcp_filetype ('LTA' or 'STA').")
+  }
+  if (length(which(!files)) > 0)  {
+    error <- which(!files)
+    warning("One or more adcp files failed to copy to raw/adcp: ",
+            paste(adcp_files[error], collapse = "\n"))
+  }
+}
