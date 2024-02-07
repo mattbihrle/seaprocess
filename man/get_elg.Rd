@@ -10,5 +10,7 @@ get_elg(elg_input)
 \item{elg_input}{}
 }
 \description{
-Get elg data from file or folder
+Takes an elg input and returns a data frame of all elg data fields before
+they are averaged within the specified file or folder. Typically this will be
+minute to minute data on SEA vessels.
 }

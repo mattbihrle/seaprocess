@@ -304,8 +304,11 @@ compile_neuston <- function(data) {
                                             moon_risen), .before = cloud_cover)
   nodec <- 0
   data <- format_decimal(data, "moon_phase", nodec)
-  #move station distance to after "heading
+  #move station distance after "heading"
   data <- dplyr::relocate(data, station_distance, .after = heading)
+
+  #MB TODO: calculate degree min lat/lon for quality control on double checking
+
   return(data)
 }
 

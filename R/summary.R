@@ -306,6 +306,10 @@ zd_to_tz <- function(zd, format_out = FALSE) {
 
 #' Get elg data from file or folder
 #'
+#' Takes an elg input and returns a data frame of all elg data fields before
+#' they are averaged within the specified file or folder. Typically this will be
+#' minute to minute data on SEA vessels.
+#'
 #' @param elg_input
 #'
 #' @return
@@ -314,6 +318,7 @@ zd_to_tz <- function(zd, format_out = FALSE) {
 #' @examples
 get_elg <- function(elg_input) {
   # TODO: add ability to tune reading elg per options provided in that function
+  # MB TODO: a possible place for filter_elg?
   # TODO: find way to store Rdata file in local folder so we don't have the delay of loading
   # TODO: confirm consistency in field names
 
