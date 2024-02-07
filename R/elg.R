@@ -585,11 +585,11 @@ fix_dateline <- function(data) {
       dplyr::mutate(data, lon = ifelse(abs(difflon) > 1,
                                        mean(lon) - 360,
                                        lon))
-    return(data)
-  } else{
-    return(data)
   }
-  #remove our column created at the start
-  data <- dplyr::select(data, -difflon)
+
+   data <- dplyr::select(data, -difflon)
+
+  return(data)
 }
+
 

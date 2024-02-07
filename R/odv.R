@@ -106,7 +106,6 @@ format_ctd_odv <- function(data,file,cruiseID = NULL) {
 #'
 #' @examples
 format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
-
   odv_out <- initialize_odv_tibble(data, cruiseID, type = "C")
 
   # create lookup table for field names as known to elg_read
@@ -171,7 +170,7 @@ format_elg_odv <- function(data, odv_output = NULL ,cruiseID = NULL) {
   odv_out <- dplyr::bind_cols(odv_out, elg_sub)
 
   # if wind speed and win dir, add E/W / N/S comp
-  if(all(c("lat", "lon") %in% names(elg_names))){
+  if(all(c("wind_sp", "wind_dir") %in% elg_names)){
     odv_out <- tibble::add_column(odv_out,
                                 `Wind-E/W Comp. [m/s]` = wswd_to_uv(data$wind_sp,data$wind_dir)$u,
                                 `Wind-N/S Comp. [m/s]` = wswd_to_uv(data$wind_sp,data$wind_dir)$v)

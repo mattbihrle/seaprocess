@@ -133,7 +133,9 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   # makes a neuston correction if not enough rows to make good on the excel read
   if(sum(data_type %in% c("NT", "MN", "2MN", "TT"))>0) {
     # Make sure all non note/description/station columns are numeric
-    data <- dplyr::mutate(data,dplyr::across(!dplyr::matches("note|desc|stat"),as.numeric))
+    suppressWarnings(
+    data <- dplyr::mutate(data, dplyr::across(!dplyr::matches("note|desc|stat"),as.numeric))
+    )
   }
 
   # read in station summary datasheet
@@ -153,8 +155,10 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     data <- dplyr::mutate(data, bottle = as.character(bottle))
 
       # add a new column to aid the joining later
+    suppressWarnings(
     data <- dplyr::mutate(data,
                           deployment = ifelse(is.na(as.numeric(bottle)), "SS", "HC"))
+    )
 
     data <- dplyr::right_join(summary, data, by=c("station","deployment"))
 
@@ -163,7 +167,6 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   } else {
     data <- dplyr::right_join(summary, data, by=c("station"))
   }
-
 
   # Neuston specific stuff
   if(sum(data_type %in% "NT")>0) {
@@ -257,7 +260,9 @@ compile_meter <- function(data) {
 #' @export
 #' @rdname compile_neuston
 compile_neuston <- function(data) {
+  #remove wire tension
 
+  data <- dplyr::mutate(data, max_tension = NULL)
   # calculate biodensity
   if(length(which(is.na(data$station_distance)))>0) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")

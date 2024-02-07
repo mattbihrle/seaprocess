@@ -133,6 +133,8 @@ create_summary <- function(summary_input, elg_input,
     max_tension[i] <- max(elg$wire_tension[sti[i]:eni[i]])
   }
 
+#filter out max tensions below a certain threshold
+
   tow_length <- rep(NA, length(sti))
   for (i in 1:length(sti)) {
     if(is.na(eni[i])) {
@@ -148,8 +150,13 @@ create_summary <- function(summary_input, elg_input,
   #add tow length in meters to data
   summary <- dplyr::mutate(summary, station_distance = tow_length*1000)
   #MB add max_tension column
-  #MB TODO filter out values that are from resting tension (eg for NT)
   summary <- dplyr::mutate(summary, max_tension = max_tension)
+  #Remove any resting tension <100
+  suppressWarnings(
+  summary <- dplyr::mutate(summary,
+                            max_tension = ifelse(summary$max_tension > 99,
+                                        summary$max_tension, as.numeric("NA")))
+  )
   summary <- dplyr::select(summary, -dttm_out)
 
 
