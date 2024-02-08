@@ -430,6 +430,8 @@ output <- dplyr::mutate(output,
                                                     "8", "7", "6", "5", "4", "3", "2", "1")))
 output <- dplyr::arrange(output, desc(bottle), .by_group = T)
 output <- dplyr::ungroup(output)
+#Remove max_tension
+output <- dplyr::mutate(output, max_tension = NULL)
 return(output)
 
 }
