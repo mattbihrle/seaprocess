@@ -13,6 +13,7 @@ create_summary(
   cruiseID = NULL,
   add_cruiseID = TRUE,
   magdiff = 60,
+  skipcheck = FALSE,
   ...
 )
 }
@@ -25,13 +26,19 @@ no csv output.}
 
 \item{csv_filename}{The csv filename to output the data}
 
-\item{force_stations}{logical - set to TRUE if you want to force the output to have station data at the nearest elg entry regardless of whether it is a longer time than magdiff from the nearest data row}
+\item{force_stations}{logical - set to TRUE if you want to force the output
+to have station data at the nearest elg entry regardless of whether it is a
+longer time than magdiff from the nearest data row}
 
 \item{cruiseID}{Optional string specifying cruise ID (i.e. "S301")}
 
 \item{magdiff}{maximum time difference in seconds between the station time
 and the nearest elg time. If greater than this value, look to force_station
 as to whether to return a NA or add a value regardless}
+
+\item{skipcheck}{toggles whether to check through the summary data to make
+sure all required fields (deployment, date, time in, zd) all have values.
+Defaults to FALSE, set to TRUE to bypass this step.}
 
 \item{...}{optional arguments passed to format_csv_output}
 
