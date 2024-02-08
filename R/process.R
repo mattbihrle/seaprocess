@@ -218,7 +218,7 @@ eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
                          adcp_file_type = "LTA" ) {
 
   elg_files <- list.files(elg_folder, pattern = "\\.elg$", full.names = T)
-
+  files <- as.logical(NULL)
   if (length(elg_files) > 0){
     files <- file.copy(elg_files, "raw/event", overwrite = T)
   } else {
@@ -230,7 +230,7 @@ eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
             paste(elg_files[error], collapse = "\n"))
   }
   ctd_files <- list.files(ctd_folder, pattern = "\\.cnv", full.names = T)
-
+  files <- as.logical(NULL)
   if (length(ctd_files) > 0){
     files <- file.copy(ctd_files, "raw/ctd", overwrite = T)
   } else {
@@ -243,7 +243,7 @@ eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
   }
 
   ros_files <- list.files(ros_folder, pattern = "\\.ros", full.names = T)
-
+  files <- as.logical(NULL)
   if (length(ros_files) > 0){
     files <-  file.copy(ros_files, "raw/ctd", overwrite = T)
   } else {
@@ -257,7 +257,7 @@ eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
   }
   adcp_files <- list.files(adcp_folder, pattern = stringr::str_c("\\.",
                                                                  adcp_file_type), full.names = T)
-
+  files <- as.logical(NULL)
   if (length(adcp_files) > 0){
     files <- file.copy(adcp_files, "raw/adcp", overwrite = T)
   } else {

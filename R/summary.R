@@ -11,13 +11,18 @@
 #' @param csv_folder The directory path to output the csv file. Set to NULL for
 #'   no csv output.
 #' @param csv_filename The csv filename to output the data
-#' @param force_stations logical - set to TRUE if you want to force the output to have station data at the nearest elg entry regardless of whether it is a longer time than magdiff from the nearest data row
+#' @param force_stations logical - set to TRUE if you want to force the output
+#'   to have station data at the nearest elg entry regardless of whether it is a
+#'   longer time than magdiff from the nearest data row
 #' @param cruiseID Optional string specifying cruise ID (i.e. "S301")
 #' @param add_cruise_ID If cruiseID is set, logical to specify whether cruiseID
 #'   should be appended to beginning of filenames for csv and odv output
 #' @param magdiff maximum time difference in seconds between the station time
 #'   and the nearest elg time. If greater than this value, look to force_station
 #'   as to whether to return a NA or add a value regardless
+#' @param skipcheck toggles whether to check through the summary data to make
+#'   sure all required fields (deployment, date, time in, zd) all have values.
+#'   Defaults to FALSE, set to TRUE to bypass this step.
 #' @param ... optional arguments passed to format_csv_output
 #'
 #' @return A tibble containing the combined data frames. If csv_folder is set to
@@ -61,12 +66,16 @@
 #' @md
 #'
 create_summary <- function(summary_input, elg_input,
-                           csv_folder = "output/csv", csv_filename = "summary_datasheet.csv",
-                           force_stations = TRUE, cruiseID = NULL, add_cruiseID = TRUE, magdiff = 60,
+                           csv_folder = "output/csv",
+                           csv_filename = "summary_datasheet.csv",
+                           force_stations = TRUE, cruiseID = NULL,
+                           add_cruiseID = TRUE, magdiff = 60, skipcheck = FALSE,
                            ...) {
 
   # read in the summary_input xlsx file
   summary <- readxl::read_excel(summary_input, col_types = "text")
+
+  summary_check(summary, skipcheck)
 
   # combine date and time and convert to R datatime object using specified time zone
   summary <- dplyr::mutate(summary,
@@ -342,4 +351,73 @@ find_tow_length <- function(elg, summary, ii) {
 
 
 }
+
+#' Summary Check
+#'
+#' Ensures each entry in the summary sheet has the needed information to run the
+#' create_datasheet functions down the line. Will make sure each station has a
+#' deployment, date, time_in, and zd. If not, will show a warning detailing
+#' which stations and data to fix.
+#'
+#' NOTE: does not check formatting. For
+#' formatting help, see the notes at the top of the summary_input sheet.
+#'
+#' @param summary summary data frame to be checked.
+#' @param skipcheck defaults to FALSE, set to TRUE within create_summary to skip
+#'   this step.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+summary_check <- function(summary = summary, skipcheck = FALSE) {
+
+  if(skipcheck) {
+    return(summary)
+  } else {
+
+    #Pull indices of na in needed values
+    deployment_na <- which(is.na(summary$deployment))
+    date_na <- which(is.na(summary$date))
+    time_na <- which(is.na(summary$time_in))
+    zd_na <- which(is.na(summary$zd))
+
+
+
+    if (length(deployment_na > 0)) {
+      warning(
+        paste("Deployment type missing from: ",
+              paste0(summary$station[deployment_na], sep = ",", collapse = " "),
+              "correct and rerun create_summary."))
+    }
+
+
+    if((length(date_na)) > 0) {
+      warning(
+        paste("Date missing from: ",
+              paste0(summary$station[date_na], sep = ",", collapse = " "),
+              "correct and rerun create_summary."))
+    }
+
+
+    if((length(time_na)) > 0) {
+      warning(
+        paste("Time_in missing from: ",
+              paste0(summary$station[time_na], sep = ",", collapse = " "),
+              "correct and rerun create_summary."))
+    }
+
+
+    if((length(zd_na)) > 0) {
+      warning(
+        paste("ZD missing from: ",
+              paste0(summary$station[zd_na], sep = ",", collapse = " "),
+              "correct and rerun create_summary.")
+      )
+    }
+    return(summary)
+  }
+}
+
+
 
