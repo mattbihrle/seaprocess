@@ -40,9 +40,9 @@ read_adcp <- function(adcp_file, calc_echo = FALSE, to_tibble = TRUE) {
   lat <- rowMeans(cbind(adcp@data$firstLatitude,adcp@data$lastLatitude))
 
   # Computer mean longitude of sample based of mean of first and last longitudes
-  # Adjusts for passing the anti-meridion
+  # Adjusts for passing the anti-meridian
   difflon <- adcp@data$firstLongitude - adcp@data$lastLongitude
-  if(length(which(abs(difflon) > 1)) == 0) {
+  if(length(which(abs(difflon) > 1)) != 0) {
     ii <- which(abs(difflon) > 1)
     for (i in ii) {
       if(difflon[i] > 0) {
