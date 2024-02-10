@@ -197,15 +197,15 @@ read_cnv_latlon <- function(cnv_file) {
 
   # LATITUDE
   # switch depending on what format the lon and lat are stored as
-  if(length(grep('^.*Lat.*Lon.*$',r)) > 0) {
+  if(length(grep('^.*Lat.*Lon.*$',r, useBytes = T)) > 0) {
     case <- 1
-    line <- grep('^.*Lat.*Lon.*$',r)
-  } else if (length(grep('Lat|Lat',r,ignore.case=T))==0) {
+    line <- grep('^.*Lat.*Lon.*$',r, useBytes = T)
+  } else if (length(grep('Lat|Lat',r,ignore.case=T, useBytes = T))==0) {
     case <- 2
     line <- 1
   } else {
     case <- 3
-    line <- grep("Lat",r,ignore.case=T)[1] # finds the word "Latitude" in r
+    line <- grep("Lat",r,ignore.case=T, useBytes = T)[1] # finds the word "Latitude" in r
   }
 
   # search for the patterns in order
@@ -252,7 +252,7 @@ read_cnv_latlon <- function(cnv_file) {
   } else if (case==2) {
     rest <- 'xxxxx'
   } else {
-    rest <- r[grep("Lon",r,ignore.case = T)[1]]
+    rest <- r[grep("Lon",r,ignore.case = T, useBytes = T)[1]]
   }
 
   # search for the patterns
@@ -470,7 +470,12 @@ interpolate_depth <- function(ctd_tibble, depth_vec = NULL, depth_step = 1) {
     ctd_tibble <- tidyr::pivot_longer(ctd_tibble,!c(lat, lon, dttm, bot_depth, cruise, dep, station))
     ctd_tibble <- dplyr::group_by(ctd_tibble, cruise, station, lat, lon, dttm, bot_depth, name)
     ctd_tibble <- dplyr::filter(ctd_tibble, any(!is.na(value)))
-    ctd_tibble <- dplyr::summarise(ctd_tibble, h = list(depth_vec), a = list(approx(x = dep, y = value, xout = depth_vec)$y))
+
+    # MB add a function to remove a "collapsing to unique 'x' variables warning.
+    # if issues arise here, remove to help troubleshoot.
+    suppressWarnings(
+      ctd_tibble <- dplyr::summarise(ctd_tibble, h = list(depth_vec), a = list(approx(x = dep, y = value, xout = depth_vec)$y))
+    )
     ctd_tibble <- tidyr::unnest(ctd_tibble, cols = c(h,a))
     ctd_tibble <- tidyr::pivot_wider(ctd_tibble, names_from = name, values_from = a)
     ctd_tibble <- dplyr::rename(ctd_tibble, dep = h)
