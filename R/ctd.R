@@ -254,6 +254,12 @@ read_cnv_latlon <- function(cnv_file) {
   } else {
     rest <- r[grep("Lon",r,ignore.case = T, useBytes = T)[1]]
   }
+  #Add a stop here with description of the problem
+  #MB TODO: Make an option to continue without metadata
+  if (is.na(rest)) {
+    stop(paste("Unable to find lat and/or lon from:", cnv_file,
+               ". Ensure lat and long are included in .cnv header in the correct format and rerun."))
+  }
 
   # search for the patterns
   a <- regexpr(patt,rest)
