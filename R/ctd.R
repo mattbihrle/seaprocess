@@ -58,6 +58,7 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
   #MB TODO: Look into warning messages here
   X <- read_cnv_latlon(cnv_file)
 
+  if (!is.null(X)) {
   line <- stringr::str_which(X$r,"(D|d)epth")[1]
   depth <- strsplit(X$r[line],'h')[[1]][2]
   depth <- as.numeric(stringr::str_extract(depth, "[0-9]+"))
@@ -94,9 +95,10 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
 
   ctd@metadata$longitude <- X$lon
   ctd@metadata$latitude <- X$lat
-  ctd@metadata$station <- as.numeric(strsplit(cnv_file,'-')[[1]][2]) # have to do this to make makeSection work.
   ctd@metadata$waterDepth <- depth
   ctd@metadata$time <- dttm
+}
+  ctd@metadata$station <- as.numeric(strsplit(cnv_file,'-')[[1]][2]) # have to do this to make makeSection work.
   ctd@metadata$filename <- cnv_file
 
   if(to_tibble) {
@@ -255,10 +257,16 @@ read_cnv_latlon <- function(cnv_file) {
     rest <- r[grep("Lon",r,ignore.case = T, useBytes = T)[1]]
   }
   #Add a stop here with description of the problem
-  #MB TODO: Make an option to continue without metadata
+
   if (is.na(rest)) {
-    stop(paste("Unable to find lat and/or lon from:", cnv_file,
-               ". Ensure lat and long are included in .cnv header in the correct format and rerun."))
+    message <- paste("Metadata missing from:", cnv_file, "Press Enter to continue or any key to force a stop.")
+    continue <- readline(message)
+    if (substr(continue, 1, 1) == "") {
+    X <- NULL
+    return(X)
+    } else {
+      stop("Processing stopped.")
+    }
   }
 
   # search for the patterns
@@ -447,6 +455,11 @@ ctd_to_tibble <- function(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_ste
                                station = station,
                                dttm = ctd_data@metadata$time,
                                cruise = ifelse(is.null(cruiseID),NA,cruiseID))
+ #check to see if we need to add a blank dttm column
+
+   if (is.null(ctd_tibble$dttm)){
+    ctd_tibble$dttm <- NA
+  }
 
   # finally regrid to depth bins
   ctd_tibble <- interpolate_depth(ctd_tibble, depth_vec = depth_vec, depth_step = depth_step)
