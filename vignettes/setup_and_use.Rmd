@@ -187,7 +187,7 @@ Once everything is setup, click on the top of the script and press
 check that you entered the relevant file paths correctly, you have no
 typos or stray characters and that your slashes are all forward ("/"
 instead of "\\"). To run the whole script at once you can go to:
-**Code\>Run Region\>Run All** or hit **ctrl + alt + A.** If you are
+**Code\>Run Region\>Run All** or hit **Ctrl + Alt + A.** If you are
 running the whole script make sure to comment out any lines you are not
 using by putting a `#` at the beginning of the line. If R see a blank
 data sheet it will show and error and stop the run where the error
@@ -196,6 +196,11 @@ separated value) for each datasheets as well as a text file formatted
 for ODV input with the "output/odv" folder. As of July 2023, the ODV
 text files are only for our most common deployments however you can
 always import csv files into ODV.
+
+**NOTE:** Cast data and bottle data are processed in two separate ODV
+.txt files (odv/ctd and odv/bottle). This means that to have an ODV
+collection that has BOTH you will need to import each .txt file into the
+collection instead of just importing hydrowork as before.
 
 ## Upon EOC
 
