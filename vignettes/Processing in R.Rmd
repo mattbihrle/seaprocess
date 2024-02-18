@@ -1,12 +1,15 @@
 ---
-title: "Processing in R"
+title: "Using SeaProcess Underway"
 author: "Matt Bihrle, Emily Dailey"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Using SeaProcess Underway}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +17,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Downloading the Package
-Ben Harden made a cool package to streamline some of our data processing. to install the package on an internet connected computer call: 
+
+Ben Harden made a cool package to streamline some of our data
+processing. to install the package on an internet connected computer
+call:
 
 ```{r, eval=FALSE}
 devtools::install_github("mattbihrle/seaprocess", 
@@ -122,7 +128,7 @@ are correct, however you should not need to change anything.
     will look a little different. The most important sheet to keep up to
     date is the `summary_input`. In this sheet, enter the station number
     formatted as "C303F-001", the deployment type, the date
-    (yyyy-mm-dd), time of start(eg. 15:32), time of end for neuestons
+    (yyyy-mm-dd), time of start (eg. 15:32), time of end for neustons
     (and anything you want max tension recorded), and ZD.
 
     -   You will notice that there are a few darker grey cells. They can
@@ -138,11 +144,16 @@ are correct, however you should not need to change anything.
 
 ### Hydrocast Data Entry
 
-\*For hydrocasts, two datasheets will need to be filled out. - First,
-the ctd_input will contain all of the meta data for the cast - Second,
-bottle_input will need station number and ONLY the bottles that you drew
-water from. This is a change from our previous practice in hydrowork of
-copying and pasting data from all 12 bottles.
+For hydrocasts, two datasheets will need to be filled out.
+
+-   First, the `ctd_input` will contain all of the meta data for the
+    cast
+
+-   Second, `bottle_input` will need the station number and ONLY the
+    bottle number for bottles that you drew water from.
+
+    -   This is a change from our previous practice in hydrowork of
+        copying and pasting data from all 12 bottles.
 
 ### Surface Stations
 
@@ -151,44 +162,47 @@ the bottle_datasheet. For their metadata there are three options:
 
 #### As Bottle 13
 
--   For this option, enter their bottle number as 13 and the HC metadata
-    will be associated with that bottle
+For this option, enter their bottle number as "13" and the HC metadata
+will be associated with that bottle
 
 #### As Own Deployment
 
--   This option requires the Surface station entered in the
-    summary_input sheet as `SS.` It's metadata will be it's own but it
-    will be grouped with the station. Still enter it's bottle data in
-    `bottle_input` and record the bottle number as `SS`.
+This option requires the surface station entered in the summary_input
+sheet as `SS.` It's metadata will be it's own but it will be grouped
+with the station. Still enter it's bottle data in `bottle_input` and
+record the bottle number as `SS`.
 
 #### As Own Station
 
--   The easiest way to count surface stations separately from all other
-    deployments is to start counting at 100 (SS-001 will be SS-101,
-    SS-002 will be SS-102 etc.). Still input the data into
-    `summary_input` and `bottle_input` as `SS`
+The easiest way to count surface stations separately from all other
+deployments is to start counting at 100 (SS-001 will be SS-101, SS-002
+will be SS-102 etc.). Still input the station time and bottle data into
+`summary_input` and `bottle_input` as `SS`.
 
 ## Running the Script
 
 Once everything is setup, click on the top of the script and press
-ctrl + enter to individually run each line of code. R may show a
-"warning" on some lines. These are okay. If you see an "error," double
+**ctrl + enter** to individually run each line of code. R may show a
+`warning` on some lines. These are okay. If you see an `error`, double
 check that you entered the relevant file paths correctly, you have no
 typos or stray characters and that your slashes are all forward ("/"
-instead of ""). To run the whole script at once you can go to: Code\>Run
-Region\>Run all or hit ctrl + alt + A. If you are running the whole
-script make sure to comment out any lines you are not using by putting
-a"\#" at the beginning of the line. If R see a blank data sheet it will
-show and error and stop the run where the error occurred. In the
-"output" folder R will create a csv file (comma separated value) for
-each datasheets as well as a text file formatted for ODV input with the
-"output/odv" folder. As of July 2023, the ODV text files are only for
-our most common deployments however you can always import csv files into
-ODV.
+instead of "\\"). To run the whole script at once you can go to:
+**Code\>Run Region\>Run All** or hit **ctrl + alt + A.** If you are
+running the whole script make sure to comment out any lines you are not
+using by putting a `#` at the beginning of the line. If R see a blank
+data sheet it will show and error and stop the run where the error
+occurred. In the "output" folder, R will create a csv file (comma
+separated value) for each datasheets as well as a text file formatted
+for ODV input with the "output/odv" folder. As of July 2023, the ODV
+text files are only for our most common deployments however you can
+always import csv files into ODV.
 
 ## Upon EOC
 
-The `eoc_process` script will lead you through the necessary steps to copy the needed files over to the raw folders. Other than running through that script, the end of cruise second sci work will look the same. 
+The `eoc_process` script will lead you through the necessary steps to
+copy the needed files over to the raw folders. Other than running
+through that script, the end of cruise second scientist work will look
+the same.
 
 ## Tips and Tricks
 
@@ -197,24 +211,26 @@ The `eoc_process` script will lead you through the necessary steps to copy the n
     computers.
 -   If an error says that there is no input folder, make sure your
     cruise ID is correct, that the computer is on, and that there is in
-    fact an elg lta file, or station summary to pull from
+    fact an elg, lta file, or station summary to pull from
 -   Formatting is important! If the script is showing errors, the first
     thing to check is whether you have any formatting inconsistencies in
     your datasheets.
 -   SeaProcess will overwrite the outputs each time it is run, this
     means that if you mess anything up in the outputs folder, just run
-    "Process_data" again to refresh your files.
+    `process_data` again to refresh your files.
 -   The `process_data` script is designed to be simple so if something
     is changed by accident it should be easy enough to go to a previous
     cruise, copy and paste their script and update it for your own
     cruise.
 -   For more information on what is happening in the background call:
+
 ```{r, eval = FALSE}
 library(seaprocess)
 vignette("seaprocess")
 ```
 
 -   For more information on variables included in the packages call:
+
 ```{r, eval = FALSE}
 library(seaprocess)
 vignette("variables")
