@@ -1,5 +1,5 @@
 ---
-title: "variables"
+title: "Variables"
 author: "Matt Bihrle"
 output: rmarkdown::html_vignette
 vignette: >

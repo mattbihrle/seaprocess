@@ -1,10 +1,10 @@
 ---
-title: "Using SeaProcess Underway"
+title: "SeaProcess Setup and Use"
 author: "Matt Bihrle, Emily Dailey"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using SeaProcess Underway}
+  %\VignetteIndexEntry{SeaProcess Setup and Use}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
