@@ -4,7 +4,7 @@ author: Ben Harden edited MBB
 date: lubridate::today()
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to seaprocess}
+  %\VignetteIndexEntry{Introduction to SeaProcess}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -14,6 +14,8 @@ process_elg(
   add_cruiseID = TRUE,
   average_window = 60,
   min_sal = 30,
+  custom_filter = FALSE,
+  filter_params = c("max_fluor = 30", "min_cdom = 0"),
   ...
 )
 }
@@ -37,6 +39,12 @@ Set to NULL for no averaging. Default is 60 minutes.}
 
 \item{min_sal}{minimum acceptable salinity. Default is 30 psu, will remove
 flow through data when salinity drops below this level.}
+
+\item{custom_filter}{default to FALSE. Set to TRUE and specify
+`filter_params` to set custom limits to elg data.}
+
+\item{filter_params}{custom parameters for elg data. See `?filter_elg` for
+more info on formatting}
 
 \item{add_cruise_ID}{If cruiseID is set, logical to specify whether cruiseID
 should be appended to beginning of filenames for csv and odv output}

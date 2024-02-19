@@ -403,12 +403,11 @@ create_gps_dttm <- function(gps_time, sys_dttm) {
 #'
 #' @param data
 #' @param average_window
-#' @param min_sal minimum acceptable salinity. see filter_elg for more
 #' @return
 #' @export
 #'
 #' @examples
-average_elg <- function(data, average_window = 60, min_sal = 30) {
+average_elg <- function(data, average_window = 60) {
 
   if(is.null(average_window)) {
     message("No time averaging applied to elg output data")
@@ -422,8 +421,7 @@ average_elg <- function(data, average_window = 60, min_sal = 30) {
 
   data <- dplyr::mutate(data, roundtime = lubridate::round_date(dttm, unit = paste(average_window,"minute")))
   data <- dplyr::group_by(data, roundtime)
- #Filter out erroneous values in minute to minute elg data before averaging
-  data <- filter_elg(data, min_sal)
+
   #Adjust for crossing the antimeridian
   data <- fix_dateline(data)
   data_out <- dplyr::summarise(data,
@@ -435,9 +433,8 @@ average_elg <- function(data, average_window = 60, min_sal = 30) {
   data_out <- dplyr::mutate(data_out, dttm = roundtime, .before=1)
   data_out <- dplyr::select(data_out, -roundtime)
 
-  # TODO need clause to test for crossing the antimeridian where the hourly average will be odd
   # could test for this before the averaging and then change back after
-  # MB TODO this could be a place to filter out other bad data before we average things
+
   # check for time gaps in average data and add them back in
   data_out <- fill_time_gaps(data_out, average_window = average_window)
 
@@ -492,43 +489,71 @@ fill_time_gaps <- function(data, average_window) {
 
 #'Filter elg data
 #'
-#'Filter out flow through data based on min salinity threshold
+#'Filter out flow through data primarily based on min salinity threshold
 #'
 #'SEA techs regularly backflush or clean components of our flow-through system
 #'while under way. When this happens, the most telling value is salinity
-#'however, all of our flow-through data is innacurate for the time freshwater is
+#'however, all of our flow-through data is inaccurate for the time freshwater is
 #'running through the system. This function takes a minimum salinity and filters
 #'out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor)
 #'while the salinity is below the minimum acceptable threshold. NOTE: if
-#'instruments on the flow through change, the parameter 'flow_thr' will need to be
-#'updated.
+#'instruments on the flow through change, the parameter 'flow_thr' will need to
+#'be updated.
 #'
-#'@param data compiled minute to minute elg data, created by average_elg
+#'@param elg compiled minute to minute elg data
 #'@param min_sal minimum acceptable salinity default to 30 psu
 #'@param custom default to FALSE. if TRUE, user will have the option to set
-#'  ranges for all flow through instruments *NOTE* This feature still in
-#'  development
+#'  ranges for all elg output variables.
 #'@param flow_thr names of instruments on the flow through.
+#'@param filter_values a list of filter values for when `custom_filter = TRUE`.
+#'  The function will take a `filter_params` argument and convert it to
+#'  `filter_values` for the function to use. Specify custom parameters within
+#'  `process_elg` using the formatting:
+#'  `filter_params = c("max_temp = 35", "min_temp = 15")` etc. Users can
+#'  specify `max` and `min` for any numeric column in the .csv output.
 #'
 #'
 #'@return
 #'@export
 #'
 #' @examples
-filter_elg <- function(data, min_sal = 30, custom = FALSE,
-                       flow_thr = c("temp", "sal", "fluor", "cdom", "xmiss")) {
+filter_elg <- function(elg, min_sal = 30, custom_filter = FALSE,
+                       flow_thr = c("temp", "sal", "fluor", "cdom", "xmiss"),
+                       filter_values = c("max_fluor = 30", "min_cdom = 0")) {
 
-  if(custom) {
-    return(data)
+  if(custom_filter) {
+    for(i in 1:length(filter_values)) {
+      # Detect looking for max or minimum
+      fmin <- stringr::str_detect(filter_values[i], "min")
+      fmax <- stringr::str_detect(filter_values[i], "max")
+      #remove white space
+      ii <- stringr::str_replace_all(filter_values[i], " ", "")
+      #split vector into 3 character strings
+      ii <- stringr::str_split_1(ii, pattern = "(m\\w\\w_|=)")
+
+      #extract variable name and max or min value
+      vari_name <- ii[2]
+      value <- as.double(ii[3])
+
+      #Perform filter
+      if(fmin) {
+        elg[vari_name] <- ifelse(elg[[vari_name]] < value, NA, elg[[vari_name]])
+      }
+
+      if(fmax) {
+        elg[vari_name] <- ifelse(elg[[vari_name]] > value, NA, elg[[vari_name]])
+      }
+    }
+    return(elg)
     #Option to create a more customizable filter function here in the future
   }
   else{
     # Turn the salinity, temp, cdom, xmiss and fluor values to NA when sal drops
     # below the min_sal defined in process_elg
-    data <-
-      data |>
+    elg <-
+      elg |>
       dplyr::mutate(across(any_of(flow_thr), ~ifelse(sal < min_sal, NA, .)))
-    return(data)
+    return(elg)
   }
 
 }

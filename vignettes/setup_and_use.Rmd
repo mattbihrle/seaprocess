@@ -214,24 +214,49 @@ the same.
 -   Keep in mind that for these files to be found, the ADCP and
     Datalogger computers need to be on, as R pulls directly from those
     computers.
+
 -   If an error says that there is no input folder, make sure your
     cruise ID is correct, that the computer is on, and that there is in
     fact an elg, lta file, or station summary to pull from
+
 -   Formatting is important! If the script is showing errors, the first
     thing to check is whether you have any formatting inconsistencies in
     your datasheets.
+
 -   SeaProcess will overwrite the outputs each time it is run, this
     means that if you mess anything up in the outputs folder, just run
     `process_data` again to refresh your files.
+
 -   The `process_data` script is designed to be simple so if something
     is changed by accident it should be easy enough to go to a previous
     cruise, copy and paste their script and update it for your own
     cruise.
--   For more information on what is happening in the background call:
+
+-   `process_elg` has a couple options to filter out bad data.
+
+    -   It will automatically filter out all flow_through data when
+        salinity drops below a a threshold. This can be set by the user
+        by adding the argument `min_sal = <desired sal threshold>`. Call
+        `?filter_elg` for more information and to see the current
+        default.
+    -   Additionally, there is an option to set custom filters for all
+        elg variables. If this is desired, your `process_elg` function
+        will look something like:
+
+    ```{r eval = FALSE}
+
+    process_elg(elg_folder, cruiseID = cruiseID, custom_filter = TRUE, 
+        filter_params =c("max_fluor = 30", "min_temp = 15, max_wind_sp = 66"))
+    ```
+
+    Again for more information on formatting, call `?filter_elg`.
+
+-   For more information on what is happening in the background of the
+    package call:
 
 ```{r, eval = FALSE}
 library(seaprocess)
-vignette("seaprocess")
+vignette("introduction_to_seaprocess")
 ```
 
 -   For more information on variables included in the packages call:

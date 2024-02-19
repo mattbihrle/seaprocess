@@ -78,7 +78,11 @@ process_adcp <- function(adcp_folder, cruiseID = NULL,
 #' @param average_window the averaging window in minutes for the exported file.
 #'   Set to NULL for no averaging. Default is 60 minutes.
 #' @param min_sal minimum acceptable salinity. Default is 30 psu, will remove
-#'  flow through data when salinity drops below this level.
+#'   flow through data when salinity drops below this level.
+#' @param custom_filter default to FALSE. Set to TRUE and specify
+#'   `filter_params` to set custom limits to elg data.
+#' @param filter_params custom parameters for elg data. See `?filter_elg` for
+#'   more info on formatting
 #'
 #' @return
 #' @export
@@ -87,14 +91,19 @@ process_adcp <- function(adcp_folder, cruiseID = NULL,
 process_elg <- function(elg_folder, cruiseID = NULL,
                         csv_folder = "output/csv", csv_filename = "elg.csv",
                         odv_folder = "output/odv/elg", odv_filename = "elg.txt",
-                        add_cruiseID = TRUE, average_window = 60, min_sal = 30, ...) {
+                        add_cruiseID = TRUE, average_window = 60, min_sal = 30,
+                        custom_filter = FALSE,
+                        filter_params = c("max_fluor = 30", "min_cdom = 0"), ...) {
 
   # Read in all the ELG files in the folder
   elg <- read_elg_fold(elg_folder, ...)
+  #Filter out erroneous values in minute to minute elg data before averaging
+
+  elg <- filter_elg(elg, min_sal, custom_filter, filter_values = filter_params)
 
   # Average the elg data (default is to 60 mins)
   if(average_window > 1) {
-    elg <- average_elg(elg, average_window = average_window, min_sal = min_sal)
+    elg <- average_elg(elg, average_window = average_window)
   }
 
   # Output csv file
