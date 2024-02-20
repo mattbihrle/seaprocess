@@ -115,8 +115,10 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
   args_in <- tibble::as_tibble(list(df=list(df),regex=args$regex,parse_fun=args$parse_fun))
   namelist <- purrr::as_vector(dplyr::select(args,name))
   # all the parsing happens here
-  output <- purrr::pmap(args_in, parse_field)
 
+  suppressWarnings(
+  output <- purrr::pmap(args_in, parse_field)
+)
   # reassign col names and make into tibble
   names(output) <- namelist
   df <- tibble::as_tibble(output)
@@ -182,6 +184,17 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
   # just keep the specified column names
   colkeep <- colnames(df) %in% keep
   df <- df[, colkeep]
+
+#test to see if any columns from "keep" are entirely NAs
+for(i in 1:length(keep)){
+  vari_name <- keep[i]
+  if(all(is.na(df[vari_name]))){
+    warning(paste(vari_name, "not found in ", file))
+  } else {
+    next
+  }
+}
+
 
   if(!is.null(csv_output)) {
     readr::write_csv(data,csv_output, na = "")

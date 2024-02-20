@@ -1,26 +1,36 @@
 #TODO eliminate the confusion b/t bottle , bottle2, and bottle_sum. Which is from the csv, which is the utility object, and which is the product?
 #TODO make it recognize that all the chl (and future nutrients) are the same variable.
-
-#' Append calculation sheet data to bottle summary
+calc_file <- "E:/S311 Data/Classic Data/Calculation Sheets/S311_CalcpH_wTemp.xls"
+#'Append calculation sheet data to bottle summary
 #'
-#' This function appends hand-entered and calculated data from calculation sheets to the bottle summary csv.
-#' It takes the 'output' sheet on the calculation excel file with whatever header value is used and matches it with station number and bottle number.
-#'
-#'
-#'
-#'
-#' @param calc_file #the calculation file to be read, chlorophyll, PO4, NO3, pH. This file must be formatted correctly with an 'output' sheet.
-#' @param bottle_sum #the bottle summary from the [create_bottle()] function
-#' @param bottle_is_file() #if TRUE, this will read the [bottle.csv] file and creat the [bottle] object. If FALSE (the default), it will append data to the bottle object.
-#'
-#' @return #creates the [bottle] object that will be updated with new data each time it is run.
-#' @export #currently does not export a csv file. The final [bottle] object must be exported for use in ODV
+#'This function appends hand-entered and calculated data from calculation sheets
+#'to the bottle summary csv. It takes the 'output' sheet on the calculation
+#'excel file with whatever header value is used and matches it with station
+#'number and bottle number.
 #'
 #'
-#'@details
-#'This function, and the [read_calc_fold()] function combine the [output] sheet from any calculation sheet (from path ['calc_file]) and the [bottle] object.
-#'If [bottle] is not an object (ex. if it is the first time this is run) it will read the [bottle.csv] file from the [bottle_sum] diriectory and create the [bottle] object.
-#'[create_bottle()] will overwrite the [bottle.csv] and delete any calc sheet data added in past uses of this function. RUnning this function again will replace these data.
+#'
+#'
+#'@param calc_file #the calculation file to be read, chlorophyll, PO4, NO3, pH.
+#'  This file must be formatted correctly with an 'output' sheet.
+#'@param bottle_sum #the bottle summary from the [create_bottle()] function
+#'@param bottle_is_file() #if TRUE, this will read the [bottle.csv] file and
+#'  creat the [bottle] object. If FALSE (the default), it will append data to
+#'  the bottle object.
+#'
+#'@return #creates the [bottle] object that will be updated with new data each
+#'  time it is run.
+#'@export #currently does not export a csv file. The final [bottle] object must
+#'  be exported for use in ODV
+#'
+#'
+#'@details This function, and the [read_calc_fold()] function combine the
+#'[output] sheet from any calculation sheet (from path ['calc_file]) and the
+#'[bottle] object. If [bottle] is not an object (ex. if it is the first time
+#'this is run) it will read the [bottle.csv] file from the [bottle_sum]
+#'diriectory and create the [bottle] object. [create_bottle()] will overwrite
+#'the [bottle.csv] and delete any calc sheet data added in past uses of this
+#'function. RUnning this function again will replace these data.
 #'
 #'
 #'
@@ -30,8 +40,9 @@ read_calc_sheet <- function(calc_file, bottle_sum, bottle_is_file = FALSE) {
 
   #read calc sheet as specified in datasheet_examples.R
   calc_sheet <- readxl::read_excel(calc_file, sheet = "output")
+  calc_sheet$bottle <- as.character(calc_sheet$bottle)
   colnames(calc_sheet) <- stringr::str_to_lower(colnames(calc_sheet))
-  #TODO Make it read the bottle collum, even if there are -, blanks or NA, N/A etc. Anything thats not a number is a SS and gets NA
+  #TODO Make it read the bottle column, even if there are -, blanks or NA, N/A etc. Anything thats not a number is a SS and gets NA
 
 
   #if the column names contain "filter" (eg. it is a chlorophyll sheet), then make each filter size its own column with the chl values.
@@ -41,7 +52,7 @@ read_calc_sheet <- function(calc_file, bottle_sum, bottle_is_file = FALSE) {
 
   #if bottle_is_file = TRUE, create an object 'bottle' from the bottle.csv. If FALSE (default), load the object 'bottle_sum'
   if(bottle_is_file == TRUE) {
-    bottle <-  readr::read_csv(bottle_sum)
+    bottle <-  readr::read_csv("C:/Users/User/Desktop/R Files/RData/C301/output/csv/C301_bottle_datasheet.csv")
 
 
 
@@ -52,7 +63,7 @@ read_calc_sheet <- function(calc_file, bottle_sum, bottle_is_file = FALSE) {
 
   #join bottle and calc sheet tibbles into one. Common errors from header typos in the seperate excel sheets. Check spelling.
   #TODO is bottle2 still a valid object? Just use bottle?
-  bottle2 <- left_join(bottle, calc_sheet, by = c('station', 'bottle'))
+  bottle2 <- dplyr::left_join(bottle, calc_sheet, by = c('station', 'bottle'))
 
   return(bottle2)
 }

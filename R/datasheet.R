@@ -150,6 +150,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   # filter by data_type
   summary <- dplyr::filter(summary, deployment %in% data_type)
 
+
   # Bottle specific stuff for combining summary, otherwise right join
   if(sum(data_type %in% c("HC", "SS")) > 1) {
     data <- dplyr::mutate(data, bottle = as.character(bottle))
@@ -159,12 +160,13 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     data <- dplyr::mutate(data,
                           deployment = ifelse(is.na(as.numeric(bottle)), "SS", "HC"))
     )
-
+    check_stations(data, summary, bottle = TRUE)
     data <- dplyr::right_join(summary, data, by=c("station","deployment"))
 
     data <- compile_bottle(data, ...)
 
   } else {
+    check_stations(data, summary, bottle = FALSE)
     data <- dplyr::right_join(summary, data, by=c("station"))
   }
 
@@ -435,6 +437,35 @@ output <- dplyr::mutate(output, max_tension = NULL)
 return(output)
 
 }
+#' Check Station
+#'
+#' Prechecks to make sure every station in the deployment sheet has a matching
+#' station in the summary sheet. Sends a warning, not an error upon failure.
+#'
+#' @param data
+#' @param summary
+#' @param bottle Logical, TRUE when processing a bottle datasheet. False all other times.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+check_stations <- function(data, summary, bottle = FALSE) {
+  if(bottle){
+    station_test <- dplyr::anti_join(data, summary, dplyr::join_by(station, deployment))
+  } else {
+    station_test <- dplyr::anti_join(data, summary, dplyr::join_by(station))
+}
+  if(nrow(station_test) != 0) {
+    stations <- station_test$station
+    #Output a warning for those columns
+    warning(paste("Station number",
+                  paste0(stations, collapse = ", "),
+                  " \n missing from summary datasheet. Correct and rerun."))
+  }
+}
+
+
 
 ##Part of function to take in a archive CSV and make it into a readable excel file
 #data_input <- "~/GitHub/seaprocess/inst/extdata/Data Sheet CSVs/S285_NT.csv"
