@@ -27,16 +27,15 @@ The function will take a `filter_params` argument and convert it to
 specify `max` and `min` for any numeric column in the .csv output.}
 
 \item{custom}{default to FALSE. if TRUE, user will have the option to set
-ranges for all flow through instruments *NOTE* This feature still in
-development}
+ranges for all elg output variables.}
 }
 \description{
-Filter out flow through data based on min salinity threshold
+Filter out flow through data primarily based on min salinity threshold
 }
 \details{
 SEA techs regularly backflush or clean components of our flow-through system
 while under way. When this happens, the most telling value is salinity
-however, all of our flow-through data is innacurate for the time freshwater is
+however, all of our flow-through data is inaccurate for the time freshwater is
 running through the system. This function takes a minimum salinity and filters
 out data from all flow-through instruments (tsal, cdom, xmiss, chla, fluor)
 while the salinity is below the minimum acceptable threshold. NOTE: if
