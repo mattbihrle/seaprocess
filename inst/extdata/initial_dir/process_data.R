@@ -56,6 +56,7 @@ ctd_input <- "datasheets/ctd_input.xls"
 neuston_input <- "datasheets/neuston_input.xls"
 meter_input <- "datasheets/meter_input.xls"
 bottle_input <- "datasheets/bottle_input.xls"
+secchi_input <- "datasheets/secchi_input.xls"
 other_input <- ""
 
 
@@ -97,4 +98,8 @@ create_datasheet(meter_input, data_type = "meter",
 # Bottle datasheet
 create_datasheet(bottle_input, data_type = "bottle",
                  ros_input = ros_folder,
+                 cruiseID = cruiseID)
+
+# Secchi datasheet
+create_datasheet(secchi_input, data_type = "SD",
                  cruiseID = cruiseID)
