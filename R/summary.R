@@ -163,7 +163,7 @@ create_summary <- function(summary_input, elg_input,
   #Remove any resting tension <100
   suppressWarnings(
   summary <- dplyr::mutate(summary,
-                            max_tension = ifelse(summary$max_tension > 69,
+                            max_tension = ifelse(summary$max_tension > 99,
                                         summary$max_tension, as.numeric("NA")))
   )
   summary <- dplyr::select(summary, -dttm_out)
