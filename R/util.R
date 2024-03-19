@@ -79,3 +79,51 @@ add_file_cruiseID <- function(filename, cruiseID) {
   return(filename)
 
 }
+
+#' Plot Limits
+#'
+#' Experimental, Takes an elg file and outputs a vector of the limits of the max
+#' and min lats and lons with a buffer for plotting.
+#'
+#' @param elg
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_limits <- function(elg) {
+  lat_max <- max(elg$lat) + 3
+  lat_min <- min(elg$lat) -3
+
+  centered_lons <- center_longitude(elg)
+
+  lon <- dplyr::if_else(elg$lon < 0, elg$lon + 360, elg$lon)
+
+  lon_max <- max(lon) + max(centered_lons) + 3
+  lon_max <- dplyr::if_else(lon_max > 180, lon_max - 360, lon_max)
+
+  lon_min <- min(lon) + min(centered_lons) - 3
+  lon_min <- dplyr::if_else(lon_min > 180, lon_min -360, lon_min)
+
+  limits <- c(lon_min, lon_max, lat_max, lat_min)
+  return(limits)
+}
+
+#' Center Longitude
+#'
+#' Experimental, A function that takes a vector of longitudes and centers them on the first longitude in the vector.
+#'
+#' @param elg
+#'
+#' @return
+#' @export
+#'
+#' @examples
+center_longitude <- function(elg) {
+  first_longitude <- elg$lon[1]
+  centered_longitudes <- elg$lon - first_longitude
+  centered_longitudes[centered_longitudes > 180] <- centered_longitudes[centered_longitudes > 180] - 360
+  centered_longitudes[centered_longitudes < -180] <- centered_longitudes[centered_longitudes < -180] + 360
+  return(centered_longitudes)
+}
+
