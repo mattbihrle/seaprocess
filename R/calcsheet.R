@@ -145,25 +145,19 @@ read_calc_fold <- function(calc_folder, bottle_sum, bottle_is_file = TRUE) {
 #'
 #'
 #'@param calc_file #the calculation file to be read, chlorophyll, PO4, NO3, pH.
-#'  This file must be formatted correctly with an 'output' sheet.
-#'@param bottle_sum #the bottle summary from the [create_bottle()] function
-#'@param bottle_is_file() #if TRUE, this will read the [bottle.csv] file and
-#'  creat the [bottle] object. If FALSE (the default), it will append data to
-#'  the bottle object.
+#'  This file must be formatted correctly with an 'output' sheet containing only
+#'  station number, bottle number, and paramter name (chla, no3 etc).
+#'@param output #the datasheet to output calc sheet data to. This will typically
+#'be the bottle_input sheet.
 #'
-#'@return #creates the [bottle] object that will be updated with new data each
-#'  time it is run.
-#'@export #currently does not export a csv file. The final [bottle] object must
-#'  be exported for use in ODV
+#'@return
+#'@export
 #'
 #'
-#'@details This function, and the [read_calc_fold()] function combine the
-#'[output] sheet from any calculation sheet (from path ['calc_file]) and the
-#'[bottle] object. If [bottle] is not an object (ex. if it is the first time
-#'this is run) it will read the [bottle.csv] file from the [bottle_sum]
-#'diriectory and create the [bottle] object. [create_bottle()] will overwrite
-#'the [bottle.csv] and delete any calc sheet data added in past uses of this
-#'function. RUnning this function again will replace these data.
+#'@details This function, and the [read_calc_fold_mb()] function combine the
+#'[output] sheet from any calculation sheet (from path ['calc_file']) and the
+#'[bottle_input] datasheet. The function will only fill values where there is an
+#'"NA" so any numerical values entered in bottle_input will not be overwritten.
 #'
 #'
 #'
@@ -223,27 +217,20 @@ read_calc_sheet_mb <- function(calc_file, output) {
 #'
 #'@param calc_folder #the calculation folder to be read. chlorophyll, PO4, NO3,
 #'  pH. All excel files must be formatted correctly with an 'output' sheet.
-#'@param bottle_sum #the bottle summary from the [create_bottle()] function
-#'@param bottle_is_file #if TRUE (the default) this will read the [bottle.csv]
-#'  file and creat the [bottle_sum] object. If FALSE, it will append data to the
-#'  bottle object.
 #'
 #'@return
-#'@export #currently does not export an ODV csv file.
+#'@export
 #'
-#'@details This function, and the [read_calc_file()] function combine the
-#'  [output] sheet from any calculation excel file (from path ['calc_file]) and
-#'  the [bottle_sum] object. If [bottle] is not an object (ex. if it is the
-#'  first time this is run) it will read the [bottle.csv] file from the
-#'  [bottle_sum] diriectory and create the [bottle_sum] object.
-#'  [create_bottle()] will overwrite the [bottle.csv] and delete any calc sheet
-#'  data added in past uses of this function. RUnning this function again will
-#'  replace these data. This function will read every excel file in the
-#'  specified folder [calc_folder] from [datasheet_examples.R] and append the
-#'  [output] sheet to the bottle summary csv. Common errors arise from spelling
-#'  typos in the header data of the many calculation excel files, or from
-#'  unexpected values in the columns (characters vs. numbers etc.). Individual
-#'  files may be run with the [read_calc_file()] function for troubleshooting.
+#'@details This function, and the [read_calc_fold_mb()] function combine the
+#'  [output] sheet from any calculation sheet (from path ['calc_file']) and the
+#'  [bottle_input] datasheet. The function will only fill values where there is
+#'  an "NA" so any numerical values entered in bottle_input will not be
+#'  overwritten. This function will read every excel file in the specified
+#'  folder [calc_folder] and append the [output] sheet to the bottle summary
+#'  csv. Common errors arise from spelling typos in the header data of the many
+#'  calculation excel files, or from unexpected values in the columns
+#'  (characters vs. numbers etc.). Individual files may be run with the
+#'  [read_calc_file()] function for troubleshooting.
 #'
 #' @examples
 read_calc_fold_mb <- function(calc_folder, output) {
