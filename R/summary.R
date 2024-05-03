@@ -23,6 +23,10 @@
 #' @param skipcheck toggles whether to check through the summary data to make
 #'   sure all required fields (deployment, date, time in, zd) all have values.
 #'   Defaults to FALSE, set to TRUE to bypass this step.
+#'  @param process_lci optional to reroute the summary function to process wire
+#'  data from the lci90 raw file. Also requires the parameter `raw_folder`
+#'  @param raw_folder location of the .RAW file for the LCI90 created by SCS.
+#'  The function will automatically look for a filename containing "LCI90-raw"
 #' @param ... optional arguments passed to format_csv_output
 #'
 #' @return A tibble containing the combined data frames. If csv_folder is set to
@@ -70,6 +74,7 @@ create_summary <- function(summary_input, elg_input,
                            csv_filename = "summary_datasheet.csv",
                            force_stations = TRUE, cruiseID = NULL,
                            add_cruiseID = TRUE, magdiff = 60, skipcheck = FALSE,
+                           process_lci = FALSE, raw_folder = lci_raw_folder,
                            ...) {
 
   # read in the summary_input xlsx file
@@ -133,6 +138,38 @@ create_summary <- function(summary_input, elg_input,
   sti[iii] <- NA
   eni[iii] <- NA
 
+# MB wire logging test additions____________________________________
+if (process_lci) {
+  files <- list.files(raw_folder, pattern = "LCI90-raw", full.names = T)
+  if (length(files) > 0) {
+lci <- readr::read_csv(files, col_names = c("date", "time", "string", "tension",
+                                            "speed", "payout", "ascii"), show_col_types = F)
+#create dttm column
+lci <- dplyr::mutate(lci,
+                     dttm = lubridate::mdy_hms(
+                       paste(lci$date,lci$time)))
+#make sure columns are numeric
+lci <- dplyr::mutate(lci, dplyr::across(tension:ascii, as.numeric))
+
+#Loop through and find max tension!
+
+sti_t <- find_near(lci$dttm, summary$dttm)
+eni_t <- find_near(lci$dttm, summary$dttm_out)
+
+max_tension <- rep(NA, length(sti_t))
+
+for (i in 1:length(sti_t)) {
+  if(is.na(eni_t[i])) {
+    next
+    }
+  max_tension[i] <- max(lci$tension[sti_t[i]:eni_t[i]])
+  }
+} else {
+  warning(paste("No raw files found matching 'LCI90-raw.'
+                \n Proceeding to pull max_tension from the event file (RCS Only)."))
+         }
+  } else {
+#_________________________________________________________
   #MB add max_tension
   max_tension <- rep(NA, length(sti))
   for (i in 1:length(sti)) {
@@ -141,7 +178,7 @@ create_summary <- function(summary_input, elg_input,
     }
     max_tension[i] <- max(elg$wire_tension[sti[i]:eni[i]])
   }
-
+}
 #filter out max tensions below a certain threshold
 
   tow_length <- rep(NA, length(sti))
@@ -158,6 +195,7 @@ create_summary <- function(summary_input, elg_input,
 
   #add tow length in meters to data
   summary <- dplyr::mutate(summary, station_distance = tow_length*1000)
+
   #MB add max_tension column
   summary <- dplyr::mutate(summary, max_tension = max_tension)
   #Remove any resting tension <100

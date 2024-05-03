@@ -267,6 +267,19 @@ the same.
     cruise, copy and paste their script and update it for your own
     cruise.
 
+-   `create_summary` has an option to autofill max tension from either
+    the event file created by SCS or the .RAW file created by SCS (RCS
+    only).
+
+    -   To process wire tension through the raw file define where the
+        raw file is found (`lci_raw_folder <- "W://"`) and add the
+        following parameters to your create summary function:
+        `raw_folder = lci_raw_folder` and `process_lci = T`
+
+    -   Processing the second to second data will take longer than
+        minute to minute so be patient as the program runs! See
+        `?create_summary` for more information.
+
 -   `process_elg` has a couple options to filter out bad data.
 
     -   It will automatically filter out all flow_through data when
