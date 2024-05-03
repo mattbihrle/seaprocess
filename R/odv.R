@@ -268,14 +268,29 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
 
   odv_out <- initialize_odv_tibble(data, cruiseID, type = "B")
 
+#MB add the other column names here
   odv_out <- tibble::add_column(odv_out,
-                                `Depth [m]` = data$depth)
+                                `Depth [m]` = data$depth_m,
+                                `Temperature [~^oC]` = data$temp_c,
+                                `Salinity [psu]` = data$sal_psu,
+                                `Phosphate [uM]` = data$po4_uM,
+                                `Nitrate [uM]` = data$no3_uM,
+                                `pH` = data$ph,
+                                `Alkalinity [meq/L]` = data$alk_meq.L,
+                                `Density[Kg/m~^3]` = data$sigtheta_kg.m3,
+                                `Chl a Fluorescence [V]` = data$chla_fluor,
+                                `Oxygen,SBE43[~$m~#mol/kg]` = data$oxygen_uM.kg,
+                                `Oxygen [mL/L]` = data$oxygen_mL.L,
+                                `CDOM Fluorescence [mg/m~^3]` = data$cdom,
+                                `PAR Irradience [~$m~#E/m~^2/s]` = data$par_mE.m2.s,
+                                `Transmittance [V]` = data$bat)
 
   # Add the rest of the data skipping depth column
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "bottle")
-  ii2 <- which(colnames(data) == "depth")
-  odv_out <- dplyr::bind_cols(odv_out, data[c(ii:(ii2-1), (ii2+1):ncol(data))])
+  #4.19 MB comment out these
+  # ii <- which(colnames(data) == "bottle")
+  # ii2 <- which(colnames(data) == "depth_m")
+  # odv_out <- dplyr::bind_cols(odv_out, data[c(ii:(ii2-1), (ii2+1):ncol(data))])
 
   if(!is.null(file)){
     readr::write_tsv(odv_out,file)

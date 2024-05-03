@@ -169,7 +169,13 @@ process_ctd <- function(ctd_folder, cruiseID = NULL,
     if(add_cruiseID == TRUE & !is.null(cruiseID)) {
       csv_output <- add_file_cruiseID(csv_output, cruiseID)
     }
-    safely_write_csv(ctd, csv_output)
+    #MB add lines to rename ctd for output
+    ctd_units <- ctd |>
+      dplyr::rename(oxygen_mL.L = oxygen, oxygen_uM.kg = oxygen2,
+                    pres_db = pres, sal_psu = sal,
+                    temp_c = temp, chla_fluor = fluor,
+                    theta_c = theta, sigtheta_kg.m3 = sigtheta, par_mE.m2.s = par)
+    safely_write_csv(ctd_units, csv_output)
   }
 
 
