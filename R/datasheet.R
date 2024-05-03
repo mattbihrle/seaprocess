@@ -133,8 +133,9 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   # makes a neuston correction if not enough rows to make good on the excel read
   if(sum(data_type %in% c("NT", "MN", "2MN", "TT"))>0) {
     # Make sure all non note/description/station columns are numeric
+    # MB add 'file' 4.17
     suppressWarnings(
-    data <- dplyr::mutate(data, dplyr::across(!dplyr::matches("note|desc|stat"),as.numeric))
+    data <- dplyr::mutate(data, dplyr::across(!dplyr::matches("note|desc|stat|file"),as.numeric))
     )
   }
 
@@ -434,6 +435,16 @@ output <- dplyr::arrange(output, desc(bottle), .by_group = T)
 output <- dplyr::ungroup(output)
 #Remove max_tension
 output <- dplyr::mutate(output, max_tension = NULL)
+if (process_calc == TRUE){
+  output <- read_calc_fold_mb(calc_folder, output)
+}
+
+##MB add renamed bottle columns
+output <- output |>
+  dplyr::rename(po4_uM = po4, no3_uM = no3, chla_ng.L = chla, alk_meq.L = alk,
+                depth_m = depth, temp_c = temperature, pres_db = pressure, chla_fluor = fluorescence,
+                par_mE.m2.s = par, oxygen_uM.kg = oxygen, oxygen_mL.L = oxygen2,
+                sal_psu = salinity, theta_c = theta, sigma_kg.m3 = sigma)
 return(output)
 
 }
