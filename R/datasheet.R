@@ -326,7 +326,7 @@ compile_neuston <- function(data) {
 #' @export
 #'
 #' @examples
-compile_bottle <- function(data, ros_input) {
+compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
 
   # get just the list of stations that are unique
   stations <- unique(data$station)

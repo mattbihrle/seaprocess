@@ -120,6 +120,38 @@ are correct, however you should not need to change anything.
             three letter code that matches the code you will input in
             the summary datasheet.
 
+### Calculation Sheets
+
+Calculation sheets for water chemistry can be setup to autofill values
+into the bottle datasheet.
+
+To do this, ensure there is a folder in your cruise project called
+"calc_sheets" (this should be autocreated when you create a new cruise).
+
+Next, double check that your `<cruise_ID>process_data.R` file has the
+line `calc_folder <- "calc_sheets"`
+
+Then, add two parameters to your `create_datasheet()` for bottle data :
+`process_calc = T` and `calc_folder = calc_folder`. Your bottle
+datasheet function should look like:
+`create_datasheet(bottle_input, data_type = "bottle", ros_input = ros_folder, cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
+
+Lastly, add your calc sheets! R will look for a tab in your excel file
+labeled exactly "output" which has a column for station number, bottle,
+and parameter (ph, chla, no3, etc). All the other tabs in the excel file
+can contain whatever, so it is easy to reuse our normal SEA calc sheets.
+
+The bottle datasheet autopopulates with a few typical parameters for SEA
+cruises but you can always add your own! Just be sure to add them
+somewhere between the pre-existing parameters and ensure column names
+match on the bottle datasheet and your output sheet.
+
+If you don't wish to use the calc sheets function, just take the
+`process_calc` and `calc_folder` parameters out of your bottle function
+and hand enter data as usual. Any data hand entered will always
+overwrite anything autofilled from the calc sheets so there is a backup
+if something is not working.
+
 ## Data Entry
 
 ### Station Summary Sheet
@@ -150,7 +182,10 @@ For hydrocasts, two datasheets will need to be filled out.
     cast
 
 -   Second, `bottle_input` will need the station number and ONLY the
-    bottle number for bottles that you drew water from.
+    bottle number for bottles that you drew water from. You can input
+    water chemistry values like pH, or chla concentrations in this
+    sheet. To have these values autofill from the calculation sheets see
+    the "Calculation Sheets" section above.
 
     -   This is a change from our previous practice in hydrowork of
         copying and pasting data from all 12 bottles.
