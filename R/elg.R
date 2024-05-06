@@ -14,8 +14,6 @@
 #' @keywords
 #' @export
 #' @examples
-#' read_elg()
-#'
 read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                      csv_output = NULL,
                      keep = c("dttm","lon","lat","temp","sal","fluor",
@@ -210,9 +208,6 @@ for(i in 1:length(keep)){
 #' @param lonin longitude to process
 #' @keywords
 #' @export
-#' @examples
-#' parse_lon()
-#'
 parse_lon <- function(lonin) {
 
   return(parse_latlon(lonin, var = "lon"))
@@ -226,8 +221,6 @@ parse_lon <- function(lonin) {
 #' @param latin lat to process
 #' @keywords
 #' @export
-#' @examples
-#' parse_lat()
 #'
 parse_lat <- function(latin) {
 
