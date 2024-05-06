@@ -12,7 +12,3 @@ parse_lon(lonin)
 \description{
 Parse lon from elg file
 }
-\examples{
-parse_lon()
-
-}

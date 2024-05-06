@@ -30,7 +30,3 @@ or other of the GPS feeds.}
 SEA event files contain output from a number of instruments
 including GPS, flow-through, chirp, etc.
 }
-\examples{
-read_elg()
-
-}

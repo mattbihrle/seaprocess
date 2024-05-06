@@ -12,7 +12,3 @@ parse_lat(latin)
 \description{
 Wrapper function for parse_latlon() for latutude case
 }
-\examples{
-parse_lat()
-
-}

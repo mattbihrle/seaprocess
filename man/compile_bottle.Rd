@@ -4,7 +4,7 @@
 \alias{compile_bottle}
 \title{Create bottle file sheet}
 \usage{
-compile_bottle(data, ros_input)
+compile_bottle(data, ros_input, calc_folder, process_calc = FALSE)
 }
 \arguments{
 \item{datasheet_folder}{}

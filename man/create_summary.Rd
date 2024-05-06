@@ -14,6 +14,8 @@ create_summary(
   add_cruiseID = TRUE,
   magdiff = 60,
   skipcheck = FALSE,
+  process_lci = FALSE,
+  raw_folder = lci_raw_folder,
   ...
 )
 }
@@ -38,7 +40,11 @@ as to whether to return a NA or add a value regardless}
 
 \item{skipcheck}{toggles whether to check through the summary data to make
 sure all required fields (deployment, date, time in, zd) all have values.
-Defaults to FALSE, set to TRUE to bypass this step.}
+Defaults to FALSE, set to TRUE to bypass this step.
+@param process_lci optional to reroute the summary function to process wire
+data from the lci90 raw file. Also requires the parameter \code{raw_folder}
+@param raw_folder location of the .RAW file for the LCI90 created by SCS.
+The function will automatically look for a filename containing "LCI90-raw"}
 
 \item{...}{optional arguments passed to format_csv_output}
 
