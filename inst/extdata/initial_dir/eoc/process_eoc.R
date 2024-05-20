@@ -1,12 +1,18 @@
 #----------------EOC Processing-------------------------------------------------
 
 # This script is intended to setup the cruise project to be used easily
-# post-cruise. First, load the processing library
+# post-cruise AND create any cruise summary reports that need to go back
+# to the office.
+
+# First, load the processing library and define cruise ID.
 
 library(seaprocess)
 
-#Then, tell the function where to find raw cruise data. You should
-# be able to just copy and paste from "<cruise_ID>_process_data.R"
+cruiseID <- ""
+
+# Then, move the raw data. Step one is to tell the function where to find raw
+# cruise data. You should be able to just copy and paste from
+# "<cruise_ID>_process_data.R"
 
 elg_folder <- "<enter-location-of-elg-folder>"
 ctd_folder <- "<enter-location-of-ctd-folder>"
@@ -37,4 +43,9 @@ adcp_folder <- "raw/adcp"
 # there are no issues.
 
 
+# Step two: Create a wire log for UNOLS reporting. Running the function
+# below will generate a wire use report saved to the `output/csv` folder. NOTE:
+# the function is looking for the column name "max_wire_out" so any wire
+# deployments will need that column in their datasheet to be included.
 
+process_wire_log(cruiseID = cruiseID)

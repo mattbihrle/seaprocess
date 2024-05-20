@@ -23,7 +23,6 @@ initialize_master <- function(path, cruiseID = NULL,
     cruiseID <- basename(path)
   }
 
-
   # ensure path exists but don't overwrite project
   if(!dir.exists(path)) {
     dir.create(path, recursive = TRUE, showWarnings = FALSE)
@@ -73,10 +72,19 @@ initialize_master <- function(path, cruiseID = NULL,
   # write this to file
   readr::write_lines(lines, file.path(path,"process_data.R"))
 
+  #Add cruiseID to the process_eoc script
+  lines_eoc <- readr::read_lines(file.path(path,"/eoc/process_eoc.R"))
+
+  # add cruiseID as master processing param
+  ii <- stringr::str_which(lines_eoc, "^cruiseID \\<-")
+  lines_eoc[ii] <- stringr::str_replace(lines_eoc[ii], '\\"\\"', paste0('\\"',cruiseID,'\\"'))
+  readr::write_lines(lines_eoc, file.path(path,"/eoc/process_eoc.R"))
+
   ## TODO append cruise ID to all files
   cruise <- basename(path)
   old_names <- c(list.files(file.path(path,"datasheets"), full.names = T, recursive = T),
-                 list.files(path, full.names = T, recursive = F, pattern = "*.R"))
+                 list.files(path, full.names = T, recursive = F, pattern = "*.R"),
+                 list.files(file.path(path, "eoc"), full.names = T, recursive = F, pattern = "*.R"))
   new_names <- file.path(dirname(old_names),paste0(cruiseID,"_",basename(old_names)))
   file.rename(old_names, new_names)
 
