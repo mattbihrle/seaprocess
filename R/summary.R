@@ -148,8 +148,10 @@ lci <- readr::read_csv(files, col_names = c("date", "time", "string", "tension",
 lci <- dplyr::mutate(lci,
                      dttm = lubridate::mdy_hms(
                        paste(lci$date,lci$time)))
-#make sure columns are numeric
+#make sure non datetime columns are numeric
+suppressWarnings(
 lci <- dplyr::mutate(lci, dplyr::across(tension:ascii, as.numeric))
+)
 
 #Loop through and find max tension!
 

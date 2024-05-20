@@ -236,10 +236,7 @@ read_calc_sheet_mb <- function(calc_file, output) {
 read_calc_fold_mb <- function(calc_folder, output) {
 
 
-  #first, ensure the needed fields in "output" are numeric
-suppressWarnings(
-  output <- dplyr::mutate(output, dplyr::across(po4:alk, as.numeric))
-)
+
   #a loop that reads all the excel files in the specified folder and calls the read_calc_file() function on each one.
   calc_files <- list.files(calc_folder,pattern = '\\.xls$|\\.xlsx$')
   if(length(calc_files) > 0) {

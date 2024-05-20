@@ -162,6 +162,11 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
                           deployment = ifelse(is.na(as.numeric(bottle)), "SS", "HC"))
     )
     check_stations(data, summary, bottle = TRUE)
+
+    #Make water chemistry columns numeric to aid in calculations later on
+   suppressWarnings(
+     data <- dplyr::mutate(data, dplyr::across(!dplyr::matches("stat|note|deployment|bott"), as.numeric))
+   )
     data <- dplyr::right_join(summary, data, by=c("station","deployment"))
 
     data <- compile_bottle(data, ...)
@@ -318,9 +323,18 @@ compile_neuston <- function(data) {
 
 #' Create bottle file sheet
 #'
-#' @param summary_csv
-#' @param ros_input
-#' @param datasheet_folder
+#' Compiles bottle data from the bottle_input sheet, .ros files and optionally, calculation sheets.
+#' To compile data from calculation sheets, set process_calc = TRUE, and define calc_folder path to the folder where calc sheets are stored.
+#' Likely this will be the "calc_sheets" folder in the project directory.
+#'
+#' @param data dataframe from bottle_input datasheet
+#' @param ros_input input folder for the .ros files output by Seabird.
+#' @param process_calc defaults to FALSE. Optional parameter to process water
+#'   chemistry data from calculation sheets. Set to TRUE if desired.
+#' @param calc_folder if process_calc = TRUE, folder where calculation sheets
+#'   are stored. Each calculation sheet will need a correctly formatted 'output'
+#'   tab with station, bottle number, and variable (chla, no3 etc). See "Setup
+#'   and Use" vignette for more information.
 #'
 #' @return
 #' @export
@@ -440,11 +454,14 @@ if (process_calc == TRUE){
 }
 
 ##MB add renamed bottle columns
-output <- output |>
-  dplyr::rename(po4_uM = po4, no3_uM = no3, chla_ng.L = chla, alk_meq.L = alk,
-                depth_m = depth, temp_c = temperature, pres_db = pressure, chla_fluor = fluorescence,
-                par_mE.m2.s = par, oxygen_uM.kg = oxygen, oxygen_mL.L = oxygen2,
-                sal_psu = salinity, theta_c = theta, sigma_kg.m3 = sigma)
+units <- c(po4_uM = "po4", no3_uM = "no3", chla_ng.L = "chla", alk_meq.L = "alk",
+           depth_m = "depth", temp_c = "temperature", pres_db = "pressure",
+           chla_fluor = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
+           oxygen_mL.L = "oxygen2", sal_psu = "salinity", theta_c = "theta",
+           sigma_kg.m3 = "sigma")
+
+output <- dplyr::rename(output, (any_of(units)))
+
 return(output)
 
 }
