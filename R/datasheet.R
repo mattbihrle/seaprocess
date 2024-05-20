@@ -489,7 +489,7 @@ check_stations <- function(data, summary, bottle = FALSE) {
     #Output a warning for those columns
     warning(paste("Station number",
                   paste0(stations, collapse = ", "),
-                  " \n missing from summary datasheet. Correct and rerun."))
+                  " \n missing from summary datasheet or incorrectly formatted. Correct and rerun."))
   }
 }
 
