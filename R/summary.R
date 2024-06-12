@@ -82,11 +82,12 @@ create_summary <- function(summary_input, elg_input,
 
   summary_check(summary, skipcheck)
 
-  # combine date and time and convert to R datatime object using specified time zone
+  # combine date and time and convert to R datetime object using specified time zone
+
   summary <- dplyr::mutate(summary,
                            dttm = lubridate::ymd_hm(
                              paste(summary$date,summary$time_in)
-                             ) + lubridate::hours(summary$zd)
+                             ) + lubridate::dhours(as.numeric(summary$zd))
                            )
 
   # Test to see whether elg_input is a file or a folder and read elg file(s) accordingly
@@ -144,6 +145,7 @@ if (process_lci) {
   if (length(files) > 0) {
 lci <- readr::read_csv(files, col_names = c("date", "time", "string", "tension",
                                             "speed", "payout", "ascii"), show_col_types = F)
+
 #create dttm column
 lci <- dplyr::mutate(lci,
                      dttm = lubridate::mdy_hms(
@@ -160,11 +162,13 @@ eni_t <- find_near(lci$dttm, summary$dttm_out)
 
 max_tension <- rep(NA, length(sti_t))
 
+
 for (i in 1:length(sti_t)) {
   if(is.na(eni_t[i])) {
     next
     }
   max_tension[i] <- max(lci$tension[sti_t[i]:eni_t[i]])
+
   }
 } else {
   warning(paste("No raw files found matching 'LCI90-raw.'
@@ -283,7 +287,8 @@ format_csv_output <- function(df, dttm_format = "%Y-%m-%dT%H:%M", dttm_suffix = 
 
   # Format date and time to be in ISO 8601 format including timezone
   if("zd" %in% colnames(df) & "dttm" %in% colnames(df)) {
-    df$dttm <- paste0(format(df$dttm - lubridate::hours(df$zd), dttm_format),
+
+    df$dttm <- paste0(format(df$dttm - lubridate::dhours(as.numeric(df$zd)), dttm_format),
                       zd_to_tz(df$zd, format_out = TRUE))
   }
 
@@ -335,20 +340,50 @@ format_decimal <- function(df, col_name, digits) {
 #' @examples
 zd_to_tz <- function(zd, format_out = FALSE) {
 
-  tz <- as.numeric(zd) * -1
+tz <- (as.numeric(zd) * -1)
 
-  if(format_out) {
-    timeadd <- paste0(stringr::str_pad(abs(tz),2,pad = "0"),":00")
-    tz <- dplyr::case_when(
-      tz == 0 ~ "Z",
-      sign(tz) == 1 ~ paste0("+", timeadd),
-      sign(tz) == -1 ~ paste0("-", timeadd),
-      TRUE ~ NA_character_
-    )
+if(format_out){
+
+zd_duration <- lubridate::dhours(as.numeric(zd) * -1)
+zd_duration <- lubridate::as.period(zd_duration)
+zd_duration <- as.character(zd_duration)
+#extract hours and minutes
+hours <- stringr::str_extract(zd_duration, pattern = "[:digit:]*(?=H)")
+minutes <- stringr::str_extract(zd_duration, pattern = "[:digit:]*(?=M)")
+#Paste things back together while adding in zeros
+timeadd <- paste0(stringr::str_pad(hours,2,pad = "0"), ":",
+                  stringr::str_pad(minutes, 2, pad = "0"))
+#swap the signs for tz
+tz <- dplyr::case_when(
+  tz == 0 ~ "Z",
+  sign(tz) == 1 ~ paste0("+", timeadd),
+  sign(tz) == -1 ~ paste0("-", timeadd),
+  TRUE ~ NA_character_
+)
+
+
   } else {
     tz <- as.character(tz)
     ii <- !stringr::str_sub(tz,1,1) == "-"
     tz[ii] <- paste0("+", tz[ii])
+
+    return(tz)
+    # MB USED to format Marquesian ZD
+#      tz <- as.character(zd)
+#      ##TESTS
+#      neg <- stringr::str_which(tz, "\\+")
+#      pos <- stringr::str_which(tz, "\\-")
+#      # tz[which(is.na(tz))] <- as.character("+99:99")
+#      # ii <- !stringr::str_sub(tz,1,1) == "-"
+#      if(length(pos) > 0) {
+#        stringr::str_sub(tz[pos],1,1) <- "+"
+#      }
+#
+#       if(length(neg) > 0) {
+#     stringr::str_sub(tz[neg],1,1) <- "-"
+#       }
+
+
   }
   return(tz)
 }
