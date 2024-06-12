@@ -137,14 +137,23 @@ datasheet function should look like:
 `create_datasheet(bottle_input, data_type = "bottle", ros_input = ros_folder, cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
 
 Lastly, add your calc sheets! R will look for a tab in your excel file
-labeled exactly "output" which has a column for station number, bottle,
+labeled exactly "output" which has 3 columns: station number, bottle,
 and parameter (ph, chla, no3, etc). All the other tabs in the excel file
 can contain whatever, so it is easy to reuse our normal SEA calc sheets.
 
+#### Adding New Parameters
+
 The bottle datasheet autopopulates with a few typical parameters for SEA
 cruises but you can always add your own! Just be sure to add them
-somewhere between the pre-existing parameters and ensure column names
-match on the bottle datasheet and your output sheet.
+somewhere between the pre-existing parameters and ensure they have the
+correct column names. R will automatically replaces spaces with `_` and
+remove `%`, periods, dashes, and anything between parentheses. *If you
+are seeing an error, check your naming in both the bottle datasheet and
+calculation sheet!*
+
+The typical SEA parameters (no3, po4, pH, alk, chla) will all auto fill
+with units in the output sheet. If you need units on new parameters be
+sure to add them to your column name.
 
 If you don't wish to use the calc sheets function, just take the
 `process_calc` and `calc_folder` parameters out of your bottle function
@@ -176,10 +185,10 @@ if something is not working.
 
 ### Hydrocast Data Entry
 
-For hydrocasts, two datasheets will need to be filled out.
+For hydrocasts, two datasheets will need to be filled out in addition to
+the `summary_input` sheet.
 
--   First, the `ctd_input` will contain all of the meta data for the
-    cast
+-   First, the `ctd_input` will contain all of the metadata for the cast
 
 -   Second, `bottle_input` will need the station number and ONLY the
     bottle number for bottles that you drew water from. You can input
@@ -189,6 +198,11 @@ For hydrocasts, two datasheets will need to be filled out.
 
     -   This is a change from our previous practice in hydrowork of
         copying and pasting data from all 12 bottles.
+    -   `bottle_input` defaults to columns for no3, po4, pH, alkalinity,
+        and chla. Each of these values will have units added on the
+        output csv and odv files. IF other variables are used, you will
+        need to add units to the column name in `bottle_input`. See the
+        "Calculation Sheets" section above for more information.
 
 ### Surface Stations
 
@@ -212,7 +226,9 @@ record the bottle number as `SS`.
 The easiest way to count surface stations separately from all other
 deployments is to start counting at 100 (SS-001 will be SS-101, SS-002
 will be SS-102 etc.). Still input the station time and bottle data into
-`summary_input` and `bottle_input` as `SS`.
+`summary_input` and `bottle_input` as `SS`. It is also possible to
+create a separate summary sheet just for surface stations if that is
+desired.
 
 ## Running the Script
 
@@ -222,15 +238,17 @@ Once everything is setup, click on the top of the script and press
 check that you entered the relevant file paths correctly, you have no
 typos or stray characters and that your slashes are all forward ("/"
 instead of "\\"). To run the whole script at once you can go to:
-**Code\>Run Region\>Run All** or hit **Ctrl + Alt + A.** If you are
+**Code\>Run Region\>Run All** or hit **Ctrl + Alt + R.** If you are
 running the whole script make sure to comment out any lines you are not
 using by putting a `#` at the beginning of the line. If R see a blank
 data sheet it will show and error and stop the run where the error
-occurred. In the "output" folder, R will create a csv file (comma
-separated value) for each datasheets as well as a text file formatted
-for ODV input with the "output/odv" folder. As of July 2023, the ODV
-text files are only for our most common deployments however you can
-always import csv files into ODV.
+occurred.
+
+In the "output" folder, R will create a csv file (comma separated value)
+for each datasheets as well as a text file formatted for ODV input with
+the "output/odv" folder. As of July 2023, the ODV text files are only
+for our most common deployments however you can always import csv files
+into ODV.
 
 **NOTE:** Cast data and bottle data are processed in two separate ODV
 .txt files (odv/ctd and odv/bottle). This means that to have an ODV

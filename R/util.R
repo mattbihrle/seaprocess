@@ -92,20 +92,29 @@ add_file_cruiseID <- function(filename, cruiseID) {
 #'
 #' @examples
 plot_limits <- function(elg) {
-  lat_max <- max(elg$lat) + 3
-  lat_min <- min(elg$lat) -3
-
-  centered_lons <- center_longitude(elg)
+  lat_max <- max(elg$lat, na.rm = T) + 3
+  lat_min <- min(elg$lat, na.rm = T) -3
 
   lon <- dplyr::if_else(elg$lon < 0, elg$lon + 360, elg$lon)
+  lon <- lon[!is.na(lon)]
 
-  lon_max <- max(lon) + max(centered_lons) + 3
-  lon_max <- dplyr::if_else(lon_max > 180, lon_max - 360, lon_max)
+lon_east <- dplyr::if_else(max(lon) > 180, max(lon) - 355, max(lon) + 5 )
 
-  lon_min <- min(lon) + min(centered_lons) - 3
-  lon_min <- dplyr::if_else(lon_min > 180, lon_min -360, lon_min)
+lon_west <- dplyr::if_else(min(lon) > 180, min(lon) - 365, min(lon) - 5)
+#
+# if(abs(lon_i) > abs(lon_ii)){
+#   lon_max
+# }
+# min(lon)
+#   lon <- dplyr::if_else(elg$lon < 0, elg$lon + 360, elg$lon)
+#
+#   lon_max <- max(lon) + max(centered_lons) + 3
+#   lon_max <- dplyr::if_else(lon_max > 180, lon_max - 360, lon_max)
+#
+#   lon_min <- min(lon) + min(centered_lons) - 3
+#   lon_min <- dplyr::if_else(lon_min > 180, lon_min -360, lon_min)
 
-  limits <- c(lon_min, lon_max, lat_max, lat_min)
+  limits <- c(lon_west, lon_east, lat_max, lat_min)
   return(limits)
 }
 
