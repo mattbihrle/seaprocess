@@ -195,16 +195,26 @@ read_calc_sheet_mb <- function(calc_file, output) {
   #combine calc sheet values with the full bottle sheet. Rows patch will only
   # update NA values.
 
-   output <- dplyr::rows_patch(output, calc_sheet,
-                               by = c("station", "bottle"), unmatched = "ignore")
+#Pull name of variable on interest
+names <- colnames(dplyr::select(calc_sheet, !c(station, bottle)))
+
+#See if that column name is also in the output dataframe, if so, run the rows patch
+if(any(colnames(output) == names)) {
+  output <- dplyr::rows_patch(output, calc_sheet,
+                              by = c("station", "bottle"), unmatched = "ignore")
+} else{
+  warning(paste("Mismatched column names for", names,". Verify column names in",
+                calc_file,"and 'bottle_input'. Calc sheet values will not be updated."))
+}
+
+
 
   } else {
     warning(paste("No 'output' sheet found in", calc_file,
                   ". Bottle values will not be updated."))
-
+}
   return(output)
 
-  }
 }
 
 #'#Read a folder of calculation sheets, and append the data to the bottle
