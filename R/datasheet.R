@@ -114,8 +114,6 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   }
 
 
-
-
   # read in the data_input excel sheet datasheet
   data <- readxl::read_excel(data_input)
   #Set all header names to lower case
@@ -138,16 +136,24 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     data <- dplyr::mutate(data, dplyr::across(!dplyr::matches("note|desc|stat|file"),as.numeric))
     )
   }
-
   # read in station summary datasheet
   # TODO: determine what formatting to apply when read in (beyond zd)
-  summary <- readr::read_csv(
+suppressWarnings(
+ summary <- readr::read_csv(
     summary_input,
     col_types = readr::cols(
-      zd = readr::col_character()
+      zd = readr::col_character(),
+      time_in = readr::col_time(),
+      time_out = readr::col_time(),
+      date = readr::col_date()
     )
   )
-
+)
+problems <- (readr::problems(summary))
+if(nrow(problems) > 0) {
+  warning(paste("One or more summary values formatted incorrectly and will be set to 'NA'.", "See table for more information."))
+  print(problems)
+}
   # filter by data_type
   summary <- dplyr::filter(summary, deployment %in% data_type)
 
@@ -196,6 +202,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     if(add_cruiseID == TRUE & !is.null(cruiseID)) {
       csv_output <- add_file_cruiseID(csv_output, cruiseID)
     }
+
     readr::write_csv(format_csv_output(data),csv_output, na = "NA")
   }
 
