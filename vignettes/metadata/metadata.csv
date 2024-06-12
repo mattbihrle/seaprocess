@@ -8,7 +8,7 @@ biodens,Biodensity,mL/m3 or mL/m2,"Zooplankton biovolume (mL) divided by tow dis
 bot_depth,Bottom Depth,m,Depth of the seafloor measured by CHIRP,1,,,double,all
 cast_depth,Cast Depth,m,,,,,,"CTD, HC"
 cdom,CDOM,V,Color Dissolved Organic Matter,2,,,double,all
-chla,Chl-a Fluorescence,V,Extracted Chlorophyll-a fluoresence,,,,,HC
+chla,Chl-a Fluorescence,V,Chlorophyll-a fluoresence,,,,,HC
 cloud_cover,,%,,,,,,NT
 date,Date,,,,,,yyyy-mm-dd,all
 dep,Depth,m,Depth bins  on CTD cast,,,,,"CTD, HC"

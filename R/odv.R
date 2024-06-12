@@ -276,8 +276,9 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
                                 `Phosphate [uM]` = data$po4_uM,
                                 `Nitrate [uM]` = data$no3_uM,
                                 `pH` = data$ph,
+                                `Chl a [ug/L]` = data$chla_ug.L,
                                 `Alkalinity [meq/L]` = data$alk_meq.L,
-                                `Density[Kg/m~^3]` = data$sigtheta_kg.m3,
+                                `Density[Kg/m~^3]` = data$sigma_kg.m3,
                                 `Chl a Fluorescence [V]` = data$chla_fluor,
                                 `Oxygen,SBE43[~$m~#mol/kg]` = data$oxygen_uM.kg,
                                 `Oxygen [mL/L]` = data$oxygen_mL.L,
@@ -287,9 +288,30 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
 
   # Add the rest of the data skipping depth column
   # TODO create look-up sheet to find real names
-  #4.19 MB comment out these
+  # 4.19 MB comment out these
+
+  ##TEST BELOW
+  fancy_names <- c("depth_m","temp_c", "sal_psu",
+  "po4_uM",
+  "no3_uM",
+  "ph",
+  "chla_ug.L",
+  "alk_meq.L",
+  "sigma_kg.m3",
+  "chla_fluor",
+  "oxygen_uM.kg",
+  "oxygen_mL.L",
+ "cdom",
+  "par_mE.m2.s",
+  "bat")
+  ii <- which(colnames(data) == "bottle")
+  ii2 <- which(colnames(data) == "depth_m")
+data_test <- dplyr::select(data, -dplyr::any_of(fancy_names) & c((ii+1):(ii2-2)))
+  odv_out <- dplyr::bind_cols(odv_out, data_test)
+  ## TESTS ABOVE
   # ii <- which(colnames(data) == "bottle")
   # ii2 <- which(colnames(data) == "depth_m")
+  #
   # odv_out <- dplyr::bind_cols(odv_out, data[c(ii:(ii2-1), (ii2+1):ncol(data))])
 
   if(!is.null(file)){

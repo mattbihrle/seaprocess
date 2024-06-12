@@ -174,7 +174,7 @@ process_ctd <- function(ctd_folder, cruiseID = NULL,
     #first create a vector of all possible names
     units <- c(oxygen_mL.L = "oxygen", oxygen_uM.kg = "oxygen2",
       pres_db = "pres", sal_psu = "sal",
-      temp_c = "temp", chla_fluor = "fluor",
+      temp_c = "temp", chla_v = "fluor",
       theta_c = "theta", sigtheta_kg.m3 = "sigtheta", par_mE.m2.s = "par")
     # Then rename those columns that exist with the labels with units
     #MB TODO figure out how to deal with warning message.

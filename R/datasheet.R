@@ -461,7 +461,7 @@ if (process_calc == TRUE){
 }
 
 ##MB add renamed bottle columns
-units <- c(po4_uM = "po4", no3_uM = "no3", chla_ng.L = "chla", alk_meq.L = "alk",
+units <- c(po4_uM = "po4", no3_uM = "no3", chla_ug.L = "chla", alk_meq.L = "alk",
            depth_m = "depth", temp_c = "temperature", pres_db = "pressure",
            chla_fluor = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
            oxygen_mL.L = "oxygen2", sal_psu = "salinity", theta_c = "theta",
