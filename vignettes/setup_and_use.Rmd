@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Downloading the Package
 
 Ben Harden made a cool package to streamline some of our data
-processing. to install the package on an internet connected computer
+processing. To install the package on an internet connected computer
 call:
 
 ```{r, eval=FALSE}
@@ -27,6 +27,9 @@ devtools::install_github("mattbihrle/seaprocess",
                          build_vignettes = T, 
                          dependencies = T)
 ```
+
+To install for use on LabUtil on either SEA vessel, see the "Package
+Management for SeaProcess" documentation in RCS Science or CC Science.
 
 ## Pre-Cruise Setup
 
