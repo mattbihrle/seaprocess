@@ -1,5 +1,5 @@
 ---
-title: "Introduction to seaprocess"
+title: "Introduction to SeaProcess"
 author: Ben Harden edited MBB
 date: lubridate::today()
 output: rmarkdown::html_vignette
