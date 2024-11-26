@@ -37,10 +37,14 @@ cruiseID <- ""
 # adcp_folder will probably be on the remote adcp machine. It can have all the
 # ADCP files in there, but will only read, by default the LTA files
 #
+# calc_folder is within the "datasheets" folder. See documentation for "Calculation Sheets"
+# witin "Setup and Use" for more info
+#
 elg_folder <- "<enter-location-of-elg-folder>"
 ctd_folder <- "<enter-location-of-ctd-folder>"
 ros_folder <- "<enter-location-of-ros-folder>"
 adcp_folder <- "<enter-location-of-adcp-folder>"
+calc_folder <- "<enter-location-of-calc-folder>"
 
 
 
