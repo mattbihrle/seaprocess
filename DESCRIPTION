@@ -22,5 +22,6 @@ Imports: oce,
 Suggests: 
     rmarkdown,
     knitr,
-    kableExtra
+    kableExtra,
+    ggOceanMaps
 VignetteBuilder: knitr
