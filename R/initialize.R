@@ -49,6 +49,7 @@ initialize_master <- function(path, cruiseID = NULL,
     dir.create(file.path(path,"output"))
     dir.create(file.path(path,"output","csv"))
     dir.create(file.path(path,"output","odv"))
+    dir.create(file.path(path, "output", "plots"))
     dir.create(file.path(path,"output","odv","neuston"))
     dir.create(file.path(path,"output","odv","bottle"))
     dir.create(file.path(path,"output","odv","adcp"))
@@ -56,7 +57,6 @@ initialize_master <- function(path, cruiseID = NULL,
     dir.create(file.path(path,"output","odv","elg"))
     dir.create(file.path(path,"output","odv","meter"))
   }
-
 
   ## TODO add cruise metadata contents
   lines <- readr::read_lines(file.path(path,"process_data.R"))
