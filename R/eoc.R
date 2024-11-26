@@ -3,14 +3,14 @@
 #' Process EOC files
 #'
 #' A simple function to copy relevant files to the "raw/" directory within the
-#' cruise project. It's goal is to have a package of cruise data that is easy to
-#' share with students and future scientists without requiring them to wade
-#' through heaps of miscellaneous files. In it's current state will only copy
-#' files needed to run the cruise processing scripts (.cnv, .ros .elg, .LTA (or
-#' STA)).
+#' cruise project. The overarching goal is to have a package of cruise data that
+#' is easy to share with students and future scientists without requiring them
+#' to wade through heaps of miscellaneous files. In the current state,
+#' process_eoc will only copy files needed to run the cruise processing scripts
+#' (.cnv, .ros .elg, .LTA (or STA)).
 #'
-#' Future improvements could include automatic outputs of cruise track,
-#' distance traveled, deployment types etc.
+#' Future improvements could include automatic outputs of cruise track, distance
+#' traveled, deployment types etc.
 #'
 #' @param elg_folder filepath to the folder containing elg files
 #' @param ctd_folder filepath to the folder containing ctd cnv files
@@ -96,7 +96,7 @@ eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
 #'
 #' @examples
 process_wire_log <- function(csv_folder = "output/csv",
-                             eoc_folder = "output/eoc",  cruiseID = NULL,
+                             eoc_folder = "eoc",  cruiseID = NULL,
                              csv_filename = "wire_log.csv",
                              add_cruiseID = TRUE) {
 
