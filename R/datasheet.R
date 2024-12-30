@@ -113,19 +113,36 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     }
   }
 
-
   # read in the data_input excel sheet datasheet
   data <- readxl::read_excel(data_input)
   #Set all header names to lower case
   colnames(data) <- stringr::str_to_lower(colnames(data))
   #replace spaces with _
   colnames(data) <- stringr::str_replace_all(colnames(data), " ", "_")
+
   # replace - with _
   colnames(data) <- stringr::str_replace_all(colnames(data), "-", "_")
-  #remove unit identifiers inside ()
-  colnames(data) <- stringr::str_remove_all(colnames(data), "_\\(.*\\)")
-  colnames(data) <- stringr::str_remove_all(colnames(data), "_%")
+
+  #if moon data exists (Neutson) remove the true/false
+  colnames(data) <- stringr::str_remove_all(colnames(data), "_\\(t/f\\)")
+  # replace % with 'pct'
+  colnames(data) <- stringr::str_replace_all(colnames(data), "%", "pct")
+
+  #replace # with 'count'
+  colnames(data) <- stringr::str_replace_all(colnames(data), "#", "count")
+
+  #remove parentheses
+  colnames(data) <- stringr::str_remove_all(colnames(data), "\\(")
+  colnames(data) <- stringr::str_remove_all(colnames(data), "\\)")
+
+  # remove degree symbol
+  colnames(data) <- stringr::str_remove_all(colnames(data), "\u00b0")
+
+  # remove periods
   colnames(data) <- stringr::str_remove_all(colnames(data), "\\.")
+
+  # replace \ with .
+  colnames(data) <- stringr::str_replace_all(colnames(data), "\\/", ".")
 
   # MB add MN and 2MN TT as numeric
   # makes a neuston correction if not enough rows to make good on the excel read
@@ -232,21 +249,21 @@ compile_meter <- function(data) {
                                                   total_flow),
                         .after = flow_in)
 
-  data <- dplyr::mutate(data, tow_length = ifelse(is.na(tow_length),
+  data <- dplyr::mutate(data, tow_length_m = ifelse(is.na(tow_length_m),
                                                   total_flow * flow_constant,
-                                                  tow_length),
+                                                  tow_length_m),
                         .after = flow_constant)
 
-  data <- dplyr::mutate(data, tow_volume = ifelse(is.na(tow_volume),
-                                                  tow_length * net_area,
-                                                  tow_volume),
-                        .after = net_area)
+  data <- dplyr::mutate(data, tow_volume_m3 = ifelse(is.na(tow_volume_m3),
+                                                  tow_length_m * net_area_m2,
+                                                  tow_volume_m3),
+                        .after = net_area_m2)
 
   data <- dplyr::mutate(data,
-                        zooplankton_biodens = ifelse(is.na(zooplankton_biodens),
-                                      as.numeric(zooplankton_biovol)/tow_volume,
-                                      zooplankton_biodens),
-                        .after = zooplankton_biovol)
+                        zooplankton_biodens_ml.m3 = ifelse(is.na(zooplankton_biodens_ml.m3),
+                                      as.numeric(zooplankton_biovol_ml)/tow_volume_m3,
+                                      zooplankton_biodens_ml.m3),
+                        .after = zooplankton_biovol_ml)
 
 
 
@@ -275,23 +292,23 @@ compile_meter <- function(data) {
 #' @export
 #' @rdname compile_neuston
 compile_neuston <- function(data) {
-  #remove wire tension
+  #remove wire tension and payout
+  data <- dplyr::mutate(data, max_tension = NULL, payout_at_max = NULL)
 
-  data <- dplyr::mutate(data, max_tension = NULL)
   # calculate biodensity
   if(length(which(is.na(data$station_distance)))>0) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")
   }
 
   # MB delete station distance/1000 to keep units as mL/m2
-  data <- dplyr::mutate(data, zooplankton_biodens =
-                          ifelse(is.na(zooplankton_biodens),
+  data <- dplyr::mutate(data, zooplankton_biodens_ml.m2 =
+                          ifelse(is.na(zooplankton_biodens_ml.m2),
 
-                                  zooplankton_biovol/station_distance,
+                                  zooplankton_biovol_ml/station_distance,
 
-                                 zooplankton_biodens)
+                                 zooplankton_biodens_ml.m2)
   )
-  data <- dplyr::relocate(data, zooplankton_biodens, .after = zooplankton_biovol)
+  data <- dplyr::relocate(data, zooplankton_biodens_ml.m2, .after = zooplankton_biovol_ml)
 
   # sum the total 100 count animals
   data <- dplyr::rowwise(data)
@@ -312,15 +329,15 @@ compile_neuston <- function(data) {
 
   # Add moon info to dataset and set the decimal to zero
   data <- dplyr::mutate(data,
-                        moon_phase = ifelse(is.na(moon_phase),
+                        moon_phase_pct = ifelse(is.na(moon_phase_pct),
                                             moon_data$illuminatedFraction * 100,
-                                            moon_phase),
+                                            moon_phase_pct),
                         moon_risen = ifelse(is.na(moon_risen), moon_data$altitude > 0,
-                                            moon_risen), .before = cloud_cover)
+                                            moon_risen), .before = cloud_cover_pct)
   nodec <- 0
   data <- format_decimal(data, "moon_phase", nodec)
   #move station distance after "heading"
-  data <- dplyr::relocate(data, station_distance, .after = heading)
+  data <- dplyr::relocate(data, station_distance, .after = heading_t)
 
   #MB TODO: calculate degree min lat/lon for quality control on double checking
 

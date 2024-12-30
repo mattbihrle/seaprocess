@@ -290,7 +290,8 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
   # TODO create look-up sheet to find real names
   # 4.19 MB comment out these
 
-  ##TEST BELOW
+  #Include any additional variables
+  #First make a list of all variables we have already replaced above
   fancy_names <- c("depth_m","temp_c", "sal_psu",
   "po4_uM",
   "no3_uM",
@@ -304,10 +305,14 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
  "cdom",
   "par_mE.m2.s",
   "bat")
+  #Then bracket these based on two variables we know will stay constant
   ii <- which(colnames(data) == "bottle")
   ii2 <- which(colnames(data) == "depth_m")
+  # Select anything that isn't one of the columns already included above
+  # OR within the calculation sheet
 data_test <- dplyr::select(data, -dplyr::any_of(fancy_names) & c((ii+1):(ii2-2)))
-  odv_out <- dplyr::bind_cols(odv_out, data_test)
+  #Combine these data
+odv_out <- dplyr::bind_cols(odv_out, data_test)
   ## TESTS ABOVE
   # ii <- which(colnames(data) == "bottle")
   # ii2 <- which(colnames(data) == "depth_m")

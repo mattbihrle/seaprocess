@@ -102,6 +102,11 @@ are correct, however you should not need to change anything.
     single column for the station number.
 -   Click Review \> Unprotect Sheet. This will allow you to add column
     labels to the grey heading cells.
+    -   Be intentional when choosing a name for your variable!
+        SeaProcess will automatically remove "()", "/", periods, the
+        degree symbol, and make all letters lowercase. Additionally "%"
+        and "\#" will be replaced by "pct" and "count", respectively.
+    -   You are encouraged to stick to letters, numbers, and "\_"
 -   R will automatically add surface temp, salinity, chla, station start
     and end, station distance bottom depth and max wire tension. You
     only need to add columns for variables that have to be hand entered!
@@ -150,7 +155,7 @@ The bottle datasheet autopopulates with a few typical parameters for SEA
 cruises but you can always add your own! Just be sure to add them
 somewhere between the pre-existing parameters and ensure they have the
 correct column names. R will automatically replaces spaces with `_` and
-remove `%`, periods, dashes, and anything between parentheses. *If you
+removes `%`, periods, dashes, and anything between parentheses. *If you
 are seeing an error, check your naming in both the bottle datasheet and
 calculation sheet!*
 
@@ -278,6 +283,10 @@ the same.
 -   Formatting is important! If the script is showing errors, the first
     thing to check is whether you have any formatting inconsistencies in
     your datasheets.
+
+-   SeaProcess will update the variable names in your excel sheet to
+    make the outputs more "R friendly." For any added column names you
+    are **strongly encouraged** to stick to letters, numbers and "\_"
 
 -   SeaProcess will overwrite the outputs each time it is run, this
     means that if you mess anything up in the outputs folder, just run
