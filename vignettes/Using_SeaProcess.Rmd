@@ -1,0 +1,188 @@
+---
+title: "Using SeaProcess"
+author: "Matt Bihrle"
+date: "13-Jan-2025"
+output:
+  rmarkdown::html_vignette: 
+    toc: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Using SeaProcess}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+**NOTE:** This document is intended to help technicians understand the file structure and data entry in SeaProcess once a cruise has been setup. Links to more detailed information can be found at the end of this document.
+
+# General Setup
+
+When opening your cruise folder you should see a few different files and folders:
+
+-   "<cruiseID>.Rproj"
+
+    -   This is is your "Project" file. Projects in RStudio are a way to organize your work so that RStudio recognizes the current folder as your root directory. It makes it easier to locate subfolders when you run your code and ultimately makes it much easier to share this work with other computers/people who might want to revisit this data. For regular data entry **Always open the project file before running the process_data.R script**
+
+-   "<cruiseID>\_process_data.R"
+
+    -   This is the script to process all incoming data into csv and odv formatted files. See [Running the Script (aka "running R")](#running-the-script-aka-running-r) for more info
+
+-   "<cruiseID>\_process_eoc.R"
+
+    -   This script performs data management functions for the end of the cruise. Details are included in: [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html)
+
+-   datasheets
+
+    -   This folder is where almost all data is input. The one exception to this is the "calc_sheets" folder. When the cruise is setup, 'datasheets' will contain at least a "summary_input.xls", and sheets for bottle, ctd, meter, neuston, and secchi input. Other input sheets can be added per instructions in [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html)
+    -   All datasheets in this folder should follow the syntax "<cruiseID>\_<deploymenttype>\_input.xls." For example: "S314_myctophid_input.xls"
+
+-   calc_sheets
+
+    -   Contains all the calculation sheets needed for your cruise (eg. pH, nitrates, chla, etc)
+
+-   output
+
+    -   Folder that contains all the output data formatted as .csv files and odv formatted .txt files as well as images of plots.
+    -   These are the datasheets to point students to for project work
+    -   Treat all files in this folder as "read-only." **Anyone working on this data should save a copy to their personal files before making any changes.** Every time "process_data.R" is run, these files will be overwritten and any changes will be lost.
+    -   This is the directory to use for double checking datasheets because it includes all calculated values like tow distance.
+
+-   raw
+
+    -   Folder used at end of cruise to store raw .cnv, .ros, .elg, and .LTA files for easy data sharing
+
+-   eoc
+
+    -   Folder that contains any files needed for EOC documentation. As of Jan-2025 this is just the wire log for RCS but may expand to contain an EOC report or logs of how the data was processed
+
+# Data Entry
+
+All data coming from deployment sheets is entered within the "datasheets" folder. Each deployment needs to be entered on two datasheets: The *station summary* sheet ("summary_input.xls") and the *deployment* sheet (eg. "neuston_input.xls".
+
+## Summary Input
+
+This is the most important sheet to keep up to date. In this sheet, enter the station number formatted as "C303F-001", the deployment code (NT, HC, etc), the date (yyyy-mm-dd), local start time (eg. 15:32), local end time (only required for deployments that need a tow distance or wire tension recorded), and ZD.
+
+There will be a new line for every piece of gear that goes in the water. For example, if your morning station has a carousel, neuston, and secchi disc. These will each get their own line in the summary sheet with the same station number but unique deployment codes and times.
+
+IMPORTANT: The station number and deployment code is the "key" that SeaProcess recognizes to find the correct data to merge into the output sheets. It is vital that formatting of these is consistent across all input sheets and calculation sheets.
+
+-   Hover your cursor over the column headers for a reminder on how to correctly format all metadata items
+
+After the initial metadata you will notice that there are a few darker grey cells. The dark grey cells indicate that the data that would fill that column will be auto-filled from the electronic record UNLESS there is a value in that cell. *These cells will normally be left blank* - This acts as a fail safe if our elg files aren't working for some reason. Although not required, the option to hand enter all data is available.
+
+## Deployment Input
+
+After entering station metadata in the station summary sheet, next open the deployment specific "input" sheet. On the deployment datasheet you only need to fill in the station number (formatted as C303F-001) and the data that needs to be hand entered. Again, you may see some dark grey cells. Leave these blank unless you need to overwrite what the computer might auto-fill. If you have questions, consult your 1st Marine Tech. - **NOTE: If a column is made up of numbers, only input numbers.** Characters like "\<", "\>" "\~" will result in NA values in the output
+
+Once a datasheet has been entered in the "summary input" sheet AND the "deployment input" sheet it is considered "Entered in Computer" and can be initialed on the paper datasheet.
+
+## Hydrocast Data Entry
+
+Hydrocast data entry is a bit more complex and thus is granted its own section. For a hydrocast where water is drawn for analysis there are three different sheets to fill in:
+
+-   Summary Input
+    -   Enter metadata as normal
+-   CTD Input
+    -   Enter the station number and metadata associated with CTD casts. Things like CTD and AFM voltages, max wire out, and notes about anomalies in the cast.
+-   Bottle Input
+    -   This sheet requires the station number and the bottle number for ONLY the bottles you drew water from. Initially, put an "x" in the columns corresponding to the analyses that will be performed on water for that bottle. This allows for a record of which water samples were drawn from which bottles.
+    -   Once those analyses have been run you can either replace the "x" with your calculated values or let the calc_sheets function auto-fill values for you.
+    -   If you are unsure whether to hand enter calculated values (pH, NO3, etc) or let them auto-fill, check in with your 1st Marine Tech.
+    -   NOTE: If you are just doing free CTD casts or not taking any water samples, you do not need to fill out the bottle datasheet.
+
+## Surface Stations
+
+Surface stations are treated as "bottles" and their data is typically entered into the bottle_datasheet. Their *metadata* can be approached in one of three ways:
+
+#### As Bottle 13
+
+Use this option if your Chief Scientists wants surface stations treated as additional bottle with a hydrocast.
+
+Enter the surface station bottle number as "13" in the "bottle_input" sheet with the same station number as the corresponding hydrocast. SeaProcess will treat it the same as any bottle on that carousel deployment with a depth of 0m.
+
+#### As Own Deployment
+
+This option requires the surface station entered in the summary_input sheet with the deployment code: `SS.` The time of the surface station--and thus associate metadata--will be unique but it will be grouped with other deployments in the same station. You will still enter bottle data in `bottle_input` and record the bottle number as `SS`.
+
+#### As Own Station
+
+If your chief scientist would like to count surface stations separately from all other deployments you will be entering data in one of two ways.
+
+-   The first is to to start counting surface stations at 100 (SS-001 will be SS-101, SS-002 will be SS-102 etc.). Still input the station time and bottle data into `summary_input` and `bottle_input` as `SS`.
+
+-   The second option is to enter the surface stations into a separate "summary input" sheet and a separate "bottle input" sheet.
+
+## Calculation Sheets (calc_sheets)
+
+Calculation sheets for water chemistry will be the same as the typical SEA calc sheets with the addition of a tab labelled "output." In most cases, enter all data on the main sheets and the "output" sheet should be setup to autofill.
+
+# Running the Script (aka "running R") {#running-the-script-aka-running-r}
+
+To run your cruise's processing script open the "<cruiseID>.Rproj" file. Typically this will also open the "<cruiseID>\_process_data.R" file too. If not, click on "Files" in the bottom right corner window and open it from there.
+
+Once open, click on the top of the script and press **ctrl + enter** or the "Run" button to individually run each line of code.
+
+Press **ctrl + alt + R** or the "Source" button to run all lines at once.
+
+As the script is running it will print a number of outputs to the "Console" in the bottom left window. **ALWAYS double check the output in the console for warnings and errors**
+
+Note: If you are running the whole script make sure to comment out any lines you are not using by putting a `#` at the beginning of the line. If R see a blank data sheet it will show an error and stop the run where the error occurred.
+
+The processing script can be run as often as is feasible for your specific trip and situation but should be at least once a day to keep the elg and ADCP datasheets updated. It is not unreasonable to run it multiple times on a watch as you are entering and double-checking datasheets.
+
+## Warnings and Errors
+
+**Warnings** are typically okay. Some warnings will show up every time you run the script, and some will show up only when there are formatting issues or missing data. Regardless, it is best practice to always look through the warnings to make sure information is not missing.
+
+**Errors** mean that something in the code didn't work as intended and processing stopped. If you see errors, double check you entered all data correctly and try to run the script again. If you still encounter errors, consult the "Tips and Tricks" section of [Setup and EOC SeaProcess](Setup_and_Use_SeaProcess.html) doc and your 1st Marine Tech.
+
+# Outputs
+
+In the "output" folder, SeaProcess will create a .csv file (comma separated value) for each datasheet (output/csv) as well as a text file formatted for ODV input with the "output/odv" folder. As of July 2023, the ODV text files are only for our most common deployments (NT, MN, elg, ADCP, CTD, bottles) however you can always import csv files into ODV. CTD metadata will be in a file labelled "<cruiseID>\_ctd_datasheet.csv" while the bin averaged profile data will be in a file labelled "<cruiseID>\_ctd.csv"
+
+**NOTE:** Cast data and bottle data are processed in two separate ODV .txt files (odv/ctd and odv/bottle). This means that to have an ODV collection that has BOTH you will need to import each .txt file into the collection.
+
+Seaprocess will also create a "plots" folder that contains plots of basic flow through values as of January 2025. As mentioned above, the output folder should be treated as "read-only." Any edits made here will be erased as soon as the processing script is re-run.
+
+# Double Checking
+
+Double checking datasheets should always be done from the "outputs/csv" folder.
+
+-   Metadata
+
+    -   Any metadata that was not hand entered (temp, salinity, chla, lat, lon) may not match the paper datasheet exactly. SeaProcess grabs all of this data at a single timestamp while it may take a person a minute or two to write everything down. These values do not need to match the paper datasheet exactly but **MUST** be very close. If in doubt, consult your 1st Marine Tech and Chief Scientist.
+
+        -   **NOTE:** latitude and longitude output in decimal degrees rather than degrees and minutes
+
+-   Autocalculated values
+
+    -   SeaProcess will auto-calculate values like tow distance, moon phase, and zooplankton biodensity. Record these values on the paper datasheet so our paper record matches our electronic record.
+
+-   Errors
+
+    -   If you find an error in the electronic record, close the .csv you were working on, open the relevant input sheet in the "datasheets" folder and make the change. Then, re-run the processing script (or just the relevant lines) and double check the output .csv for your updated change.
+
+## Hydrocast and Calc Sheet Double Checking
+
+Hydrocasts, again, are special. To double check data from hydrocasts look at:
+
+-   "<cruiseID>\_ctd_datasheet.csv" AND
+
+-   "<cruiseID>\_bottle_datasheet.csv" to ensure there is a line for each bottle.
+
+Once a chemical run requiring a calc_sheet has been completed double check "<cruiseID>\_bottle_datasheet.csv" that all the values have been entered or auto-filled correctly.
+
+# Additional Info
+
+-   Keep the summary input up to date! Having this well organized will save you lots of headaches as the cruise progresses
+-   Formatting is SO important. Data entry should be faster within SeaProcess but requires a little extra care
+-   Paper datasheets are still ***vital*** to our data integrity. Ensure students are filling out datasheet accurately and as Marine Techs we are carefully double checking all portions of each datasheet.
+
+For deeper information on setting up a cruise project see: [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html) For information on what is happening in the background while datasheets are processing see: [introduction to seaprocess](introduction_to_seaprocess.html)

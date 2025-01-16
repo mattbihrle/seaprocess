@@ -1,0 +1,271 @@
+---
+title: "Setup and EOC SeaProcess"
+author: "Matt Bihrle, Emily Dailey"
+date: "2025-Jan-14"
+output:
+  rmarkdown::html_vignette: 
+    toc: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Setup and EOC SeaProcess}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**NOTE:** If SeaProcess is not installed already see the [Package
+Management for SeaProcess](Package_Management_for_seaProcess.html)
+vignette or documentation in RCS Science or CC Science.
+
+# Pre-Cruise Setup
+
+1.  Open RStudio. Go to File \> New Project. Then click "New Directory"
+
+2.  Click "Initialize Cruise Project" or "Initialize Cruise Project
+    Example", if you want to practice with old data first.
+
+3.  Then, name the project with the cruise name. For example, C303G.
+
+**NOTE:** When you create this project, RStudio creates a folder with
+your `cruiseID` as the name of the folder and populates this folder with
+a bunch of blank templates and other folders. It also creates:
+
+-   A project file with the same name as the `cruiseID` (which will show
+    up in the file directory as <cruiseID> next to a icon with an R
+    inside a cube).
+
+-   A template processing script (called `<cruiseID>_process_data.R` -
+    described below)
+
+-   A template eoc processing script (called `<cruiseID>_process_eoc.R`)
+
+The top left of your screen should read : "<your cruise ID> - RStudio".
+This shows you that RStudio is open in project mode and the name of the
+project is (<your cruiseID>).
+
+**To make things run smoothly it's important that you open this project
+in RStudio when you reopen RStudio.** To do this, open RStudio by double
+clicking on the project file in the folder rather than by
+double-clicking the RStudio program icon on the desktop. To load the
+processing script, you need to click the the second link in the bottom
+right hand corner called `<cruiseID>_process_data.R`. This will load the
+template processing script on the left hand side of the screen.
+
+**Note on Projects:** Projects in RStudio are a way to organize your
+work so that RStudio recognizes the current folder as your root
+directory. It makes it easier to locate subfolders when you run your
+code and ultimately makes it much easier to share this work with other
+computers/people who might want to revisit this data. As described above
+in the note, the project file is created in the folder the initalization
+just created.
+
+-   In order for Seaprocess to access the folders it needs, you need to
+    define some file paths. Next to cruiseID, should be the name of your
+    cruise, such as C308D.
+-   Where it says `elg_folder <- "<enter-location-of-elg-folder>"`,
+    enter the location of the elg folder on the datalogger computer. For
+    example, on Cramer: `elg_folder <- "Y:/EventData/Event60sec_2021/"`.
+-   Where it says `adcp_folder <- "<enter-location-of-adcp-folder>"` ,
+    enter the location of the ADCP folder where LTA files are kept. Eg.
+    `adcp_folder <- "X:/"`
+-   Where it says `ctd_folder <- “<enter-location-of-ctd-folder>"`,
+    enter the folder where the .avg files are kept. Eg:
+    `<- “C:/Data/CTD/Avg”`
+-   Where it says `ros_folder <- “<enter-location-of-ros-folder>"` enter
+    the file path the the ros files. This should be the same as the cnv
+    folder so you can enter`ros_folder <- "C:/Data/CTD/Cnv`
+
+## Datasheets
+
+The R script will automatically create datasheets for our most common
+deployments (ctd, niskin bottles, surface stations, neuston nets, meter
+nets, and secchi discs), and autofills the file paths. Double check that
+the paths are correct, however you should not need to change anything.
+
+## Adding Datasheets
+
+-   To create a new datasheet, go to RData/[Your cruise]/datasheets.
+    Here you should see a "<cruiseID>\_template_input.xls" excel sheet.
+    Create a copy of template and rename to match your deployment type
+    (C308D_secchi_input.xls, or C308D_sediment_input.xls).
+-   When you open your new data sheet you will see a blank sheet with a
+    single column for the station number.
+-   Click Review \> Unprotect Sheet. This will allow you to add column
+    labels to the grey heading cells.
+-   R will automatically add surface temp, salinity, chla, station start
+    and end, station distance bottom depth and max wire tension. You
+    only need to add columns for additional variables that have to be
+    hand entered!
+-   Once you have added your desired column labels be sure to "Protect
+    Sheet" and set the data type on the entire sheet to "Text." R is
+    picky about how it sees data and may show an error if Excel changed
+    the data type. Dates and times are particularly bad.
+-   Once you have created your datasheet you need to make sure the
+    script can recognize it and add the relevant metadata.
+    -   In the "datasheets" portion of the script create a new variable
+        with the same name as the datasheet you created and point it to
+        the new datasheet.
+        -   Eg `secchi_input <- “datasheets/C308E_secchi_input.xls”`
+    -   Next scroll down to the "Create Datasheets" portion of the
+        script and type the following code:
+        -   `create_datasheet(secchi_input, data_type = "SD", cruiseID = cruiseID)`
+        -   The "secchi_input" command should match the variable you
+            just created above and the `data_type` should be a two or
+            three letter code that matches the code you will input in
+            the summary datasheet.
+
+**Pro-Tip:** The `create_summary` function will work to fill metadata
+for any datasheet that has at least the same columns as the autocreated
+"summary_input" sheet.This means we can have a single datasheet for
+observational data or surface station data instead of separate summary
+sheets for each. To do this for an obs sheet: - Make a copy of the
+"summary_input.xls", and rename it "<cruiseID>\_obs_input.xls." - Keep
+the columns already present and add the additional columns you want. -
+In the `process_data.R` script first define the file path:
+`obs_input <- "datasheets/"<cruiseID>_obs_input.xls"` - The create a new
+line with `create_summary()` instead of `create_datasheet()`:
+`create_summary(summary_input = obs_input, elg_folder, cruiseID = cruiseID, csv_filename = "obs_datasheet.csv")`
+
+## Calculation Sheets
+
+Calculation sheets for water chemistry can be setup to autofill values
+into the bottle datasheet.
+
+To do this, ensure there is a folder in your cruise project called
+"calc_sheets" (this should be autocreated when you create a new cruise).
+
+Next, double check that your `<cruise_ID>process_data.R` file has the
+line `calc_folder <- "calc_sheets"`
+
+Then, add two parameters to your `create_datasheet()` for bottle data :
+`process_calc = T` and `calc_folder = calc_folder`. Your bottle
+datasheet function should look like:
+`create_datasheet(bottle_input, data_type = "bottle", ros_input = ros_folder, cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
+
+Lastly, add your calc sheets! R will look for a tab in your excel file
+labeled exactly "output" which has 3 columns: station number, bottle,
+and parameter (ph, chla, no3, etc). All the other tabs in the excel file
+can contain whatever, so it is easy to reuse our normal SEA calc sheets.
+
+### Adding New Parameters
+
+The bottle datasheet autopopulates with a few typical parameters for SEA
+cruises but you can always add your own! Just be sure to add them
+somewhere between the pre-existing parameters--not at the beginning or
+end-- and ensure they have the correct column names. R will
+automatically replaces spaces with `_` and remove `%`, `\#`,periods,
+dashes, and parentheses. It is best practice to stick with numbers,
+lowercase letters, and `_` for naming columns. *If you are seeing an
+error, check your naming in both the bottle datasheet and calculation
+sheet!*
+
+The typical SEA parameters (no3, po4, pH, alk, chla) will all auto-fill
+with units in the output sheet. If you need units on new parameters be
+sure to add them to your column name.
+
+If you don't wish to use the calc sheets function, just take the
+`process_calc` and `calc_folder` parameters out of your bottle function
+and hand enter data as usual. Any data hand entered will always
+overwrite anything auto-filled from the calc sheets so there is a backup
+if something is not working.
+
+# End Of Cruise
+
+The `eoc_process.R` script will lead you through the necessary steps to
+copy the needed files over to the "raw" folder. As of Jan-2025 this is
+the elg files, averaged cnvs and ros files, and LTAs. It will also
+create a wire log output for submission to UNOLS. **Please read and
+follow all steps.**
+
+The primary goal of this script is setup your cruise's RData folder to
+contain all of the raw data and scripts used to create outputs on your
+trip. This will allow future scientists and students to access most of
+what they need from a cruise through a single folder. It is still
+imperative that all data files created on the trip go back to the office
+in the places they historically live (see the second scientist checklist
+for more info). However, things like .hex files or additional ADCP files
+do not need to be stored in the "raw" folder.
+
+# Tips and Tricks
+
+-   Each function within the package has lots of information to
+    customize outputs. For more information on a specific function just
+    put a `?` infront of it. For example: `?create_summary()`.
+
+-   Keep in mind that for these files to be found, the ADCP and
+    Datalogger computers need to be on, as R pulls directly from those
+    computers.
+
+-   If an error says that there is no input folder, make sure your
+    cruise ID is correct, that the computer is on, and that there is in
+    fact an elg, lta file, or station summary to pull from.
+
+-   Formatting is important! If the script is showing errors, the first
+    and second thing to check is whether you have any formatting
+    inconsistencies in your datasheets.
+
+-   SeaProcess will overwrite the outputs each time it is run, this
+    means that if you mess anything up in the outputs folder, just run
+    `process_data` again to refresh your files.
+
+-   The `process_data` script is designed to be simple so if something
+    is changed by accident it should be easy enough to go to a previous
+    cruise, copy and paste their script and update it for your own
+    cruise.
+
+-   `create_summary` has an option to autofill max tension from either
+    the event file created by SCS or the .RAW file created by SCS (RCS
+    only).
+
+    -   To process wire tension through the raw file define where the
+        .raw file is found (`lci_raw_folder <- "W://"`) and add the
+        following parameters to your create summary function:
+        `raw_folder = lci_raw_folder` and `process_lci = T`
+    -   Processing the second to second data will take longer than
+        minute to minute so be patient as the program runs! See
+        `?create_summary` for more information.
+
+-   `process_elg` has a couple options to filter out bad data.
+
+    -   It will automatically filter out all flow_through data when
+        salinity drops below a a threshold. This can be set by the user
+        by adding the argument `min_sal = <desired sal threshold>`. Call
+        `?filter_elg` for more information and to see the current
+        default settings.
+    -   Additionally, there is an option to set custom filters for all
+        elg variables. If this is desired, your `process_elg` function
+        will look something like:
+
+    ```{r eval = FALSE}
+
+    process_elg(elg_folder, cruiseID = cruiseID, custom_filter = TRUE, 
+        filter_params =c("max_fluor = 30", "min_temp = 15, max_wind_sp = 66"))
+    ```
+
+    Again for more information on formatting, call `?filter_elg`.
+
+-   For more information on what is happening in the background of the
+    package call:
+
+```{r, eval = FALSE}
+library(seaprocess)
+vignette("introduction_to_seaprocess")
+```
+
+or click here: [Introduction TO
+SeaProcess](introduction_to_seaprocess.html)
+
+-   For more information on variables included in the packages call:
+
+```{r, eval = FALSE}
+library(seaprocess)
+vignette("variables")
+```
+
+or click here: [Variables](variables.html)

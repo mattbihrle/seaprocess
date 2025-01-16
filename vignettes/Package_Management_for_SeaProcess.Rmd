@@ -2,7 +2,10 @@
 title: "Package Management for SeaProcess"
 author: "Matt Bihrle"
 date: "2024-Oct-25"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{Package Management for SeaProcess}
   %\VignetteEncoding{UTF-8}
@@ -22,9 +25,11 @@ knitr::opts_chunk$set(echo = TRUE)
 needed for SeaProcess to run. **If updating packages, you only need to
 worry about the steps that concern packages.**
 
-# Install R and Packages on Windows PC with Internet
+# Install R and Packages on a Shipboard Computer
 
-## Install R
+## Install R and Packages on Windows PC with Internet
+
+### Install R
 
 Follow this link to download the .exe file for the most recent version
 of R:
@@ -41,7 +46,7 @@ of R:
     then go to **Tools \> Global Options... \> General \> R Version \>
     Change...** and select the newest version.
 
-## Download Required Packages
+### Download Required Packages
 
 -   The required packages are: tidyverse (readr, ggplot, dplyr,
     lubridate, purrr, stringr, tidyr, tibble, etc.), oce, readxl,
@@ -66,7 +71,7 @@ install.packages(c("oce", "tidyverse", "readxl", "devtools", "vegan",
     remotes::install_local(path = "\<path to zip
     file\>/seaprocess-master.zip", build_vignettes = T)
 
-## Copy .exe and packages to a USB drive or EHD.
+### Copy .exe and packages to a USB drive or EHD.
 
 Taken from:
 [https://wikis.utexas.edu/display/coeito/R+Tutorial](https://wikis.utexas.edu/display/coeito/R+Tutorial+-+How+to+Transfer+R+Packages+To+An+Offline+Computer#:~:text=If%20you%20had%20compressed%20the,use%20on%20the%20offline%20computer.)
@@ -86,7 +91,7 @@ right-clicking on the R packages directory and choosing the option
 entire folder to a single zip file that you can then transfer off the
 computer."
 
-# Install Updated R On LabUtil
+### Install Updated R On LabUtil
 
 \- Put the USB drive in LabUtil and run the .exe file from the USB
 following the same steps (Tools \> Global Options ...) to make sure
@@ -95,7 +100,7 @@ RStudio is running the most updated version of R.
 NOTE: If the newer version of R doesn't work, we can always just select
 the older version in "Global Options" and run that instead.
 
-# Install Updated Packages on LabUtil
+### Install Updated Packages on LabUtil
 
 Again, taken from
 [https://wikis.utexas.edu/display/coeito/R+Tutorial](https://wikis.utexas.edu/display/coeito/R+Tutorial+-+How+to+Transfer+R+Packages+To+An+Offline+Computer#:~:text=If%20you%20had%20compressed%20the,use%20on%20the%20offline%20computer.):
