@@ -20,10 +20,10 @@ filter_elg(
 \item{flow_thr}{names of instruments on the flow through.}
 
 \item{filter_values}{a list of filter values for when `custom_filter = TRUE`.
-The function will take a `filter_params` argument and convert it to
+The function will take a `filter_values` argument and convert it to
 `filter_values` for the function to use. Specify custom parameters within
 `process_elg` using the formatting:
-`filter_params = c("max_temp = 35", "min_temp = 15")` etc. Users can
+`filter_values = c("max_temp = 35", "min_temp = 15")` etc. Users can
 specify `max` and `min` for any numeric column in the .csv output.}
 
 \item{custom}{default to FALSE. if TRUE, user will have the option to set

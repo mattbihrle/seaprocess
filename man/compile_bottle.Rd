@@ -7,8 +7,20 @@
 compile_bottle(data, ros_input, calc_folder, process_calc = FALSE)
 }
 \arguments{
-\item{datasheet_folder}{}
+\item{data}{dataframe from bottle_input datasheet}
+
+\item{ros_input}{input folder for the .ros files output by Seabird.}
+
+\item{calc_folder}{if process_calc = TRUE, folder where calculation sheets
+are stored. Each calculation sheet will need a correctly formatted 'output'
+tab with station, bottle number, and variable (chla, no3 etc). See "Setup
+and Use" vignette for more information.}
+
+\item{process_calc}{defaults to FALSE. Optional parameter to process water
+chemistry data from calculation sheets. Set to TRUE if desired.}
 }
 \description{
-Create bottle file sheet
+Compiles bottle data from the bottle_input sheet, .ros files and optionally, calculation sheets.
+To compile data from calculation sheets, set process_calc = TRUE, and define calc_folder path to the folder where calc sheets are stored.
+Likely this will be the "calc_sheets" folder in the project directory.
 }
