@@ -1,8 +1,8 @@
 #' Create complete data sheet from xls input
 #'
 #' This function reads in a hand-entered excel data sheet along with a station
-#' summary csv file (created using `create_summary()`) and combines them to produce well-formatted csv and odv file
-#' outputs.
+#' summary csv file (created using `create_summary()`) and combines them to
+#' produce well-formatted csv and odv file outputs.
 #'
 #' data_input is the only argument that the function *needs* to create an
 #' output. The default values for summary_input and the csv and odv outputs are
@@ -20,9 +20,12 @@
 #' * "meter" for meter net datasheets
 #' * "<custom>" for custom datasheets you've created and given a unique code to in station summary
 #'
-#' @param data_input File path for the .xls file with hand-recorded data values. These are created by default in the "datasheets" folder and all have the suffix "_input"
+#' @param data_input File path for the .xls file with hand-recorded data values.
+#'   These are created by default in the "datasheets" folder and all have the
+#'   suffix "_input"
 #' @param summary_input File path for the csv summary datasheet produced with
-#'   create_summary() (see details below). This defaults to the output/csv folder in the standard SEA data project organization
+#'   create_summary() (see details below). This defaults to the output/csv
+#'   folder in the standard SEA data project organization
 #' @param data_type The data type code that will draw data from the summary
 #'   sheet (see details below)
 #' @param csv_folder The directory path to output the csv file. Set to NULL for
@@ -34,10 +37,18 @@
 #' @param cruiseID Optional string specifying cruise ID (i.e. "S301")
 #' @param add_cruise_ID If cruiseID is set, logical to specify whether cruiseID
 #'   should be appended to beginning of filenames for csv and odv output
-#' @param add_deployment_type logical to tell function whether to add the default deployment type to the beginning of the filename that is being created.
+#' @param add_deployment_type logical to tell function whether to add the
+#'   default deployment type to the beginning of the filename that is being
+#'   created.
 #' @param add_deployment_fold logical to tell function whether to add a new
 #'   directory to the end of the odv_folder directory path to keep .txt files
 #'   separate. Will create the new directory name depending on data_type
+#' @param preserve_col_names logical. Function will default to renaming columns
+#'   so they are primarily alphanumeric and underscores. If you would like to
+#'   toggle this option "off", set to TRUE. The function will make your column
+#'   names lowercase but otherwise leave them unchanged. NOTE: This is only
+#'   recommended for datasheets that are not automatically created. Setting to
+#'   TRUE will cause errors for neuston, meter, bottle, secchi, ctd.
 #' @param ... option arguments to be sent to compile_bottle. Initially, this is
 #'   just ros_input
 #'
@@ -55,7 +66,8 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
                              odv_folder = "output/odv", odv_filename = "datasheet.txt",
                              cruiseID = NULL, add_cruiseID = TRUE,
                              add_deployment_type = TRUE,
-                             add_deployment_subfold = TRUE, ...) {
+                             add_deployment_subfold = TRUE,
+                             preserve_col_names = FALSE, ...) {
 
   if(add_cruiseID == TRUE & !is.null(cruiseID)) {
     if(summary_input == "output/csv/summary_datasheet.csv") {
@@ -115,9 +127,12 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
 
   # read in the data_input excel sheet datasheet
   data <- readxl::read_excel(data_input)
+
+
   #Set all header names to lower case
   colnames(data) <- stringr::str_to_lower(colnames(data))
-  #replace spaces with _
+ if (!preserve_col_names){
+   #replace spaces with _
   colnames(data) <- stringr::str_replace_all(colnames(data), " ", "_")
 
   # replace - with _
@@ -143,6 +158,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
 
   # replace \ with .
   colnames(data) <- stringr::str_replace_all(colnames(data), "\\/", ".")
+ }
 
   # MB add MN and 2MN TT as numeric
   # makes a neuston correction if not enough rows to make good on the excel read
