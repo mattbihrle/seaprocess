@@ -141,7 +141,7 @@ The processing script can be run as often as is feasible for your specific trip 
 
 **Warnings** are typically okay. Some warnings will show up every time you run the script, and some will show up only when there are formatting issues or missing data. Regardless, it is best practice to always look through the warnings to make sure information is not missing.
 
-**Errors** mean that something in the code didn't work as intended and processing stopped. If you see errors, double check you entered all data correctly and try to run the script again. If you still encounter errors, consult the "Tips and Tricks" section of [Setup and EOC SeaProcess](Setup_and_Use_SeaProcess.html) doc and your 1st Marine Tech.
+**Errors** mean that something in the code didn't work as intended and processing stopped. If you see errors, double check you entered all data correctly and try to run the script again. If you still encounter errors, consult the "Tips and Tricks" section of [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html) doc and your 1st Marine Tech.
 
 # Outputs
 
