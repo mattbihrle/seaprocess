@@ -208,13 +208,13 @@ format_neuston_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp,
-                                `Salinity [PSU]` = data$sal,
-                                `Fluorescence` = data$fluor)
+                                `Temperature [~^oC]` = data$temp_c,
+                                `Salinity [PSU]` = data$sal_psu,
+                                `Fluorescence` = data$chla_fluor)
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "station_distance")
+  ii <- which(colnames(data) == "station_distance_m")
   odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
 
   readr::write_tsv(odv_out,file)
@@ -239,13 +239,13 @@ format_meter_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp,
-                                `Salinity [PSU]` = data$sal,
-                                `Fluorescence` = data$fluor)
+                                `Temperature [~^oC]` = data$temp_c,
+                                `Salinity [PSU]` = data$sal_psu,
+                                `Fluorescence` = data$chla_fluor)
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
-  ii <- which(colnames(data) == "station_distance")
+  ii <- which(colnames(data) == "station_distance_m")
   odv_out <- dplyr::bind_cols(odv_out, data[ii:ncol(data)])
 
   readr::write_tsv(odv_out,file)
@@ -335,7 +335,9 @@ initialize_odv_tibble <- function(data, cruiseID = NULL, type = "C") {
   } else {
     station <- 1:nrow(data)
   }
-
+  #Rename bottom depth to remove "_m" if it exists
+  bottom_name <- c(bot_depth = "bot_depth_m")
+  data <- dplyr::rename(data, any_of(bottom_name))
   odv_out <- tibble::tibble(Cruise = cruiseID,
                             Station = data$station,
                             Type = type,

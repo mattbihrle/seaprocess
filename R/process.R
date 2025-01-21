@@ -105,6 +105,11 @@ process_elg <- function(elg_folder, cruiseID = NULL,
   if(average_window > 1) {
     elg <- average_elg(elg, average_window = average_window)
   }
+  units <- c(temp_c = "temp", sal_psu = "sal", chla_fluor = "fluor",
+                 cdom_fluor = "cdom", xmiss_counts = "xmiss",
+                 wind_sp_kts = "wind_sp", bot_depth_m = "bot_depth")
+
+  elg_units <- dplyr::rename(elg, (any_of(units)))
 
   # Output csv file
   # add cruise ID to default output if not already existing
@@ -113,7 +118,7 @@ process_elg <- function(elg_folder, cruiseID = NULL,
     if(add_cruiseID == TRUE & !is.null(cruiseID)) {
       csv_output <- add_file_cruiseID(csv_output, cruiseID)
     }
-    safely_write_csv(elg, csv_output)
+    safely_write_csv(elg_units, csv_output)
   }
 
   # output odv file
@@ -125,7 +130,7 @@ process_elg <- function(elg_folder, cruiseID = NULL,
     format_odv(elg, file.path(odv_folder,odv_filename), data_type = "elg", cruiseID = cruiseID)
   }
 
-  return(elg)
+  return(elg_units)
 
 }
 
@@ -173,8 +178,8 @@ process_ctd <- function(ctd_folder, cruiseID = NULL,
 
     #first create a vector of all possible names
     units <- c(oxygen_mL.L = "oxygen", oxygen_uM.kg = "oxygen2",
-      pres_db = "pres", sal_psu = "sal",
-      temp_c = "temp", chla_v = "fluor",
+      pres_db = "pres", salinity_psu = "sal",
+      temperature_c = "temp", chla_fluor = "fluor",
       theta_c = "theta", sigtheta_kg.m3 = "sigtheta", par_mE.m2.s = "par")
     # Then rename those columns that exist with the labels with units
     #MB TODO figure out how to deal with warning message.

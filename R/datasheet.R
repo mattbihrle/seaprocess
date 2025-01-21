@@ -296,7 +296,7 @@ compile_neuston <- function(data) {
   data <- dplyr::mutate(data, max_tension = NULL, payout_at_max = NULL)
 
   # calculate biodensity
-  if(length(which(is.na(data$station_distance)))>0) {
+  if(length(which(is.na(data$station_distance_m)))>0) {
     warning("One or more tow distances are not available - be sure that they exist in the summary data csv")
   }
 
@@ -304,7 +304,7 @@ compile_neuston <- function(data) {
   data <- dplyr::mutate(data, zooplankton_biodens_ml.m2 =
                           ifelse(is.na(zooplankton_biodens_ml.m2),
 
-                                 zooplankton_biovol_ml/station_distance,
+                                 zooplankton_biovol_ml/station_distance_m,
 
                                  zooplankton_biodens_ml.m2)
   )
@@ -337,7 +337,7 @@ compile_neuston <- function(data) {
   nodec <- 0
   data <- format_decimal(data, "moon_phase", nodec)
   #move station distance after "heading"
-  data <- dplyr::relocate(data, station_distance, .after = heading_t)
+  data <- dplyr::relocate(data, station_distance_m, .after = heading_t)
 
   #MB TODO: calculate degree min lat/lon for quality control on double checking
 
@@ -418,17 +418,20 @@ compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
   bottle_lines <- dplyr::filter(data, bottle == "SS" | bottle == "13")
   if(nrow(bottle_lines) > 0) {
     if(!is.null(ros_output)) {
+      #create an empty table, first the correct number of columns
       data_add <- purrr::quietly(tibble::as_tibble)(t(rep(NA_real_, ncol(ros_output))))$result
+      # rename columns to have the same names as the ros file
       names(data_add) <- names(ros_output)
+      # add the correct number of rows
       data_add <- dplyr::mutate(data_add, count = nrow(bottle_lines))
       data_add <- tidyr::uncount(data_add, count)
-
+      # add the data
       data_add <- dplyr::mutate(data_add,
                                 bottle = bottle_lines$bottle,
                                 depth = 0,
-                                temperature = bottle_lines$temp,
+                                temperature = bottle_lines$temp_c,
                                 pressure = 0,
-                                salinity = bottle_lines$sal,
+                                salinity = bottle_lines$sal_psu,
                                 theta = oce::swTheta(salinity = salinity,
                                                      temperature = temperature,
                                                      pressure = pressure),
@@ -443,9 +446,9 @@ compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
     } else {
       data_add <- tibble::tibble(bottle = "SS",
                                  depth = 0,
-                                 temperature = bottle_lines$temp,
+                                 temperature = bottle_lines$temp_c,
                                  pressure = 0,
-                                 salinity = bottle_lines$sal,
+                                 salinity = bottle_lines$sal_psu,
                                  theta = oce::swTheta(salinity = salinity,
                                                       temperature = temperature,
                                                       pressure = pressure),
@@ -479,9 +482,9 @@ compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
 
   ##MB add renamed bottle columns
   units <- c(po4_uM = "po4", no3_uM = "no3", chla_ug.L = "chla", alk_meq.L = "alk",
-             depth_m = "depth", temp_c = "temperature", pres_db = "pressure",
-             chla_fluor = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
-             oxygen_mL.L = "oxygen2", sal_psu = "salinity", theta_c = "theta",
+             depth_m = "depth", temperature_c = "temperature", pres_db = "pressure",
+             chla_fluor_v = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
+             oxygen_mL.L = "oxygen2", salinity_psu = "salinity", theta_c = "theta",
              sigma_kg.m3 = "sigma")
 
   output <- dplyr::rename(output, (any_of(units)))

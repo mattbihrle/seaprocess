@@ -237,6 +237,12 @@ for (i in 1:length(sti_t)) {
   summary <- dplyr::relocate(summary, station_distance, .after = tidyselect::last_col())
   #MB add max tension before station distance
   summary <- dplyr::relocate(summary, max_tension, .before = station_distance)
+  # Once finished rearranging columns, rename all to have units
+
+  sum_units <- c(temp_c = "temp", sal_psu = "sal", chla_fluor = "fluor",
+                 station_distance_m = "station_distance", bot_depth_m = "bot_depth")
+
+  summary <- dplyr::rename(summary, (any_of(sum_units)))
   # check to ensure that there are no duplicate deployments for any one station
   duplicated_deployments <- dplyr::n_groups(dplyr::group_by(summary, station, deployment)) != nrow(summary)
   if(duplicated_deployments) {
