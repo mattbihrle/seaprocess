@@ -100,7 +100,10 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
 }
   ctd@metadata$station <- as.numeric(strsplit(cnv_file,'-')[[1]][2]) # have to do this to make makeSection work.
   ctd@metadata$filename <- cnv_file
-
+  # MB place here to incorporate quick plots before removing the ctd class
+  # object
+plot_ctd(ctd)
+  # TESTING ABOVE
   if(to_tibble) {
     ctd <- ctd_to_tibble(ctd, cruiseID = cruiseID, depth_vec = depth_vec, depth_step = depth_step)
   }
@@ -503,3 +506,34 @@ interpolate_depth <- function(ctd_tibble, depth_vec = NULL, depth_step = 1) {
   return(ctd_tibble)
 }
 
+#' Plot CTD
+#'
+#' Used to create ctd plot outputs in the RStudio Plots viewer. Ideally, marine
+#' techs will be able to take a quick look at the most common parameters to
+#' ensure profiles make sense. Currently setup to recognize temperature,
+#' salinity, fluorescence and oxygen. If not all of those parameters are
+#' present, it will default to plots that can be created using only temp,
+#' conductivity, and pressure. Makes use of purrr functions to ensure that if an
+#' error is thrown the ctd processing continues on.
+#'
+#' Utilizes oce::plot() for all plotting. See the documentation for that
+#' function for more information.
+#'
+#' @param ctd a formal 'ctd' object created by the oce package.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_ctd <- function (ctd) {
+
+  safe_plot <- purrr::possibly(oce::plot)
+
+  if (!is.null(ctd@data$oxygen) && !is.null(ctd@data$fluorescence)){
+  suppressWarnings(safe_plot(ctd, which = c(1, "fluorescence", "oxygen", 4), type = "l",
+                             col = c("blue", "green4")))
+
+  } else {
+    suppressWarnings(safe_plot(ctd, which = c(1, 2, 3, 4), type = "l"))
+  }
+}
