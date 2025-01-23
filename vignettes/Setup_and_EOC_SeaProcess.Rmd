@@ -138,10 +138,11 @@ Calculation sheets for water chemistry can be setup to autofill values
 into the bottle datasheet.
 
 To do this, ensure there is a folder in your cruise project called
-"calc_sheets" (this should be autocreated when you create a new cruise).
+"calc_sheets" (this should be autocreated when you create a new cruise)
+and lives within the "datasheets" folder.
 
 Next, double check that your `<cruise_ID>process_data.R` file has the
-line `calc_folder <- "calc_sheets"`
+line `calc_folder <- "datasheets/calc_sheets"`
 
 Then, add two parameters to your `create_datasheet()` for bottle data :
 `process_calc = T` and `calc_folder = calc_folder`. Your bottle
@@ -155,8 +156,8 @@ can contain whatever, so it is easy to reuse our normal SEA calc sheets.
 
 ### Adding New Parameters
 
-The bottle datasheet autopopulates with a few typical parameters for SEA
-cruises but you can always add your own! Just be sure to add them
+The bottle datasheet auto-populates with a few typical parameters for
+SEA cruises but you can always add your own! Just be sure to add them
 somewhere between the pre-existing parameters--not at the beginning or
 end-- and ensure they have the correct column names. R will
 automatically replaces spaces with `_` and remove `%`, `\#`,periods,
@@ -174,6 +175,24 @@ If you don't wish to use the calc sheets function, just take the
 and hand enter data as usual. Any data hand entered will always
 overwrite anything auto-filled from the calc sheets so there is a backup
 if something is not working.
+
+# Station Plots
+
+Within the `station_plots` folder are three scripts (as of 1/23/2025) to create quick maps of station locations. 
+
+## Setup
+
+To setup the plot scripts, follow the steps at the beginning to define your cruiseID and input and output file paths. The one additional setting that may need to be changed is the padding on the latitude and longitude of the plots. To do that scroll down to a line that looks like: `plot_limits(data, lat_pad = 3, lon_pad = 5)` and change the value of `lat_pad` and `lon_pad`. I recommend running the "NoBathymetry.R" script first. Without needing to load in bathymetry data, it goes much faster. 
+
+## Running
+
+Once the script is setup, you can run the whole script with "Source" or "ctrl + alt + r", or run the script line by line. The plots will be created for each datasheet in the csv folder and will output to the "output/plots" folder.
+
+If you are the type to try an automate things, you can add a line `source("plot_scripts/StationPlotsNoBathymetery.R")` at the end of your `process_data.R` script. When you run `process_data.R` it will also run the entirety of that station plots script without having to navigate to it and run it separately. 
+
+## Editing
+
+Feel free to edit the plot scripts to fit your cruise's needs! Just be sure the science team is on the same page about changes and you save a clean copy somewhere in case you accidentally make a change you can't revert.
 
 # End Of Cruise
 
@@ -258,7 +277,7 @@ library(seaprocess)
 vignette("introduction_to_seaprocess")
 ```
 
-or click here: [Introduction TO
+or click here: [Introduction To
 SeaProcess](introduction_to_seaprocess.html)
 
 -   For more information on variables included in the packages call:

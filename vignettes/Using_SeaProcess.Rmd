@@ -44,7 +44,11 @@ When opening your cruise folder you should see a few different files and folders
 
 -   calc_sheets
 
-    -   Contains all the calculation sheets needed for your cruise (eg. pH, nitrates, chla, etc)
+    -   This lives within the "datasheets" folder. Once setup, it contains all the calculation sheets needed for your cruise (eg. pH, nitrates, chla, etc)
+    
+-   plot_scripts
+
+    -   This folder contains a few scripts to create station summary plots. One for flow through data, one for for station summaries WITH bathymetry data and one for station summary data WITHOUT bathymetery data.
 
 -   output
 
