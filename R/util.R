@@ -82,37 +82,32 @@ add_file_cruiseID <- function(filename, cruiseID) {
 
 #' Plot Limits
 #'
-#' Experimental, Takes an elg file and outputs a vector of the limits of the max
-#' and min lats and lons with a buffer for plotting.
+#' A rudimentary function that takes a data frame (one of our datasheets) and outputs a vector
+#' of the limits of the max and min lats and lons with a buffer for plotting.
+#' The output is specifically formatted to match the output required for
+#' plotting within ggOceanMaps.
 #'
-#' @param elg
+#' @param data data frame with a lat and lon column in decimal degrees.
+#' @param lat_pad Numerical, buffer for latitudinal values. Default is 3
+#'   degrees.
+#' @param lon_pad Numerical, buffer for longitudinal values. Default is 5
+#'   degrees.
 #'
-#' @return
+#' @return a vector of values formatted as c(lon_west, lon_east, lat_max,
+#'   lat_min). This vector can be created by hand if needed.
 #' @export
 #'
 #' @examples
-plot_limits <- function(elg) {
-  lat_max <- max(elg$lat, na.rm = T) + 3
-  lat_min <- min(elg$lat, na.rm = T) -3
+plot_limits <- function(data, lat_pad = 3, lon_pad = 5) {
+  lat_max <- max(data$lat, na.rm = T) + lat_pad
+  lat_min <- min(data$lat, na.rm = T) - lat_pad
 
-  lon <- dplyr::if_else(elg$lon < 0, elg$lon + 360, elg$lon)
+  lon <- dplyr::if_else(data$lon < 0, data$lon + 360, data$lon)
   lon <- lon[!is.na(lon)]
 
-lon_east <- dplyr::if_else(max(lon) > 180, max(lon) - 355, max(lon) + 5 )
+lon_east <- dplyr::if_else(max(lon) > 180, max(lon) - (360 - lon_pad), max(lon) + lon_pad)
 
-lon_west <- dplyr::if_else(min(lon) > 180, min(lon) - 365, min(lon) - 5)
-#
-# if(abs(lon_i) > abs(lon_ii)){
-#   lon_max
-# }
-# min(lon)
-#   lon <- dplyr::if_else(elg$lon < 0, elg$lon + 360, elg$lon)
-#
-#   lon_max <- max(lon) + max(centered_lons) + 3
-#   lon_max <- dplyr::if_else(lon_max > 180, lon_max - 360, lon_max)
-#
-#   lon_min <- min(lon) + min(centered_lons) - 3
-#   lon_min <- dplyr::if_else(lon_min > 180, lon_min -360, lon_min)
+lon_west <- dplyr::if_else(min(lon) > 180, min(lon) - (360 + lon_pad), min(lon) - lon_pad)
 
   limits <- c(lon_west, lon_east, lat_max, lat_min)
   return(limits)
