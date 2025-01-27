@@ -49,7 +49,15 @@
 #'   names lowercase but otherwise leave them unchanged. NOTE: This is only
 #'   recommended for datasheets that are not automatically created. Setting to
 #'   TRUE will cause errors for neuston, meter, bottle, secchi, ctd.
-#' @param ... option arguments to be sent to compile_bottle. Initially, this is
+#' @param process_calc logical to tell the function whether to look for
+#'   calculation sheets to add to the datasheet. Likely this will mostly be used
+#'   with reef data. See ?seaprocess::read_calc_sheet_mb or the "Setup and EOC"
+#'   vignette for more information
+#' @param calc_folder Defaults to NULL. If you wish to append calculation sheet
+#'   information to your datasheet, set this file path to a folder containing
+#'   all the calculation sheets you would like to use for that specific
+#'   datasheet. This should be autocreated within the 'datasheets' folder
+#' @param ... optional arguments to be sent to compile_bottle. Initially, this is
 #'   just ros_input
 #'
 #'
@@ -67,7 +75,8 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
                              cruiseID = NULL, add_cruiseID = TRUE,
                              add_deployment_type = TRUE,
                              add_deployment_subfold = TRUE,
-                             preserve_col_names = FALSE, ...) {
+                             preserve_col_names = FALSE, process_calc = FALSE,
+                             calc_folder = NULL, ...) {
 
   if(add_cruiseID == TRUE & !is.null(cruiseID)) {
     if(summary_input == "output/csv/summary_datasheet.csv") {
@@ -225,7 +234,20 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   if(sum(data_type %in% c("MN","2MN", "TT")) > 0) {
     data <- compile_meter(data)
   }
+  # Process calculation sheets if that option is selected within create_datasheet
+if (process_calc == TRUE){
+  data <- read_calc_fold_mb(calc_folder, data)
+}
 
+  ##MB add renamed bottle columns, can also double as a master list of variables
+  ##to rename if we need to
+  units <- c(po4_uM = "po4", no3_uM = "no3", chla_ug.L = "chla", alk_meq.L = "alk",
+             depth_m = "depth", temperature_c = "temperature", pressure_db = "pressure",
+             chla_fluor_v = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
+             oxygen_mL.L = "oxygen2", salinity_psu = "salinity", theta_c = "theta",
+             sigma_kg.m3 = "sigma")
+
+  data <- dplyr::rename(data, (any_of(units)))
   # Remove columns we don't need, e.g. deployment
   data <- dplyr::select(data, -deployment)
 
@@ -363,30 +385,86 @@ compile_neuston <- function(data) {
 
 #' Create bottle file sheet
 #'
-#' Compiles bottle data from the bottle_input sheet, .ros files and optionally, calculation sheets.
-#' To compile data from calculation sheets, set process_calc = TRUE, and define calc_folder path to the folder where calc sheets are stored.
-#' Likely this will be the "calc_sheets" folder in the project directory.
+#' Compiles bottle data from the bottle_input sheet, .ros files and optionally,
+#' calculation sheets. To compile data from calculation sheets, set process_calc
+#' = TRUE, and define calc_folder path to the folder where calc sheets are
+#' stored. Likely this will be the "calc_sheets" folder in the project
+#' directory.
+#'
+#' Also an experimental option to process data from niskins on the wire. For
+#' this, ensure there is a "depth" column in your bottle datasheet. Then set
+#' niskin_on_wire = TRUE, and define a ctd_folder.
 #'
 #' @param data dataframe from bottle_input datasheet
 #' @param ros_input input folder for the .ros files output by Seabird.
+#' @param ctd_folder  input folder for the .cnv files ONLY needed if processing
+#'   bottles as niskins on the wire.
 #' @param process_calc defaults to FALSE. Optional parameter to process water
 #'   chemistry data from calculation sheets. Set to TRUE if desired.
 #' @param calc_folder if process_calc = TRUE, folder where calculation sheets
 #'   are stored. Each calculation sheet will need a correctly formatted 'output'
 #'   tab with station, bottle number, and variable (chla, no3 etc). See "Setup
-#'   and Use" vignette for more information.
+#'   and EOC" vignette for more information.
+#' @param niskin_on_wire logical. Set to TRUE to process niskin data from ctd
+#'   sheet and not look for a ros file.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
-
+compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folder = NULL,
+                           process_calc = FALSE, niskin_on_wire = FALSE) {
   # get just the list of stations that are unique
   stations <- unique(data$station)
 
+  # if no ros_input is given
+  if (niskin_on_wire == TRUE) {
+  #Process ctd input
+    # read in ctd input as an ungrouped data frame
+    ctd_input <- read_ctd_fold(ctd_folder) |>
+      dplyr::ungroup()
+    #remove overlapping columns except for station
+    cols <- c("cruise", "lat", "lon", "dttm", "bot_depth", "file")
+    ctd_input <- ctd_input |> dplyr::select(!any_of(cols))
+    #create a vector of possible names to simplify coming in from the ctd datasheet
+    units <- c(oxygen = "oxygen_mL.L", oxygen2 = "oxygen_uM.kg",
+               pressure = "pressure_db", salinity = "salinity_psu",
+               temperature = "temperature_c", fluor = "chla_fluor",
+               theta = "theta_c", sigtheta = "sigtheta_kg.m3", par = "par_mE.m2.s")
+    # # Then rename those columns that exist with the labels with units
+    ctd_input <- dplyr::rename(ctd_input, any_of(units))
+    #filter out any SS or bottle 13s. They will be dealt with later
+    bottle_input <- dplyr::filter(data, bottle != "13")
+    bottle_input <- dplyr::filter(bottle_input, bottle != "SS")
+      ros_output <- NULL
+    #Loop through each station and find the depth row closest to the bottle depth
+    for (i in 1:length(stations)) {
+      #Isolate just the profile data for the specific station
+      cast_data <- dplyr::filter(ctd_input, station == stations[i])
+      # Isolate bottle data for the specific station and remove everything but
+      # station bottle and depth
+      bottle_data <- dplyr::filter(bottle_input, station == stations[i])
+      bottle_data <- dplyr::select(bottle_data, c("station", "bottle", "depth"))
+      #check to see if there is a bottle for that station. If not, skip that cast
+      if(nrow(bottle_data) < 1) {
+        next
+      } else{
+        #If so, find the depth rows closest to the bottle depths
+        nearest_row <- find_near(cast_data$dep, bottle_data$depth)
+        cast_data <- dplyr::slice(cast_data, nearest_row)
+
+        #add in bottle numbers to cast data
+        cast_data <- dplyr::mutate(cast_data, bottle = bottle_data$bottle)
+        bottle_data <- dplyr::left_join(bottle_data, cast_data, by = c("station", "bottle"))
+        ros_output <- dplyr::bind_rows(ros_output, bottle_data)
+      }
+    }
+      ros_output <- dplyr::select(ros_output, -dep)
+      data <- dplyr::select(data, -depth)
+  }
   # Go find appropriate bottle files from ctd folder and
   # list all files with *.ros extension in ros_input
+  if(!is.null(ros_input)){
   ros_files <- list.files(ros_input,pattern = "\\.ros")
 
   # Loop through all ros files and
@@ -422,10 +500,11 @@ compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
     }
 
   }
-
+}
   if(!is.null(ros_output)) {
     ros_output$bottle <- as.character(ros_output$bottle)
   }
+
 
   # Now that we have our depths and metadata for each bottle in a hydrocast,
   # add all the surface station samples to this
@@ -455,6 +534,7 @@ compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
                                                       temperature = temperature,
                                                       pressure = pressure),
                                 station = bottle_lines$station)
+
       # combine ros with bottle
       all_output <- dplyr::bind_rows(ros_output, data_add)
 
@@ -492,18 +572,18 @@ compile_bottle <- function(data, ros_input, calc_folder, process_calc = FALSE) {
   output <- dplyr::ungroup(output)
   #Remove max_tension
   output <- dplyr::mutate(output, max_tension = NULL)
-  if (process_calc == TRUE){
-    output <- read_calc_fold_mb(calc_folder, output)
-  }
-
-  ##MB add renamed bottle columns
-  units <- c(po4_uM = "po4", no3_uM = "no3", chla_ug.L = "chla", alk_meq.L = "alk",
-             depth_m = "depth", temperature_c = "temperature", pres_db = "pressure",
-             chla_fluor_v = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
-             oxygen_mL.L = "oxygen2", salinity_psu = "salinity", theta_c = "theta",
-             sigma_kg.m3 = "sigma")
-
-  output <- dplyr::rename(output, (any_of(units)))
+  # if (process_calc == TRUE){
+  #   output <- read_calc_fold_mb(calc_folder, output)
+  # }
+  #
+  # ##MB add renamed bottle columns
+  # units <- c(po4_uM = "po4", no3_uM = "no3", chla_ug.L = "chla", alk_meq.L = "alk",
+  #            depth_m = "depth", temperature_c = "temperature", pressure_db = "pressure",
+  #            chla_fluor_v = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
+  #            oxygen_mL.L = "oxygen2", salinity_psu = "salinity", theta_c = "theta",
+  #            sigma_kg.m3 = "sigma")
+  #
+  # output <- dplyr::rename(output, (any_of(units)))
 
   return(output)
 
@@ -545,3 +625,4 @@ check_stations <- function(data, summary, bottle = FALSE) {
 
 #colnames(data) <- stringr::str_to_title(colnames(data))
 #colnames(data) <- stringr:: str_replace_all(colnames(data), "_", " ")
+
