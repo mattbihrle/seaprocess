@@ -9,6 +9,9 @@
 #' @param cnv_file file path to the CNV file to be read
 #' @param pmin minimum cut off pressure for ctdTrim
 #' @param p pressure bins for ctdDecimate
+#' @param plot_ctd Logical, default FALSE. A small plotting function to show
+#'   outputs of ctd plots as they are processed. Set `plot_ctd = TRUE` within
+#'   process_ctd to view plots
 #' @param ... additional arguments passed to called functions
 #'
 #' @return
@@ -16,7 +19,7 @@
 #'
 #' @examples
 read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
-                     cruiseID = NULL, depth_vec = NULL, depth_step = 1, ...) {
+                     cruiseID = NULL, depth_vec = NULL, depth_step = 1, plot_ctd = FALSE, ...) {
 # MB change pmin default from 5 to 1
 
 # Initial read ------------------------------------------------------------
@@ -102,7 +105,9 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
   ctd@metadata$filename <- cnv_file
   # MB place here to incorporate quick plots before removing the ctd class
   # object
-plot_ctd(ctd)
+if(plot_ctd == TRUE){
+  plot_ctd(ctd)
+}
   # TESTING ABOVE
   if(to_tibble) {
     ctd <- ctd_to_tibble(ctd, cruiseID = cruiseID, depth_vec = depth_vec, depth_step = depth_step)
