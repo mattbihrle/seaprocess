@@ -178,7 +178,7 @@ process_ctd <- function(ctd_folder, cruiseID = NULL,
 
     #first create a vector of all possible names
     units <- c(oxygen_mL.L = "oxygen", oxygen_uM.kg = "oxygen2",
-      pres_db = "pres", salinity_psu = "sal",
+      pressure_db = "pres", salinity_psu = "sal",
       temperature_c = "temp", chla_fluor = "fluor",
       theta_c = "theta", sigtheta_kg.m3 = "sigtheta", par_mE.m2.s = "par")
     # Then rename those columns that exist with the labels with units
@@ -196,7 +196,7 @@ process_ctd <- function(ctd_folder, cruiseID = NULL,
     }
     format_odv(ctd, file.path(odv_folder,odv_filename), data_type = "ctd", cruiseID = cruiseID)
   }
-
+return(ctd_units)
 }
 
 
