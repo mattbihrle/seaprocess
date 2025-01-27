@@ -453,7 +453,7 @@ ctd_to_tibble <- function(ctd_data, cruiseID = NULL, depth_vec = NULL, depth_ste
                                sal = ctd_data@data$salinity,
                                fluor = ctd_data@data$fluorescence,
                                par = par,
-                               bat = ctd_data@data$beamAttenuation,
+                               beam_atten = ctd_data@data$beamAttenuation,
                                cdom = ctd_data@data$fluorescence2,
                                oxygen = ctd_data@data$oxygen,
                                oxygen2 = ctd_data@data$oxygen2,

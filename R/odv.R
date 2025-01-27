@@ -74,7 +74,7 @@ format_adcp_odv <- function(data, odv_output, cruiseID = NULL) {
 format_ctd_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- initialize_odv_tibble(data, cruiseID, type = "C")
-  # MB added "data$bat" for xmiss beam attenuation and "data$cdom" for CDOM flour
+  # MB added "data$beam_atten" for xmiss beam attenuation and "data$cdom" for CDOM flour
   #   to be retained in the ctd odv output
   # MB TODO check this function with other cruise data to make sure other sensors
   #   dont mess things up
@@ -88,7 +88,7 @@ format_ctd_odv <- function(data,file,cruiseID = NULL) {
                                 `Oxygen [mL/L]` = data$oxygen2,
                                 `CDOM Fluorescence [mg/m~^3]` = data$cdom,
                                 `PAR Irradience [~$m~#E/m~^2/s]` = data$par,
-                                `Transmittance [V]` = data$bat)
+                                `Transmittance [V]` = data$beam_atten)
 
   readr::write_tsv(odv_out,file)
 
@@ -284,7 +284,7 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
                                 `Oxygen [mL/L]` = data$oxygen_mL.L,
                                 `CDOM Fluorescence [mg/m~^3]` = data$cdom,
                                 `PAR Irradience [~$m~#E/m~^2/s]` = data$par_mE.m2.s,
-                                `Transmittance [V]` = data$bat)
+                                `Transmittance [V]` = data$beam_atten)
 
   # Add the rest of the data skipping depth column
   # TODO create look-up sheet to find real names
@@ -303,7 +303,7 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
   "oxygen_mL.L",
  "cdom",
   "par_mE.m2.s",
-  "bat")
+  "beam_atten")
   ii <- which(colnames(data) == "bottle")
   ii2 <- which(colnames(data) == "depth_m")
 data_test <- dplyr::select(data, -dplyr::any_of(fancy_names) & c((ii+1):(ii2-2)))
