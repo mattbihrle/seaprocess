@@ -134,8 +134,7 @@ line with `create_summary()` instead of `create_datasheet()`:
 
 ## Calculation Sheets
 
-Calculation sheets for water chemistry can be setup to autofill values
-into the bottle datasheet.
+Calculation sheets can be setup to autofill calculated values from any SEA calc sheet into a datasheet with a matching column name and a 'bottle' column. We will most often use it to enter water chemistry values (nutrients, ph, chla) into the bottle datasheet for hydrocasts or niskins on the wire.
 
 To do this, ensure there is a folder in your cruise project called
 "calc_sheets" (this should be autocreated when you create a new cruise)
@@ -148,6 +147,9 @@ Then, add two parameters to your `create_datasheet()` for bottle data :
 `process_calc = T` and `calc_folder = calc_folder`. Your bottle
 datasheet function should look like:
 `create_datasheet(bottle_input, data_type = "bottle", ros_input = ros_folder, cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
+
+Alternatively, say you want to do calculation sheet for reef data. Your function could look like:
+`create_datasheet(reef_input, data_type = "REEF", cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)` **NOTE:** Each datasheet can look through one folder of calc sheets. If you are running calculation sheets for hydrocasts AND for reef data, you will need to define two separate calc_folders. 
 
 Lastly, add your calc sheets! R will look for a tab in your excel file
 labeled exactly "output" which has 3 columns: station number, bottle,
