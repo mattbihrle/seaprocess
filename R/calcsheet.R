@@ -196,23 +196,25 @@ read_calc_sheet_mb <- function(calc_file, output) {
   # update NA values.
 
 #Pull name of variable on interest
-names <- colnames(dplyr::select(calc_sheet, !c(station, bottle)))
+names <- colnames(dplyr::select(calc_sheet, !dplyr::any_of(c("station", "bottle"))))
 
 #See if that column name is also in the output dataframe, if so, run the rows patch
 if(any(colnames(output) == names)) {
+  # Ensure the variable column in the data sheet is numeric to aid in joining
+  # Supress "NAs introduced by coercion" warning
+  suppressWarnings(
+    output <- dplyr::mutate(output, dplyr::across(dplyr::matches(paste(names)), as.numeric))
+  )
   output <- dplyr::rows_patch(output, calc_sheet,
                               by = c("station", "bottle"), unmatched = "ignore")
-} else{
+} else {
   warning(paste("Mismatched column names for", names,". Verify column names in",
                 calc_file,"and 'bottle_input'. Calc sheet values will not be updated."))
-}
-
-
-
-  } else {
+    }
+} else {
     warning(paste("No 'output' sheet found in", calc_file,
                   ". Bottle values will not be updated."))
-}
+  }
   return(output)
 
 }
@@ -261,5 +263,52 @@ read_calc_fold_mb <- function(calc_folder, output) {
   return(output)
 
   #should we make this auto-output a CSV file?
+
+}
+
+#' Read Net Calculation Sheet
+#'
+#' Not in use. Similar to our other calculation sheet function but does not
+#' require or look for a column labelled "bottle." Instead your output sheet
+#' would have just 'station' and 'parameter' to worry about.
+#'
+#' @param calc_file
+#' @param output
+#'
+#' @return
+#' @export
+#'
+#' @examples
+read_calc_sheet_net <- function(calc_file, output) {
+
+  if (any(stringr::str_detect(readxl::excel_sheets(calc_file), "output")) == TRUE) {
+
+    #read calc sheet as specified in datasheet_examples.R
+    calc_sheet <- readxl::read_excel(calc_file, sheet = "output")
+    colnames(calc_sheet) <- stringr::str_to_lower(colnames(calc_sheet))
+
+    #combine calc sheet values with the full datasheet. Rows patch will only
+    # update NA values.
+    #Pull name of variable on interest
+    names <- colnames(dplyr::select(calc_sheet, !dplyr::any_of(c("station"))))
+
+    #See if that column name is also in the output dataframe, if so, run the rows patch
+    if(any(colnames(output) == names)) {
+      # Ensure the variable column in the data sheet is numeric to aid in joining
+      # Supress "NAs introduced by coercion" warning
+      suppressWarnings(
+        output <- dplyr::mutate(output, dplyr::across(dplyr::matches(paste(names)), as.numeric))
+      )
+      output <- dplyr::rows_patch(output, calc_sheet,
+                                  by = c("station"), unmatched = "ignore")
+    } else {
+      warning(paste("Mismatched column names for", names,". Verify column names in",
+                    calc_file,"and 'deployment input'. Calc sheet values will not be updated."))
+    }
+  } else {
+    warning(paste("No 'output' sheet found in", calc_file,
+                  ". Values will not be updated."))
+  }
+  return(output)
 
 }
