@@ -88,6 +88,8 @@ deployments (ctd, niskin bottles, surface stations, neuston nets, meter
 nets, and secchi discs), and autofills the file paths. Double check that
 the paths are correct, however you should not need to change anything.
 
+If you need to add variables to a datasheet for a specific project, just add a new column. 
+
 ## Adding Datasheets
 
 -   To create a new datasheet, go to RData/[Your cruise]/datasheets.
@@ -119,6 +121,7 @@ the paths are correct, however you should not need to change anything.
             just created above and the `data_type` should be a two or
             three letter code that matches the code you will input in
             the summary datasheet.
+        -   Seaprocess will automatically do some formatting to try and standardize column names to be easier to work with in R. To skip this step in datasheet processing, set `preserve_col_names = T` within `create_datasheet()`. Because of the additional processing that happens with the autocreated datasheets, this argument will only work with custom datasheets. 
 
 **Pro-Tip:** The `create_summary` function will work to fill metadata
 for any datasheet that has at least the same columns as the autocreated
@@ -148,8 +151,8 @@ Then, add two parameters to your `create_datasheet()` for bottle data :
 datasheet function should look like:
 `create_datasheet(bottle_input, data_type = "bottle", ros_input = ros_folder, cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
 
-Alternatively, say you want to do calculation sheet for reef data. Your function could look like:
-`create_datasheet(reef_input, data_type = "REEF", cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)` **NOTE:** Each datasheet can look through one folder of calc sheets. If you are running calculation sheets for hydrocasts AND for reef data, you will need to define two separate calc_folders. 
+Alternatively, say you want to setup calculation sheets for reef data. Your function could look like:
+`create_datasheet(reef_input, data_type = "REEF", cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)` **NOTE:** Each deployment datasheet can look through one folder of calc sheets. If you are running calculation sheets for hydrocasts AND for reef data, you will need to define two separate calc_folders. 
 
 Lastly, add your calc sheets! R will look for a tab in your excel file
 labeled exactly "output" which has 3 columns: station number, bottle,
@@ -217,7 +220,7 @@ do not need to be stored in the "raw" folder.
 
 -   Each function within the package has lots of information to
     customize outputs. For more information on a specific function just
-    put a `?` infront of it. For example: `?create_summary()`.
+    put a `?` in front of it. For example run: `?seaprocess::create_summary()`.
 
 -   Keep in mind that for these files to be found, the ADCP and
     Datalogger computers need to be on, as R pulls directly from those
