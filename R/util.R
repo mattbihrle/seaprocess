@@ -110,6 +110,11 @@ lon_east <- dplyr::if_else(max(lon) > 180, max(lon) - (360 - lon_pad), max(lon) 
 lon_west <- dplyr::if_else(min(lon) > 180, min(lon) - (360 + lon_pad), min(lon) - lon_pad)
 
   limits <- c(lon_west, lon_east, lat_max, lat_min)
+
+  if (any(limits > 180)){
+    warning(paste("One or more plotting limits exceeds 180 degrees.",
+                  "This may result in an odd plot. Adjust lat_pad and lon_pad to fix."))
+  }
   return(limits)
 }
 
