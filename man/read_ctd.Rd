@@ -12,6 +12,7 @@ read_ctd(
   cruiseID = NULL,
   depth_vec = NULL,
   depth_step = 1,
+  plot_ctd = FALSE,
   ...
 )
 }
@@ -21,6 +22,10 @@ read_ctd(
 \item{pmin}{minimum cut off pressure for ctdTrim}
 
 \item{p}{pressure bins for ctdDecimate}
+
+\item{plot_ctd}{Logical, default FALSE. A small plotting function to show
+outputs of ctd plots as they are processed. Set `plot_ctd = TRUE` within
+process_ctd to view plots}
 
 \item{...}{additional arguments passed to called functions}
 }

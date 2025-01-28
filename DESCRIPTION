@@ -1,13 +1,14 @@
 Package: seaprocess
 Type: Package
 Title: Onboard Processing of SEA Data Streams
-Version: 0.2.3
-Authors@R: person("Ben", "Harden", email = "bharden@sea.edu", role = c("aut", "cre"))
+Version: 0.2.4
+Authors@R: c(person("Ben", "Harden", email = "bharden@sea.edu", role = "aut"),
+            person("Matt", "Bihrle", email = "mbihrle@sea.edu", role = "cre"))
 Description: A selection of tools for the data workflows onboard the two Sea Education Association Sailing School Vessels.
 License: Free
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: oce,
     readxl,
     dplyr,

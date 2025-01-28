@@ -16,14 +16,20 @@ create_datasheet(
   add_cruiseID = TRUE,
   add_deployment_type = TRUE,
   add_deployment_subfold = TRUE,
+  preserve_col_names = FALSE,
+  process_calc = FALSE,
+  calc_folder = NULL,
   ...
 )
 }
 \arguments{
-\item{data_input}{File path for the .xls file with hand-recorded data values. These are created by default in the "datasheets" folder and all have the suffix "_input"}
+\item{data_input}{File path for the .xls file with hand-recorded data values.
+These are created by default in the "datasheets" folder and all have the
+suffix "_input"}
 
 \item{summary_input}{File path for the csv summary datasheet produced with
-create_summary() (see details below). This defaults to the output/csv folder in the standard SEA data project organization}
+create_summary() (see details below). This defaults to the output/csv
+folder in the standard SEA data project organization}
 
 \item{data_type}{The data type code that will draw data from the summary
 sheet (see details below)}
@@ -40,9 +46,28 @@ no odv output.}
 
 \item{cruiseID}{Optional string specifying cruise ID (i.e. "S301")}
 
-\item{add_deployment_type}{logical to tell function whether to add the default deployment type to the beginning of the filename that is being created.}
+\item{add_deployment_type}{logical to tell function whether to add the
+default deployment type to the beginning of the filename that is being
+created.}
 
-\item{...}{option arguments to be sent to compile_bottle. Initially, this is
+\item{preserve_col_names}{logical. Function will default to renaming columns
+so they are primarily alphanumeric and underscores. If you would like to
+toggle this option "off", set to TRUE. The function will make your column
+names lowercase but otherwise leave them unchanged. NOTE: This is only
+recommended for datasheets that are not automatically created. Setting to
+TRUE will cause errors for neuston, meter, bottle, secchi, ctd.}
+
+\item{process_calc}{logical to tell the function whether to look for
+calculation sheets to add to the datasheet. Likely this will mostly be used
+with reef data. See ?seaprocess::read_calc_sheet_mb or the "Setup and EOC"
+vignette for more information}
+
+\item{calc_folder}{Defaults to NULL. If you wish to append calculation sheet
+information to your datasheet, set this file path to a folder containing
+all the calculation sheets you would like to use for that specific
+datasheet. This should be autocreated within the 'datasheets' folder}
+
+\item{...}{optional arguments to be sent to compile_bottle. Initially, this is
 just ros_input}
 
 \item{add_cruise_ID}{If cruiseID is set, logical to specify whether cruiseID
@@ -58,8 +83,8 @@ tibble that was exported to csv
 }
 \description{
 This function reads in a hand-entered excel data sheet along with a station
-summary csv file (created using \code{create_summary()}) and combines them to produce well-formatted csv and odv file
-outputs.
+summary csv file (created using \code{create_summary()}) and combines them to
+produce well-formatted csv and odv file outputs.
 }
 \details{
 data_input is the only argument that the function \emph{needs} to create an

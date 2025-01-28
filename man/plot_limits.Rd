@@ -4,12 +4,24 @@
 \alias{plot_limits}
 \title{Plot Limits}
 \usage{
-plot_limits(elg)
+plot_limits(data, lat_pad = 3, lon_pad = 5)
 }
 \arguments{
-\item{elg}{}
+\item{data}{data frame with a lat and lon column in decimal degrees.}
+
+\item{lat_pad}{Numerical, buffer for latitudinal values. Default is 3
+degrees.}
+
+\item{lon_pad}{Numerical, buffer for longitudinal values. Default is 5
+degrees.}
+}
+\value{
+a vector of values formatted as c(lon_west, lon_east, lat_max,
+  lat_min). This vector can be created by hand if needed.
 }
 \description{
-Experimental, Takes an elg file and outputs a vector of the limits of the max
-and min lats and lons with a buffer for plotting.
+A rudimentary function that takes a data frame (one of our datasheets) and outputs a vector
+of the limits of the max and min lats and lons with a buffer for plotting.
+The output is specifically formatted to match the output required for
+plotting within ggOceanMaps.
 }

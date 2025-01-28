@@ -4,23 +4,43 @@
 \alias{compile_bottle}
 \title{Create bottle file sheet}
 \usage{
-compile_bottle(data, ros_input, calc_folder, process_calc = FALSE)
+compile_bottle(
+  data,
+  ros_input = NULL,
+  ctd_folder = NULL,
+  calc_folder = NULL,
+  process_calc = FALSE,
+  niskin_on_wire = FALSE
+)
 }
 \arguments{
 \item{data}{dataframe from bottle_input datasheet}
 
 \item{ros_input}{input folder for the .ros files output by Seabird.}
 
+\item{ctd_folder}{input folder for the .cnv files ONLY needed if processing
+bottles as niskins on the wire.}
+
 \item{calc_folder}{if process_calc = TRUE, folder where calculation sheets
 are stored. Each calculation sheet will need a correctly formatted 'output'
 tab with station, bottle number, and variable (chla, no3 etc). See "Setup
-and Use" vignette for more information.}
+and EOC" vignette for more information.}
 
 \item{process_calc}{defaults to FALSE. Optional parameter to process water
 chemistry data from calculation sheets. Set to TRUE if desired.}
+
+\item{niskin_on_wire}{logical. Set to TRUE to process niskin data from ctd
+sheet and not look for a ros file.}
 }
 \description{
-Compiles bottle data from the bottle_input sheet, .ros files and optionally, calculation sheets.
-To compile data from calculation sheets, set process_calc = TRUE, and define calc_folder path to the folder where calc sheets are stored.
-Likely this will be the "calc_sheets" folder in the project directory.
+Compiles bottle data from the bottle_input sheet, .ros files and optionally,
+calculation sheets. To compile data from calculation sheets, set process_calc
+= TRUE, and define calc_folder path to the folder where calc sheets are
+stored. Likely this will be the "calc_sheets" folder in the project
+directory.
+}
+\details{
+Also an experimental option to process data from niskins on the wire. For
+this, ensure there is a "depth" column in your bottle datasheet. Then set
+niskin_on_wire = TRUE, and define a ctd_folder.
 }
