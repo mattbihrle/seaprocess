@@ -83,7 +83,7 @@ eoc_process <- function (elg_folder = elg_folder, ctd_folder = ctd_folder,
 #' Process Wire Log
 #'
 #' Experimental. Cycles through all output csv sheets and compiles wire log data for submission to UNOLS wire pool.Outputs to an EOC folder.
-#' *Important* the function must see "max_wire_out" as a column name to include that deployment sheet in the final output.
+#' *Important* the function must see "max_wire_out_m" as a column name to include that deployment sheet in the final output.
 #'
 #' @param csv_folder Where to find the datasheets to compile.
 #' @param eoc_folder output for the final wire log.
@@ -105,20 +105,19 @@ process_wire_log <- function(csv_folder = "output/csv",
 
   wire_data <- NA
 
-
   for(i in 1:length(datasheets)){
     #read in a datasheeet
     iii <- readr::read_csv(datasheets[i], col_names = T, show_col_types = F)
-    #see if the datasheet contains a max_wire_out column
-    if(any(colnames(iii) == "max_wire_out")){
+    #see if the datasheet contains a max_wire_out_m column
+    if(any(colnames(iii) == "max_wire_out_m")){
       #read in wire data and either start a new df or append to the old one
       if(all(is.na(wire_data))){
         wire_data <- dplyr::select(iii, c("station", "dttm", "time_in", "time_out",
-                                          "max_tension", "max_wire_out"))
+                                          "max_tension", "max_wire_out_m"))
 
       } else {
         ii <- dplyr::select(iii, c("station", "dttm", "time_in", "time_out",
-                                   "max_tension", "max_wire_out"))
+                                   "max_tension", "max_wire_out_m"))
         wire_data <- dplyr::rows_append(wire_data, ii)
       }
     }
