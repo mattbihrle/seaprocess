@@ -23,7 +23,6 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
 # MB change pmin default from 5 to 1
 
 # Initial read ------------------------------------------------------------
-
   # Read CTD data from file
   ctd_safe <- purrr::possibly(oce::read.ctd, NULL)
   ctd <- ctd_safe(cnv_file,...)
@@ -358,7 +357,7 @@ read_ros <- function(ros_file) {
                           theta = oce::swTheta(salinity = salinity,
                                                temperature = temperature,
                                                pressure = pressure),
-                          sigma = oce::swSigma0(salinity = salinity,
+                          sigtheta = oce::swSigma0(salinity = salinity,
                                                 temperature = temperature,
                                                 pressure = pressure))
 

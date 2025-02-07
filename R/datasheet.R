@@ -245,7 +245,7 @@ if (process_calc == TRUE){
              depth_m = "depth", temperature_c = "temperature", pressure_db = "pressure",
              chla_fluor_v = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
              oxygen_mL.L = "oxygen2", salinity_psu = "salinity", theta_c = "theta",
-             sigma_kg.m3 = "sigma")
+             sigma_kg.m3 = "sigma", sigtheta_kg.m3 = "sigtheta")
 
   data <- dplyr::rename(data, (any_of(units)))
   # Remove columns we don't need, e.g. deployment
@@ -534,7 +534,7 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
                                 theta = oce::swTheta(salinity = salinity,
                                                      temperature = temperature,
                                                      pressure = pressure),
-                                sigma = oce::swSigma0(salinity = salinity,
+                                sigtheta = oce::swSigma0(salinity = salinity,
                                                       temperature = temperature,
                                                       pressure = pressure),
                                 station = bottle_lines$station)
@@ -552,7 +552,7 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
                                  theta = oce::swTheta(salinity = salinity,
                                                       temperature = temperature,
                                                       pressure = pressure),
-                                 sigma = oce::swSigma0(salinity = salinity,
+                                 sigtheta = oce::swSigma0(salinity = salinity,
                                                        temperature = temperature,
                                                        pressure = pressure),
                                  station = bottle_lines$station)
