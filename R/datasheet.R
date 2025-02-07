@@ -426,10 +426,11 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
     #remove overlapping columns except for station
     cols <- c("cruise", "lat", "lon", "dttm", "bot_depth", "file")
     ctd_input <- ctd_input |> dplyr::select(!any_of(cols))
+
     #create a vector of possible names to simplify coming in from the ctd datasheet
     units <- c(oxygen = "oxygen_mL.L", oxygen2 = "oxygen_uM.kg",
-               pressure = "pressure_db", salinity = "salinity_psu",
-               temperature = "temperature_c", fluor = "chla_fluor",
+               pressure = "pres", salinity = "sal",
+               temperature = "temp", fluorescence = "fluor",
                theta = "theta_c", sigtheta = "sigtheta_kg.m3", par = "par_mE.m2.s")
     # # Then rename those columns that exist with the labels with units
     ctd_input <- dplyr::rename(ctd_input, any_of(units))
@@ -444,6 +445,7 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
       # Isolate bottle data for the specific station and remove everything but
       # station bottle and depth
       bottle_data <- dplyr::filter(bottle_input, station == stations[i])
+
       bottle_data <- dplyr::select(bottle_data, c("station", "bottle", "depth"))
       #check to see if there is a bottle for that station. If not, skip that cast
       if(nrow(bottle_data) < 1) {
@@ -459,6 +461,7 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
         ros_output <- dplyr::bind_rows(ros_output, bottle_data)
       }
     }
+
       ros_output <- dplyr::select(ros_output, -dep)
       data <- dplyr::select(data, -depth)
   }
@@ -521,6 +524,7 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
       data_add <- dplyr::mutate(data_add, count = nrow(bottle_lines))
       data_add <- tidyr::uncount(data_add, count)
       # add the data
+
       data_add <- dplyr::mutate(data_add,
                                 bottle = bottle_lines$bottle,
                                 depth = 0,

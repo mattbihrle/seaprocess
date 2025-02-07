@@ -271,8 +271,8 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
 #MB add the other column names here
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = data$depth_m,
-                                `Temperature [~^oC]` = data$temp_c,
-                                `Salinity [psu]` = data$sal_psu,
+                                `Temperature [~^oC]` = data$temperature_c,
+                                `Salinity [psu]` = data$salinity_psu,
                                 `Phosphate [uM]` = data$po4_uM,
                                 `Nitrate [uM]` = data$no3_uM,
                                 `pH` = data$ph,
@@ -306,6 +306,7 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
   "beam_atten")
   ii <- which(colnames(data) == "bottle")
   ii2 <- which(colnames(data) == "depth_m")
+  #remove anything between bottle and two before depth_m and any of the "fancy names"
 data_test <- dplyr::select(data, -dplyr::any_of(fancy_names) & c((ii+1):(ii2-2)))
   odv_out <- dplyr::bind_cols(odv_out, data_test)
   ## TESTS ABOVE
