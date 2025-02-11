@@ -1,6 +1,7 @@
 # This script will create quick station plots without any bathymetry. Follow the
-# steps in "Setup" and run the whole script to generate plots. For specific
-# plots, copy and paste a reuse as desired.
+# steps in "Setup" and run the whole script to generate plots. If you want to
+# change the formatting or run for a single deployment, copy and paste the
+# script somewhere else and edit away!
 
 #Code for these plots adapted from "chemproperties_SK.R"
 
@@ -9,7 +10,7 @@ library(seaprocess)
 
 #--------------------------------##SETUP##--------------------------------------
 # Set Cruise ID
-cruiseID <-"C318"
+cruiseID <-""
 
 # Point R to the folder with the data you want to use
 csv_folder <- "output/csv"
@@ -73,6 +74,6 @@ Map <- ggOceanMaps::basemap(limits=limits, rotate = T, legends = F, verbose = F)
 print(Map)
 
 # Save the plot
-ggsave(paste(cruiseID, title, "map_nobath.jpg", sep = "_"), plot = Map,
+ggsave(paste(cruiseID, title, "Map_nobath.jpg", sep = "_"), plot = Map,
        scale = 4, path = plots_output)
 }
