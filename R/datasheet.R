@@ -57,8 +57,9 @@
 #'   information to your datasheet, set this file path to a folder containing
 #'   all the calculation sheets you would like to use for that specific
 #'   datasheet. This should be autocreated within the 'datasheets' folder
-#' @param ... optional arguments to be sent to compile_bottle. Initially, this is
-#'   just ros_input
+#' @param ... optional arguments to be sent to compile_bottle. Can be used to
+#'   process niskins on the wire. See the documentation for that function
+#'   (`?seaprocess::compile_bottle()`) for more information.
 #'
 #'
 #' @return If assigned to an object, the function will return the formatted
@@ -406,7 +407,8 @@ compile_neuston <- function(data) {
 #'   tab with station, bottle number, and variable (chla, no3 etc). See "Setup
 #'   and EOC" vignette for more information.
 #' @param niskin_on_wire logical. Set to TRUE to process niskin data from ctd
-#'   sheet and not look for a ros file.
+#'   sheet and not look for a ros file. When this option is selected you will
+#'   need to define ctd_folder = ctd_folder.
 #'
 #' @return
 #' @export
