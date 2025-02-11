@@ -1,3 +1,9 @@
+# This script will create plots of surface temperature, salinity, and chla
+# fluorescence with detailed bathymetry data. This script will take a couple
+# minutes to run. Follow the steps in "Setup" and run the whole script to
+# generate plots. If you want to change the formatting or create a plot for a
+# different variable, copy and paste the script somewhere else and edit away!
+
 library(ggOceanMaps)
 library(seaprocess)
 
