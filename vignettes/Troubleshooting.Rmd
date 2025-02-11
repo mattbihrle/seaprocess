@@ -218,5 +218,9 @@ Make sure to note the warning messages that show up, but remember that most of t
 **Message:** "Warning messages:
 Unknown or uninitialised column: `station`. "
 
-**Description:** This message shows up when the odv formatting function couldn't find the column described. Think about whether that column is needed in your data. For example: we don't track stations in our ADCP data so this warning can be ignored for ADCP data. For HC data, you may see SeaProcess show a warning about CDOM or bat (beam attenuation). If you don't have the CDOM or Xmiss attached to the ctd, it can be safely ignored. 
+**Description:** This message shows up when the odv formatting function couldn't find the column described. Think about whether that column is needed in your data. For example: we don't track stations in our ADCP data so this warning can be ignored for ADCP data. For HC data, you may see SeaProcess show a warning about CDOM or beam_atten (beam attenuation). If you don't have the CDOM or Xmiss attached to the ctd, it can be safely ignored. 
+
+**Message:** "In read.adp.rdi(file, encoding = encoding, processingLog = processingLog..."
+
+**Description:** This message has a couple of variants and will occur during all adcp processing. The warnings do not affect the data output and can be safely ignored. 
 
