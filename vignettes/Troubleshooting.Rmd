@@ -202,9 +202,9 @@ expand this list!
 closed and try again.
 
 **Message:** "Error in `dplyr::rows_patch()` at seaprocess/R/calcsheet.R:203:3:                  
-! Can't convert from `y$no3` <double> to `x$no3` <logical> due to loss of precision."
+! Can't convert from `y$no3` \<double\> to `x$no3` \<logical\> due to loss of precision."
 
-**Fix:** When a column shows up as <logical> it often means that the column is all "NAs." A quick fix for this is to put a "0" in a cell that would otherwise be blank. Let the office know you are having this problem and they can edit how the datasheet is read into R. 
+**Fix:** When a column shows up as *logical* it often means that the column is all "NAs." A quick fix for this is to put a "0" in a cell that would otherwise be blank. Let the office know you are having this problem and they can edit how the datasheet is read into R. 
 
 **Message:** "Error in utils::unzip(zip_path, list = TRUE) : 
   zip file 'C:/~$CalcNO3_VGriess_July23Update - Copy.xlsx' cannot be opened"
