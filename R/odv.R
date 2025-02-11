@@ -88,7 +88,7 @@ format_ctd_odv <- function(data,file,cruiseID = NULL) {
                                 `Oxygen [mL/L]` = data$oxygen2,
                                 `CDOM Fluorescence [mg/m~^3]` = data$cdom,
                                 `PAR Irradience [~$m~#E/m~^2/s]` = data$par,
-                                `Transmittance [V]` = data$beam_atten)
+                                `Beam Attenuation [1/m]` = data$beam_atten)
 
   readr::write_tsv(odv_out,file)
 
@@ -284,7 +284,7 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
                                 `Oxygen [mL/L]` = data$oxygen_mL.L,
                                 `CDOM Fluorescence [mg/m~^3]` = data$cdom,
                                 `PAR Irradience [~$m~#E/m~^2/s]` = data$par_mE.m2.s,
-                                `Transmittance [V]` = data$beam_atten)
+                                `Beam Attenuation [1/m]` = data$beam_atten)
 
   # Add the rest of the data skipping depth column
   # TODO create look-up sheet to find real names
