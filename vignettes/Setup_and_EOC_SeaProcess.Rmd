@@ -49,21 +49,19 @@ The top left of your screen should read : "<your cruise ID> - RStudio".
 This shows you that RStudio is open in project mode and the name of the
 project is (<your cruiseID>).
 
-**To make things run smoothly it's important that you open this project
-in RStudio when you reopen RStudio.** To do this, open RStudio by double
-clicking on the project file in the folder rather than by
-double-clicking the RStudio program icon on the desktop. To load the
-processing script, you need to click the the second link in the bottom
-right hand corner called `<cruiseID>_process_data.R`. This will load the
-template processing script on the left hand side of the screen.
+**To make things run smoothly it's important that you are always working
+in this project file.** To do this, open RStudio by double clicking on
+the project file in the folder rather than by double-clicking the
+RStudio program icon on the desktop. To load the processing script, you
+need to click the the second link in the bottom right hand corner called
+`<cruiseID>_process_data.R`. This will load the template processing
+script on the left hand side of the screen.
 
 **Note on Projects:** Projects in RStudio are a way to organize your
 work so that RStudio recognizes the current folder as your root
 directory. It makes it easier to locate subfolders when you run your
 code and ultimately makes it much easier to share this work with other
-computers/people who might want to revisit this data. As described above
-in the note, the project file is created in the folder the initalization
-just created.
+computers/people who might want to revisit this data.
 
 -   In order for Seaprocess to access the folders it needs, you need to
     define some file paths. Next to cruiseID, should be the name of your
@@ -88,28 +86,30 @@ deployments (ctd, niskin bottles, surface stations, neuston nets, meter
 nets, and secchi discs), and autofills the file paths. Double check that
 the paths are correct, however you should not need to change anything.
 
-If you need to add variables to a datasheet for a specific project, just add a new column. 
+If you need to add variables to a datasheet for a specific project, just
+add a new column.
 
 ## Adding Datasheets
 
--   To create a new datasheet, go to RData/[Your cruise]/datasheets.
+1.  To create a new datasheet, go to RData/[Your cruise]/datasheets.
     Here you should see a "<cruiseID>\_template_input.xls" excel sheet.
     Create a copy of template and rename to match your deployment type
     (C308D_secchi_input.xls, or C308D_sediment_input.xls).
--   When you open your new data sheet you will see a blank sheet with a
+2.  When you open your new data sheet you will see a blank sheet with a
     single column for the station number.
--   Click Review \> Unprotect Sheet. This will allow you to add column
+3.  Click Review \> Unprotect Sheet. This will allow you to add column
     labels to the grey heading cells.
--   R will automatically add surface temp, salinity, chla, station start
-    and end, station distance bottom depth and max wire tension. You
+4.  R will automatically add surface temp, salinity, chla, station start
+    and end, station distance, bottom depth, and max wire tension. You
     only need to add columns for additional variables that have to be
     hand entered!
--   Once you have added your desired column labels be sure to "Protect
-    Sheet" and set the data type on the entire sheet to "Text." R is
-    picky about how it sees data and may show an error if Excel changed
-    the data type. Dates and times are particularly bad.
--   Once you have created your datasheet you need to make sure the
-    script can recognize it and add the relevant metadata.
+5.  After you add your desired columns be sure to "Protect Sheet" and
+    set the data type on the entire sheet to "Text." R is picky about
+    how it sees data and may show an error if Excel changed the data
+    type. Dates and times are particularly bad.
+6.  Once you have created your datasheet you need to make sure the
+    `process_data` script can recognize it and add metadata to your
+    datasheet. Open `process_data.R` and:
     -   In the "datasheets" portion of the script create a new variable
         with the same name as the datasheet you created and point it to
         the new datasheet.
@@ -121,23 +121,35 @@ If you need to add variables to a datasheet for a specific project, just add a n
             just created above and the `data_type` should be a two or
             three letter code that matches the code you will input in
             the summary datasheet.
-        -   Seaprocess will automatically do some formatting to try and standardize column names to be easier to work with in R. To skip this step in datasheet processing, set `preserve_col_names = T` within `create_datasheet()`. Because of the additional processing that happens with the autocreated datasheets, this argument will only work with custom datasheets. 
+        -   SeaProcess will automatically do some formatting to try and
+            standardize column names to be easier to work with in R. To
+            skip this step in datasheet processing, set
+            `preserve_col_names = T` within `create_datasheet()`.
+            Because of the additional processing that happens with the
+            autocreated datasheets, this argument will only work with
+            custom datasheets.
 
 **Pro-Tip:** The `create_summary` function will work to fill metadata
 for any datasheet that has at least the same columns as the autocreated
-"summary_input" sheet.This means we can have a single datasheet for
-observational data or surface station data instead of separate summary
-sheets for each. To do this for an obs sheet: - Make a copy of the
-"summary_input.xls", and rename it "<cruiseID>\_obs_input.xls." - Keep
-the columns already present and add the additional columns you want. -
-In the `process_data.R` script first define the file path:
+"summary_input" sheet. For example, if you have a datasheet with blank
+columns "temp," "sal," chla," etc and additional columns. This means we
+can have a single datasheet for observational data or surface station
+data instead of separate summary sheets for each. To do this for an obs
+sheet: - Make a copy of the "summary_input.xls", and rename it
+"<cruiseID>\_obs_input.xls." - Keep the columns already present and add
+the additional columns you want. - In the `process_data.R` script first
+define the file path:
 `obs_input <- "datasheets/"<cruiseID>_obs_input.xls"` - The create a new
 line with `create_summary()` instead of `create_datasheet()`:
 `create_summary(summary_input = obs_input, elg_folder, cruiseID = cruiseID, csv_filename = "obs_datasheet.csv")`
 
 ## Calculation Sheets
 
-Calculation sheets can be setup to autofill calculated values from any SEA calc sheet into a datasheet with a matching column name and a 'bottle' column. We will most often use it to enter water chemistry values (nutrients, ph, chla) into the bottle datasheet for hydrocasts or niskins on the wire.
+Calculation sheets can be setup to autofill calculated values from any
+SEA calc sheet into a datasheet with a matching column name and a
+'bottle' column. We will most often use it to enter water chemistry
+values (nutrients, ph, chla) into the bottle datasheet for hydrocasts or
+niskins on the wire.
 
 To do this, ensure there is a folder in your cruise project called
 "calc_sheets" (this should be autocreated when you create a new cruise)
@@ -151,8 +163,12 @@ Then, add two parameters to your `create_datasheet()` for bottle data :
 datasheet function should look like:
 `create_datasheet(bottle_input, data_type = "bottle", ros_input = ros_folder, cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
 
-Alternatively, say you want to setup calculation sheets for reef data. Your function could look like:
-`create_datasheet(reef_input, data_type = "REEF", cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)` **NOTE:** Each deployment datasheet can look through one folder of calc sheets. If you are running calculation sheets for hydrocasts AND for reef data, you will need to define two separate calc_folders. 
+Alternatively, say you want to setup calculation sheets for reef data.
+Your function could look like:
+`create_datasheet(reef_input, data_type = "REEF", cruiseID = cruiseID, process_calc = T, calc_folder = calc_folder)`
+**NOTE:** Each deployment datasheet can look through one folder of calc
+sheets. If you are running calculation sheets for hydrocasts AND for
+reef data, you will need to define two separate calc_folders.
 
 Lastly, add your calc sheets! R will look for a tab in your excel file
 labeled exactly "output" which has 3 columns: station number, bottle,
@@ -165,7 +181,7 @@ The bottle datasheet auto-populates with a few typical parameters for
 SEA cruises but you can always add your own! Just be sure to add them
 somewhere between the pre-existing parameters--not at the beginning or
 end-- and ensure they have the correct column names. R will
-automatically replaces spaces with `_` and remove `%`, `\#`,periods,
+automatically replaces spaces with `_` and remove `%`, `#`, periods,
 dashes, and parentheses. It is best practice to stick with numbers,
 lowercase letters, and `_` for naming columns. *If you are seeing an
 error, check your naming in both the bottle datasheet and calculation
@@ -183,21 +199,39 @@ if something is not working.
 
 # Station Plots
 
-Within the `station_plots` folder are three scripts (as of 1/23/2025) to create quick maps of station locations. 
+Within the `station_plots` folder are three scripts (as of 1/23/2025) to
+create quick maps of station locations.
 
 ## Setup
 
-To setup the plot scripts, follow the steps at the beginning to define your cruiseID and input and output file paths. The one additional setting that may need to be changed is the padding on the latitude and longitude of the plots. To do that scroll down to a line that looks like: `plot_limits(data, lat_pad = 3, lon_pad = 5)` and change the value of `lat_pad` and `lon_pad`. I recommend running the "NoBathymetry.R" script first. Without needing to load in bathymetry data, it goes much faster. 
+To setup the plot scripts, follow the steps at the beginning to define
+your cruiseID and input and output file paths. The one additional
+setting that may need to be changed is the padding on the latitude and
+longitude of the plots. To do that scroll down to a line that looks
+like: `plot_limits(data, lat_pad = 3, lon_pad = 5)` and change the value
+of `lat_pad` and `lon_pad`. I recommend running the "NoBathymetry.R"
+script first. Without needing to load in bathymetry data, it goes much
+faster.
 
 ## Running
 
-Once the script is setup, you can run the whole script with "Source" or "ctrl + alt + r", or run the script line by line. The plots will be created for each datasheet in the csv folder and will output to the "output/plots" folder.
+Once the script is setup, you can run the whole script with "Source" or
+"ctrl + alt + r", or run the script line by line. The plots will be
+created for each datasheet in the csv folder and will output to the
+"output/plots" folder.
 
-If you are the type to try an automate things, you can add a line `source("plot_scripts/StationPlotsNoBathymetery.R")` at the end of your `process_data.R` script. When you run `process_data.R` it will also run the entirety of that station plots script without having to navigate to it and run it separately. 
+If you are the type to try an automate things, you can add a line
+`source("plot_scripts/StationPlotsNoBathymetery.R")` at the end of your
+`process_data.R` script. When you run `process_data.R` it will also run
+the entirety of that station plots script without having to open the
+script and run it separately.
 
 ## Editing
 
-Feel free to edit the plot scripts to fit your cruise's needs! Just be sure the science team is on the same page about changes and you save a clean copy somewhere in case you accidentally make a change you can't revert.
+Feel free to edit the plot scripts to fit your cruise's needs! Just be
+sure the science team is on the same page about changes and you save a
+clean copy somewhere in case you accidentally make a change you can't
+revert.
 
 # End Of Cruise
 
@@ -214,13 +248,15 @@ what they need from a cruise through a single folder. It is still
 imperative that all data files created on the trip go back to the office
 in the places they historically live (see the second scientist checklist
 for more info). However, things like .hex files or additional ADCP files
-do not need to be stored in the "raw" folder.
+do not need to be stored in the "raw" folder because they are stored
+elsewhere.
 
 # Tips and Tricks
 
 -   Each function within the package has lots of information to
     customize outputs. For more information on a specific function just
-    put a `?` in front of it. For example run: `?seaprocess::create_summary()`.
+    put a `?` in front of it. For example run:
+    `?seaprocess::create_summary()`.
 
 -   Keep in mind that for these files to be found, the ADCP and
     Datalogger computers need to be on, as R pulls directly from those

@@ -30,7 +30,8 @@ and EOC" vignette for more information.}
 chemistry data from calculation sheets. Set to TRUE if desired.}
 
 \item{niskin_on_wire}{logical. Set to TRUE to process niskin data from ctd
-sheet and not look for a ros file.}
+sheet and not look for a ros file. When this option is selected you will
+need to define ctd_folder = ctd_folder.}
 }
 \description{
 Compiles bottle data from the bottle_input sheet, .ros files and optionally,

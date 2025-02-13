@@ -33,7 +33,7 @@ The goals of this package are to:
 -   To document the process for others interested in how SEA processes it's data
 -   To simplify many of SEA's historic data processing routines.
 
-## OVERVIEW PROCESS DIAGRAM
+\#> Overview process diagram
 
 # Processing Philosophy
 
@@ -49,7 +49,9 @@ process_elg("data/elg")
 
 Under the hood, `process_elg()` is calling:
 
--   `read_elg_fold()`, which is the actual function that reads a list of elg files from a folder. It loops through all the elg files in a folder and in-tern calls `read_elg()` which is the function that reads individual elg files. `read_elg_fold()` then combines them all in to one data file
+-   `read_elg_fold()`, which is the actual function that reads a list of elg files from a folder. It loops through all the elg files in a folder and in-tern calls `read_elg()` which is the function that reads individual elg files. `read_elg_fold()` then combines them all in to one data file.
+
+-   `filter_elg()`, which is a function to filter out flow-through data based on a minimum salinity threshold (default 30 psu), or user-defined maximum and minimum values for other flow-through parameter.
 
 -   `average_elg()`, which is a function that averages the data into some time window. This is a little akin to what hourlywork used to do. However, you can specify the averaging window to be any number of minutes.
 
@@ -71,6 +73,9 @@ process_elg(
   odv_filename = "elg.txt",
   add_cruiseID = TRUE,
   average_window = 60,
+  min_sal = 30,
+custom_filter = FALSE,
+filter_params = c("max_fluor = 30", "min_cdom = 0"),
   ...
 )
 ```
@@ -95,6 +100,31 @@ elg_data <- read_elg(system.file("extdata", "example_data","Event60sec_012.elg",
 
 ## ADCP
 
+Under the hood, `process_adcp()` is calling:
+
+-   `read_adcp_fold()`, which is the actual function that reads a list of adcp files from a folder. It loops through all the .LTA or .STA files in a folder and in-turn calls `read_adcp()` which is the function that reads individual .LTA or .STA files. `read_adcp_fold()` then combines them all in to one data file.
+
+
+-   `add_file_cruiseID()`, which adds an optional cruise identifier to output files so that you can keep them organized.
+
+-   `safely_write_csv()`, which writes data to a comma-separated-value file
+
+-   `format_elg_odv()`, which formats the averaged data so that it can be read into Ocean Data View.
+
+The complete list of settings you can send to process_adcp() are:
+
+```         
+process_adcp(
+adcp_folder, 
+cruiseID = NULL,
+csv_folder = "output/csv",
+csv_filename = "adcp.csv",
+odv_folder = "output/odv/adcp", 
+odv_filename = "adcp.txt",
+add_cruiseID = TRUE, 
+...)
+```
+
 # Station data streams
 
 Many data on SEA cruises are collected at discrete station locations. We stop (or partially stop) the ship at a location to, for example, take CTD measurements, water samples or tow nets. We will refer to the data collected during these activities as station data for the purposes of this document.
@@ -102,8 +132,6 @@ Many data on SEA cruises are collected at discrete station locations. We stop (o
 Station data is a combination of data recorded manually, data recorded by some device (i.e. CTD) and metadata of the time, location, and other environmental parameters. All of these data are recorded on a paper data sheet, but the goal of this portion of the computer data processing is to limit the amount of metadata that we need to input into the computer that is already being recorded digitally elsewhere.
 
 ## Overall justification and flow
-
-#\> SKETCH PROCESS
 
 ## Station summary sheet
 
@@ -120,7 +148,7 @@ Once we've created this table, we can then use the metadata to populate specific
 
 We begin creating a station summary sheet by using an Excel spreadsheet with the following column headers:
 
-#\> ADD SCREEN GRAB
+![](images/summary_input_example-01.png)
 
 -   station: Station number using format C/SXXX-YYY where C/S designate Cramer or Seamans, XXX is the three-digit cruise ID, and YYY is a three-digit station number (e.g. 005)
 -   deployment: A shortcode for the type of deployment undertaken (see appendix)
@@ -132,20 +160,20 @@ We begin creating a station summary sheet by using an Excel spreadsheet with the
 NOTE: There is a new line on the sheet for every deployment type at every station so as to make use of the actual time of deployment in finding the location (see below). An example of this can be seen here.
 
 ```{r, echo = FALSE, eval = FALSE}
-knitr::kable(readxl::read_excel(system.file("extdata", "S285_station.xlsx", package="seaprocess"), col_types = "text"))
+knitr::kable(readxl::read_excel(system.file("extdata", "initial_example", "datasheets", "summary_input.xls", package="seaprocess"), col_types = "text"))
 ```
 
 ### Combining with continuous data
 
 The next step is to match up the time of deployment with the location and environmental data recorded by SCS to populate the rest of the summary sheet with electronically recorded metadata.
 
-This is acheived using the `create_summary()` function. Create summary takes in the following inputs:
+This is achieved using the `create_summary()` function. Create summary takes in the following inputs:
 
 -   summary_input: the file location of the Excel sheet we've just made above
 -   elg_input: either the file location of the cruise .elg file, OR a folder location containing all elg files for the cruise, OR an R data frame containing the event data already read-in by `read_elg()`
 -   csv_output: An optional argument to specify if a CSV file should be created as output.
 
-With these inputs, the function reads in the elg information, looks at all the dates/times of the deployments, and find the matching location and environmental metadata to add to the station summary. The result is a table that looks the same as the input station Excel sheet, but with aditional columns of:
+With these inputs, the function reads in the elg information, looks at all the dates/times of the deployments, and find the matching location and environmental metadata to add to the station summary. The result is a table that looks the same as the input station Excel sheet, but with additional columns of:
 
 -   dttm: Date and time in UTC.
 -   lon: Longitude of the deployment in degrees east (-180 to 180)
@@ -153,26 +181,34 @@ With these inputs, the function reads in the elg information, looks at all the d
 -   temp: Surface ocean temperature (°C)
 -   sal: Surface ocean salinity
 -   fluor: Surface ocean chla fluorescence
+-   bottom depth: CHIRP depth reading (m)
+-   wire_tension: recorded from SCS (currently RCS only)
 
 An example of these code in action and the output can be seen here.
 
 ```{r, message = FALSE, warning = FALSE, eval = FALSE}
-summary_input <- system.file("extdata", "S285_station.xlsx", package="seaprocess")
-elg_input <- system.file("extdata", "S285_elg", package="seaprocess")
-summary <- create_summary(summary_input, elg_input)
+summary_input <- system.file("extdata", "initial_example", "datasheets", "summary_input.xls", package="seaprocess")
+elg_input <- system.file("extdata", "initial_example", "raw", "event", "Event60sec_012.elg", package="seaprocess")
+summary <- create_summary(summary_input, elg_input, csv_folder = NULL)
 ```
 
 ```{r, echo = FALSE, eval = FALSE}
 knitr::kable(summary)
 ```
 
-#\> ADD IN CODE AND DESCRIPTION OF FAIL SAFES IF THE ELG DATA IS NOT AVAILABLE
-
 To move on to populating specific datasheets with this station summary data, we need to save this station summary to a CSV file which we can do by including a file path for the `csv_output` argument. In this case, you wouldn't need to then assign the output of the function to some object (in our case `summary`) unless you needed this object for something.
 
 ```{r, eval=FALSE}
 create_summary(summary_input, elg_input, "<some-path-to-folder>/<C/SXXX>_station_summary.csv")
 ```
+
+#### Fail Safes
+
+If the elg file is not available or is corrupt, environmental metadata can be hand entered for each station. The station summary sheet has a section of dark grey columns that are typically left blank.
+
+![](images/station_metadata.png)
+
+The user has the option to put values in any of these cells. SeaProcess will recognize which cells have values already and only fill the cells that are blank. Similarly, across all datasheets any colummns with a dark grey color will autopopulate if they are blank and any hand entered value will automatically overwrite the autopopulated value.
 
 ## Other basic data sheets
 
@@ -182,21 +218,21 @@ To do this we use the `create_datasheet()` function which takes in the following
 
 -   data_input: The filepath of the Excel data sheet witih minimal hand-entered data
 -   summary_input: The filepath of the CSV station summary sheet
--   data_type: a string that specifies the type of data (e.g. "CTD") - IS THIS REDUNDENT, can we guess...??
+-   data_type: a string that specifies the type of data (e.g. "CTD", "MN", OBS")
 
 For example, with CTD data, our initial Excel datasheet looks like this:
 
 ```{r, echo = FALSE, eval = FALSE}
-knitr::kable(readxl::read_excel(system.file("extdata", "S285_ctd.xlsx", package="seaprocess"), col_types = "text"))
+knitr::kable(readxl::read_excel(system.file("extdata", "initial_example", "datasheets", "ctd_input.xls", package="seaprocess"), col_types = "text"))
 ```
 
 You can see that there is no info on location, timing, etc. but we have that all stored away elsewhere. All we need is to bring it together like this:
 
 ```{r, eval = FALSE}
-data_input <- system.file("extdata", "S285_ctd.xlsx", package="seaprocess")
-summary_input <- system.file("extdata", "S285_station.csv", package="seaprocess")
+data_input <- system.file("extdata", "initial_example", "datasheets", "ctd_input.xls", package="seaprocess")
+summary_input <- system.file("extdata", "example_data", "C285C_summary_datasheet.csv", package="seaprocess")
 data_type = "CTD"
-datasheet <- create_datasheet(data_input, summary_input, data_type)
+datasheet <- create_datasheet(data_input, summary_input, data_type, csv_folder = NULL)
 ```
 
 ```{r, eval = FALSE}
@@ -216,9 +252,25 @@ create_datasheet(data_input, summary_input, data_type, "<some-path-to-folder>/<C
 There are a few additional Neuston datasheet steps. First, is to also calculate the biodensity of the tow (mL/m2) by dividing the biovolume of zooplankton (mL) by the tow length (m2).
 
 ```{r, eval=FALSE}
-data <- dplyr::mutate(data, biodens = zooplankton_biovol/station_distance_m)
+data <- dplyr::mutate(data, biodens = zooplankton_biovol_ml/station_distance_m)
   data <- dplyr::relocate(data, biodens, .after = zooplankton_biovol)
 ```
+
+Tow length (`station_distance_m`) is calculated when the summary sheet is created by calculating distance between minute to minute positions using the following code:
+
+```{r, eval = FALSE}
+ tow_length[i] <- tail(
+      oce::geodDist(
+        elg$lon[sti[i]:eni[i]],
+        elg$lat[sti[i]:eni[i]],
+        alongPath = TRUE),1)
+  }
+
+  #add tow length in meters to data
+  summary <- dplyr::mutate(summary, station_distance = tow_length*1000)
+```
+
+For more information on the calculation call `?oce::geodDist()`.
 
 Next we sum the 100 count organisms and calculate Shannon-Weiner Diversity with the help of the vegan package.
 
@@ -231,6 +283,8 @@ Next we sum the 100 count organisms and calculate Shannon-Weiner Diversity with 
                           (vegan::diversity(dplyr::c_across(medusa:other3),
                                             index = "shannon", base = 10)))
 ```
+
+For more information on this calculation call: `?vegan::diversity()`
 
 Lastly, with the help of the oce package we use starting location of the tow to determine moon phase (%) and whether the moon was risen.
 
@@ -246,9 +300,11 @@ Lastly, with the help of the oce package we use starting location of the tow to 
   data <- format_decimal(data, "moon_phase", nodec)
 ```
 
+And for more info on the moon calculations call `?oce::moonAngle()`
+
 ### Meter net datasheet
 
-The Meter Net Datasheet performs the same basic functions as the Neuston datasheet with the exacet same code used to calculate biodensity and Shannon-Weiner diversity. It differs in it's calculation of tow distance, using flowmeter data instead of lat and long calculations.
+The Meter Net Datasheet performs the same basic functions as the Neuston datasheet with the exact same code used to calculate biodensity and Shannon-Weiner diversity. It differs in it's calculation of tow distance, using flowmeter data instead of lat and long calculations.
 
 ```{r, eval=FALSE}
 data <- dplyr::mutate(data, total_flow = ifelse(is.na(total_flow),
@@ -277,4 +333,4 @@ At each step, there is a fail-safe to hand enter total flow, tow length, or tow 
 
 Included as it's own section because of the complexity of what is involved here. Not only are there hand entered data to combine with summary metadata, there is also chemical analysis of collected water which also needs to be incorporated too.
 
-The solution right now is to have calculation sheets which look very similar to the traditional SEA ones. I.e. a series of sheets that you use to build up from calibration curves to final outcomes. The key to our process is that each Excel workbook has a sheet called "output", which is what our function will go looking for in order to incorporate the data
+The solution right now is to have calculation sheets which look very similar to the traditional SEA ones. I.e. a series of sheets that you use to build up from calibration curves to final outcomes. The key to our process is that each Excel workbook has a sheet called "output", which is what our function will go looking for in order to incorporate the data. Ultimately, the bottle datasheet will combine .ros data, summary data, and values from calculation sheets.

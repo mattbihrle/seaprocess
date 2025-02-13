@@ -25,5 +25,5 @@ process_wire_log(
 }
 \description{
 Experimental. Cycles through all output csv sheets and compiles wire log data for submission to UNOLS wire pool.Outputs to an EOC folder.
-*Important* the function must see "max_wire_out" as a column name to include that deployment sheet in the final output.
+*Important* the function must see "max_wire_out_m" as a column name to include that deployment sheet in the final output.
 }

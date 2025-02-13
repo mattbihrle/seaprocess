@@ -67,8 +67,9 @@ information to your datasheet, set this file path to a folder containing
 all the calculation sheets you would like to use for that specific
 datasheet. This should be autocreated within the 'datasheets' folder}
 
-\item{...}{optional arguments to be sent to compile_bottle. Initially, this is
-just ros_input}
+\item{...}{optional arguments to be sent to compile_bottle. Can be used to
+process niskins on the wire. See the documentation for that function
+(\code{?seaprocess::compile_bottle()}) for more information.}
 
 \item{add_cruise_ID}{If cruiseID is set, logical to specify whether cruiseID
 should be appended to beginning of filenames for csv and odv output}

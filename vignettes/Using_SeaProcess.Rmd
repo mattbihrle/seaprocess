@@ -45,7 +45,7 @@ When opening your cruise folder you should see a few different files and folders
 -   calc_sheets
 
     -   This lives within the "datasheets" folder. Once setup, it contains all the calculation sheets needed for your cruise (eg. pH, nitrates, chla, etc)
-    
+
 -   plot_scripts
 
     -   This folder contains a few scripts to create station summary plots. One for flow through data, one for for station summaries WITH bathymetry data and one for station summary data WITHOUT bathymetery data.
@@ -67,19 +67,19 @@ When opening your cruise folder you should see a few different files and folders
 
 # Data Entry
 
-All data coming from deployment sheets is entered within the "datasheets" folder. Each deployment needs to be entered on two datasheets: The *station summary* sheet ("summary_input.xls") and the *deployment* sheet (eg. "neuston_input.xls".
+All data coming from deployment sheets is entered within the "datasheets" folder. Each deployment needs to be entered on two datasheets: The *station summary* sheet ("summary_input.xls") and the *deployment* sheet (eg. "neuston_input.xls").
 
 ## Summary Input
 
 This is the most important sheet to keep up to date. In this sheet, enter the station number formatted as "C303F-001", the deployment code (NT, HC, etc), the date (yyyy-mm-dd), local start time (eg. 15:32), local end time (only required for deployments that need a tow distance or wire tension recorded), and ZD.
 
-There will be a new line for every piece of gear that goes in the water. For example, if your morning station has a carousel, neuston, and secchi disc. These will each get their own line in the summary sheet with the same station number but unique deployment codes and times.
+There will be a new line for every piece of gear that goes in the water. For example, if your morning station has a carousel, neuston, and secchi disc, these will each get their own line in the summary sheet with the **same** station number but **unique** deployment codes and times.
 
 IMPORTANT: The station number and deployment code is the "key" that SeaProcess recognizes to find the correct data to merge into the output sheets. It is vital that formatting of these is consistent across all input sheets and calculation sheets.
 
 -   Hover your cursor over the column headers for a reminder on how to correctly format all metadata items
 
-After the initial metadata you will notice that there are a few darker grey cells. The dark grey cells indicate that the data that would fill that column will be auto-filled from the electronic record UNLESS there is a value in that cell. *These cells will normally be left blank* - This acts as a fail safe if our elg files aren't working for some reason. Although not required, the option to hand enter all data is available.
+After the initial metadata you will notice that there are a few dark grey cells. The dark grey cells indicate that the data that would fill that column will be auto-filled from the electronic record UNLESS there is a value in that cell. *These cells will normally be left blank* - This acts as a fail safe if our elg files aren't working for some reason. Although not required, the option to hand enter all data is available.
 
 ## Deployment Input
 
@@ -137,7 +137,7 @@ Press **ctrl + alt + R** or the "Source" button to run all lines at once.
 
 As the script is running it will print a number of outputs to the "Console" in the bottom left window. **ALWAYS double check the output in the console for warnings and errors**
 
-Note: If you are running the whole script make sure to comment out any lines you are not using by putting a `#` at the beginning of the line. If R see a blank data sheet it will show an error and stop the run where the error occurred.
+**Note:** If you are running the whole script make sure to comment out any lines you are not using by putting a `#` at the beginning of the line. If R see a blank data sheet it will show an error and stop the run where the error occurred.
 
 The processing script can be run as often as is feasible for your specific trip and situation but should be at least once a day to keep the elg and ADCP datasheets updated. It is not unreasonable to run it multiple times on a watch as you are entering and double-checking datasheets.
 
@@ -153,7 +153,7 @@ In the "output" folder, SeaProcess will create a .csv file (comma separated valu
 
 **NOTE:** Cast data and bottle data are processed in two separate ODV .txt files (odv/ctd and odv/bottle). This means that to have an ODV collection that has BOTH you will need to import each .txt file into the collection.
 
-Seaprocess will also create a "plots" folder that contains plots of basic flow through values as of January 2025. As mentioned above, the output folder should be treated as "read-only." Any edits made here will be erased as soon as the processing script is re-run.
+Seaprocess will also create a "plots" folder that contains plots of basic flow through values and station plots as of January 2025 (v0.3.0). As mentioned above, the output folder should be treated as "read-only." Any edits made here will be erased as soon as the processing script is re-run.
 
 # Double Checking
 
