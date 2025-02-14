@@ -11,6 +11,7 @@
 #' @examples
 format_odv <- function(data, odv_output, data_type = "CTD", cruiseID = NULL) {
 # MB added MN
+
 # MB TODO add in 2MN and TT to format_meter
   if("HC" %in% data_type | "B" %in% data_type ) {
     format_function <- format_bottle_odv
@@ -25,8 +26,7 @@ format_odv <- function(data, odv_output, data_type = "CTD", cruiseID = NULL) {
   } else if ("MN" %in% data_type) {
     format_function <- format_meter_odv
   } else {
-    warning("No valid data type specified to output odv. No output created.")
-    return()
+    format_function <- format_gen_odv
   }
 
   odv_out <- format_function(data, odv_output, cruiseID = cruiseID)
@@ -306,6 +306,7 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
   "beam_atten")
   ii <- which(colnames(data) == "bottle")
   ii2 <- which(colnames(data) == "depth_m")
+
   #remove anything between bottle and two before depth_m and any of the "fancy names"
 data_test <- dplyr::select(data, -dplyr::any_of(fancy_names) & c((ii+1):(ii2-2)))
   odv_out <- dplyr::bind_cols(odv_out, data_test)
@@ -388,3 +389,110 @@ import_odv <- function(odv_txt) {
   system(paste("/Applications/Ocean\\ Data\\ View\\ \\(64bit\\).app/Contents/MacOS/odv4 -x",cmd_file,"-q"))
 }
 
+#' Format General ODV
+#'
+#' Function that takes a datasheet created by SeaProcess and using a large
+#' lookup table, attempts to match common column names to well formatted odv
+#' names. Any columns that do not match will be left as is. After the matching
+#' occurs, it outputs a tab delimited file for import into ODV.
+#'
+#' See "Setup and EOC" for more information.
+#'
+#' @param data dataframe from csv output
+#' @param file file path for odv output. Typcially will be
+#'   "output/odv/<cruiseID>_<yourdatasheet>.txt"
+#' @param cruiseID optional to add cruiseID as a column in odv file.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+format_gen_odv <- function(data,file,cruiseID = NULL) {
+
+  odv_out <- initialize_odv_tibble(data, cruiseID, type = "B")
+
+  odv_out <- tibble::add_column(odv_out,
+                                `Depth [m]` = 0,
+                                `Temperature [~^oC]` = data$temp_c,
+                                `Salinity [PSU]` = data$sal_psu,
+                                `Fluorescence` = data$chla_fluor)
+
+  odv_lookup <- c("sys_date"= "System Date",
+                  "sys_time"= "System Time",
+                  "nav_time"= "Nav Time",
+                  "nav_lon"= "Nav Longitude",
+                  "nav_lat"= "Nav Latitude",
+                  "nav_sog"= "Nav Speed Over Ground [knots]",
+                  "nav_cog"= "Nav Course Over Ground [degrees true]",
+                  "nav_quality"= "Nav GPS Quality",
+                  "lab_time"= "Lab Time",
+                  "lab_lon"= "Lab Longitude",
+                  "lab_lat"= "Lab Latitude",
+                  "lab_sog"= "Lab Speed Over Ground [knots]",
+                  "lab_cog"= "Lab Course Over Ground [knots]",
+                  "lab_quality"= "Lab GPS Quality",
+                  "temp"= "Temperature [deg C]",
+                  "temp_1min"= "Temperature, 1 min avg [deg C]",
+                  "temp_60min" = "Temperature, 60 min avg [dec C]",
+                  "sal"= "Salinity [psu]",
+                  "sal_1min"= "Salinity, 1 min avg [psu]",
+                  "sal_60min"= "Salinity, 60 min avg [psu]",
+                  "sound_vel"= "Sound Velocity [m/s]",
+                  "fluor"= "Rel. Fluorescence",
+                  "fluor_1min"= "Rel. Fluorescence, 1 min avg",
+                  "fluor_60min"= "Rel. Fluorescence, 60 min avg",
+                  "cdom"= "CDOM [counts]",
+                  "cdom_1min"= "CDOM, 1 min avg [counts]",
+                  "cdom_60min"= "CDOM, 60 min avg [counts]",
+                  "xmiss"= "Transmissometer [counts]",
+                  "xmiss_1min"= "Transmissometer, 1 min avg [counts]",
+                  "xmiss_60min"= "Transmissometer, 60 min avg [counts]",
+                  "wind_sp.*"= "True Wind Speed [knots]",
+                  "wind_dir.*"= "True Wind Direction [degrees]",
+                  "wind_sp_rel"= "Relative Wind Speed [knots]",
+                  "wind_dir_rel"= "Relative Wind Direction [degrees]",
+                  "heading.*"= "Ship's Heading [degrees true]",
+                  "pitch"= "Pitch [degrees]",
+                  "roll"= "Roll [degrees]",
+                  "bot_depth.*"= "CHIRP depth [m]",
+                  "wire_payout.*"= "Wire Payout",
+                  "wire_tension.*"= "Wire Tension",
+                  "wire_speed.*"= "Wire Speed",
+                  "zooplankton_biovol.*"= "Zooplankton Biovolume [mL]",
+                  "moon_phase.*"= "Moon Phase [%]",
+                  "zooplankton_biodens.*m2"="Zooplankton Biodensity [mL/m2]",
+                  "zoop.*bioden.*m3"= "Zooplankton Biodensity [mL/m3]",
+                  "shannon_wiener.*"= "Shannon-Wiener Diversity",
+                  "cloud_cover_pct"= "Cloud Cover [%]",
+                  "wave_height_ft"= "Wave Height [ft]",
+                  "wind_sp.*b.*f.*"= "Wind Speed [BF]",
+                  "secchi_depth.*"= "Secchi Depth [m]",
+                  "beau.*f.*"= "Beaufort Force",
+                  "po4_uM"="Phosphate [uM]",
+                  "no3_uM"= "Nitrate [uM]",
+                  "chla_ug.L"="Chl a [ug/L]" ,
+                  "alk_meq.L"= "Alkalinity [meq/L]",
+                  "sigtheta_kg.m3"= "Potential Density[Kg/m~^3]" ,
+                  "oxygen_uM.kg"= "Oxygen,SBE43[~$m~#mol/kg]",
+                  "oxygen_mL.L"= "Oxygen [mL/L]" ,
+                  "par_mE.m2.s"= "PAR Irradience [~$m~#E/m~^2/s]" ,
+                  "beam_atten.*"= "Beam Attenuation [1/m]")
+
+
+  # get names from datasheet, skip dttm, lat, lon; n, filename_first, filename_last if binned
+  datasheet_names <- names(data)[! names(data) %in% c("station", "date", "time_in",
+                                                      "time_out", "zd", "dttm","lon","lat","n", "temp_c", "sal_psu", "chla_fluor", "filename_first","filename_last")]
+
+  odv_names <- stringr::str_replace_all(datasheet_names, odv_lookup)
+
+
+  # subset and rename columns by ODV name
+  data_sub <- data[,datasheet_names]
+  colnames(data_sub) <- odv_names
+
+  odv_out <- dplyr::bind_cols(odv_out, data_sub)
+
+  readr::write_tsv(odv_out,file)
+
+  return(odv_out)
+}

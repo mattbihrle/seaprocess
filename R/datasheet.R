@@ -73,6 +73,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
                              data_type = "CTD",
                              csv_folder = "output/csv", csv_filename = "datasheet.csv",
                              odv_folder = "output/odv", odv_filename = "datasheet.txt",
+                             odv_export = TRUE,
                              cruiseID = NULL, add_cruiseID = TRUE,
                              add_deployment_type = TRUE,
                              add_deployment_subfold = TRUE,
@@ -86,7 +87,6 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
   }
 
 
-  odv_export <- FALSE
   if(data_type == "bottle") {
 
     if(add_deployment_type) {
@@ -117,6 +117,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
       csv_filename <- paste0("ctd_", csv_filename)
       odv_filename <- paste0("ctd_", odv_filename)
     }
+    odv_export <- FALSE
   } else if (data_type == "meter") {
 
     if(add_deployment_type) {
@@ -261,7 +262,6 @@ if (process_calc == TRUE){
 
     readr::write_csv(format_csv_output(data),csv_output, na = "NA")
   }
-
   # export to odv
   if(odv_export) {
     if(!is.null(odv_filename) & !is.null(odv_folder)) {
@@ -271,6 +271,9 @@ if (process_calc == TRUE){
       }
       format_odv(data, odv_output, data_type = data_type, cruiseID = cruiseID)
     }
+  } else {
+    warning("No ODV output created. For ODV output, set odv_export = TRUE
+            or manually import .csv file to ODV.")
   }
 
 
