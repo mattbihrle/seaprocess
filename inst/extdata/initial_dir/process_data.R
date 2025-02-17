@@ -107,3 +107,11 @@ create_datasheet(bottle_input, data_type = "bottle",
 # Secchi datasheet
 create_datasheet(secchi_input, data_type = "SD",
                  cruiseID = cruiseID)
+
+# Print Session Info------------------------------------------------------------
+
+# Set cruiseID and run this line to log package versions used to analyze data in
+# this script. This should be run at EOC, but will not do any harm if it is
+# regularly run with the rest of the processing script.
+
+source("eoc/<cruiseID>_session_info.R")
