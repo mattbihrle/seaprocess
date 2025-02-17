@@ -129,8 +129,8 @@ the offline computer."
 
 Open RStudio, and run the following command:
 
-*devtools::install_github("mattbihrle/seaprocess", build_vignettes = T,
-dependencies = T)*
+`devtools::install_github("mattbihrle/seaprocess", build_vignettes = T,
+dependencies = T)`
 
 ## LabUtil Not Connecting to Internet
 

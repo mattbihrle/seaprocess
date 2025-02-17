@@ -185,8 +185,9 @@ Once a chemical run requiring a calc_sheet has been completed double check "<cru
 
 # Additional Info
 
--   Keep the summary input up to date! Having this well organized will save you lots of headaches as the cruise progresses
--   Formatting is SO important. Data entry should be faster within SeaProcess but requires a little extra care
+-   **Do not leave blank cells.** If there is no data for a cell, use "NA" or "na" to show it was not unintentionally left blank.
+-   Keep the summary input up to date! Having this well organized will save you lots of headaches as the cruise progresses.
+-   Formatting is SO important. Data entry should be faster within SeaProcess but requires a little extra care.
 -   Paper datasheets are still ***vital*** to our data integrity. Ensure students are filling out datasheet accurately and as Marine Techs we are carefully double checking all portions of each datasheet.
 
 For deeper information on setting up a cruise project see: [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html) For information on what is happening in the background while datasheets are processing see: [introduction to seaprocess](introduction_to_seaprocess.html)

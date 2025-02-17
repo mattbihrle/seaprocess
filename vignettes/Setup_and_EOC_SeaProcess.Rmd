@@ -128,6 +128,9 @@ add a new column.
             Because of the additional processing that happens with the
             autocreated datasheets, this argument will only work with
             custom datasheets.
+        -   SeaProcess will try to create an ODV formatted output for
+            any addition datasheets created. If this causes an issue,
+            set `odv_export = FALSE` withing `create_datasheet()`
 
 **Pro-Tip:** The `create_summary` function will work to fill metadata
 for any datasheet that has at least the same columns as the autocreated
