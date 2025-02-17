@@ -20,6 +20,9 @@
 #' * "meter" for meter net datasheets
 #' * "<custom>" for custom datasheets you've created and given a unique code to in station summary
 #'
+#' See "Introduction to SeaProcess" vignette for more information about
+#' processing specific to neuston tows and meter nets.
+#'
 #' @param data_input File path for the .xls file with hand-recorded data values.
 #'   These are created by default in the "datasheets" folder and all have the
 #'   suffix "_input"
@@ -34,6 +37,10 @@
 #' @param odv_folder The directory path to output the odv file. Set to NULL for
 #'   no odv output.
 #' @param odv_filename The odv .txt filename to output the data
+#' @param odv_export Logical defaults to TRUE. Will try to create an ODV
+#'   formatted datasheet. If the data type is not neuston, meter, bottle,
+#'   hydrocast, or CTD-- Seaprocess will use the format_gen_odv() function to
+#'   make an odv output.
 #' @param cruiseID Optional string specifying cruise ID (i.e. "S301")
 #' @param add_cruise_ID If cruiseID is set, logical to specify whether cruiseID
 #'   should be appended to beginning of filenames for csv and odv output
@@ -273,7 +280,7 @@ if (process_calc == TRUE){
     }
   } else {
     warning("No ODV output created. For ODV output, set odv_export = TRUE
-            or manually import .csv file to ODV.")
+            or manually import .csv file to ODV. \n If data_type = CTD, this warning can be ignored.")
   }
 
 
@@ -326,9 +333,10 @@ compile_meter <- function(data) {
 
 #' Create Neuston datasheet
 #'
-#' This function combines metadata from the station summary with the hand entered
-#' data from 'neuston_input.' Additionally it calculates biodensity (mL/m2) by dividing
-#' zooplankton biovolume (mL) by station distance (m).
+#' This function combines metadata from the station summary with the hand
+#' entered data from 'neuston_input.' Additionally it calculates biodensity
+#' (mL/m2) by dividing zooplankton biovolume (mL) by station distance (m), and
+#' calculates Shannon-Wiener Diversity using the "vegan" package.
 #'
 #' For more information on station distance calculation see \link[oce]{geodDist}
 #' @export

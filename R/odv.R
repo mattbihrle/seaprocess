@@ -396,7 +396,6 @@ import_odv <- function(odv_txt) {
 #' names. Any columns that do not match will be left as is. After the matching
 #' occurs, it outputs a tab delimited file for import into ODV.
 #'
-#' See "Setup and EOC" for more information.
 #'
 #' @param data dataframe from csv output
 #' @param file file path for odv output. Typcially will be
