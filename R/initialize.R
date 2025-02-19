@@ -69,7 +69,11 @@ initialize_master <- function(path, cruiseID = NULL,
   ii <- stringr::str_which(lines, "datasheets/")
   lines[ii] <- stringr::str_replace_all(lines[ii], "datasheets/", paste0("datasheets/",cruiseID,"_"))
 
-  # write this to file
+  # add cruiseID to session info script (and any others with <cruiseID>)
+  ii <- stringr::str_which(lines, "<cruiseID>")
+  lines[ii] <- stringr::str_replace(lines[ii], "<cruiseID>", paste0(cruiseID))
+
+   # write this to file
   readr::write_lines(lines, file.path(path,"process_data.R"))
 
   #Add cruiseID to the process_eoc script
