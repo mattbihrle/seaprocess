@@ -45,8 +45,8 @@ ctd_folder <- "<enter-location-of-ctd-folder>"
 ros_folder <- "<enter-location-of-ros-folder>"
 adcp_folder <- "<enter-location-of-adcp-folder>"
 calc_folder <- "<enter-location-of-calc-folder>"
-
-
+#RCS
+raw_folder <- "<enter-location-of-lci_raw-folder>"
 
 # Datasheets
 #
@@ -63,7 +63,9 @@ bottle_input <- "datasheets/bottle_input.xls"
 secchi_input <- "datasheets/secchi_input.xls"
 other_input <- ""
 
-
+# Obs Datasheets
+obs_input <- "datasheets/obs_input.xls"
+obs_summary_input <- "datasheets/obs_summary_input.xls"
 
 
 # Process non-datasheet data sources --------------------------------------
@@ -85,7 +87,8 @@ process_adcp(adcp_folder, cruiseID = cruiseID)
 # datasheets
 
 # Create Summary datasheet
-create_summary(summary_input, elg_folder, cruiseID = cruiseID)
+create_summary(summary_input, elg_folder, cruiseID = cruiseID,
+               process_lci = TRUE, raw_folder = lci_raw_folder)
 
 # CTD datasheet
 create_datasheet(ctd_input, data_type = "CTD",
@@ -102,11 +105,20 @@ create_datasheet(meter_input, data_type = "meter",
 # Bottle datasheet
 create_datasheet(bottle_input, data_type = "bottle",
                  ros_input = ros_folder,
+                 process_calc = TRUE, calc_folder = calc_folder,
                  cruiseID = cruiseID)
 
 # Secchi datasheet
 create_datasheet(secchi_input, data_type = "SD",
                  cruiseID = cruiseID)
+
+# Obs Summary Input
+create_summary(obs_summary_input, elg_folder, cruiseID = cruiseID,
+               csv_filename = "obs_summary_datasheet.csv")
+
+# Obs datasheet
+create_datasheet(obs_input, summary_input = "output/csv/<cruiseID>_obs_summary_datasheet.csv",
+                 data_type = "OBS", cruiseID = cruiseID)
 
 # Print Session Info------------------------------------------------------------
 

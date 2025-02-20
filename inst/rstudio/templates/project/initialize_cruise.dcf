@@ -1,2 +1,48 @@
 Binding: initialize_cruise
 Title: Initialize Cruise Project
+Subtitle: Select Ship and Deployments. More can be added later!
+
+Parameter: select_ship
+Widget:SelectInput
+Label: Select Ship
+Fields: RCS, CC
+Postion: left
+
+Parameter: neuston
+Widget: CheckboxInput
+Label: Neuston Tow
+Default: On
+
+Parameter: meter
+Widget: CheckboxInput
+Label: Meter Net
+Default: On
+
+Parameter: ctd
+Widget: CheckboxInput
+Label: Hydrocast and/or Free CTD
+Default: On
+
+Parameter: secchi
+Widget: CheckboxInput
+Label: Secchi Disk
+Default: Off
+
+Parameter: niskins_on_wire
+Widget: CheckboxInput
+Label: Niskins on the Wire
+Default: Off
+Position: right
+
+Parameter: free_ctd
+Widget: CheckboxInput
+Label: Free CTDs only (no bottles)
+Default: Off
+Position: right
+
+Parameter: obs
+Widget: CheckboxInput
+Label: Obs Data (Creates separate summary sheet)
+Default: Off
+Position: right
+
