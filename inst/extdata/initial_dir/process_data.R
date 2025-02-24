@@ -120,6 +120,16 @@ create_summary(obs_summary_input, elg_folder, cruiseID = cruiseID,
 create_datasheet(obs_input, summary_input = "output/csv/<cruiseID>_obs_summary_datasheet.csv",
                  data_type = "OBS", cruiseID = cruiseID)
 
+# Station Plots-----------------------------------------------------------------
+
+# Uncomment one or all of these lines to run a script to generate station plots.
+# Please navigate to the the 'plot_scripts' folder to make the necessary updates
+# to cruiseID and output folder before running
+
+# source("plot_scripts/StationPlotsNoBathymetry.R")
+# source("plot_scripts/StationPlots.R")
+# source("plot_scripts/ft_plots.R")
+
 # Print Session Info------------------------------------------------------------
 
 # Set cruiseID and run this line to log package versions used to analyze data in
