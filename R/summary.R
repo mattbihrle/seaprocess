@@ -97,7 +97,7 @@ create_summary <- function(summary_input, elg_input,
 
   # filter out rows for which there is data hand-entered
   summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lat:station_distance,is.na))
-  summary <- dplyr::select(summary, !c(lat,lon,temp,fluor,sal,bot_depth,max_tension,station_distance))
+  summary <- dplyr::select(summary, !c(lat,lon,temp,fluor,sal,bot_depth,payout_at_max,max_tension,station_distance))
 
   # find all the nearest date time values of summary sheet to the elg file and add these indeces
   # TODO: what happens if any of ii are blank or at beginning or end of the elg?
@@ -155,22 +155,40 @@ lci <- dplyr::mutate(lci,
 suppressWarnings(
 lci <- dplyr::mutate(lci, dplyr::across(tension:ascii, as.numeric))
 )
-
 #Loop through and find max tension!
 
 sti_t <- find_near(lci$dttm, summary$dttm)
 eni_t <- find_near(lci$dttm, summary$dttm_out)
 
 max_tension <- rep(NA, length(sti_t))
-
+wire_payout <- rep(NA, length(sti_t))
 
 for (i in 1:length(sti_t)) {
   if(is.na(eni_t[i])) {
     next
-    }
-  max_tension[i] <- max(lci$tension[sti_t[i]:eni_t[i]])
-
   }
+  tension_peak <- lci |>
+    dplyr::slice(sti_t[i]:eni_t[i]) |>
+    dplyr::filter(payout <= 0) |>
+    dplyr::slice_max(order_by = tension)
+  # Ensure there is data before adding
+  #TESTS
+  if(nrow(tension_peak) > 1){
+    warning("Equal max tension occured at multiple times during:
+        ", paste(summary$station[i], summary$deployment[i], sep = "-")
+            , "
+        Seaprocess will record the first instance.")
+  }
+  #TESTS
+  if(nrow(tension_peak > 0)) {
+    suppressWarnings(
+    max_tension[i] <- tension_peak$tension)
+    suppressWarnings(
+    wire_payout[i] <- tension_peak$payout)
+  } else {
+    next
+  }
+}
 } else {
   warning(paste("No raw files found matching 'LCI90-raw.'
                 \n Proceeding to pull max_tension from the event file (RCS Only)."))
@@ -178,15 +196,17 @@ for (i in 1:length(sti_t)) {
   } else {
 #_________________________________________________________
   #MB add max_tension
+    browser()
   max_tension <- rep(NA, length(sti))
+  wire_payout <- rep(NA, length(sti))
   for (i in 1:length(sti)) {
     if(is.na(eni[i])) {
       next
     }
     max_tension[i] <- max(elg$wire_tension[sti[i]:eni[i]])
+    wire_payout[i] <- elg$wire_payout[max(elg$wire_tension[sti[i]:eni[i]])]
   }
 }
-#filter out max tensions below a certain threshold
 
   tow_length <- rep(NA, length(sti))
   for (i in 1:length(sti)) {
@@ -205,12 +225,27 @@ for (i in 1:length(sti_t)) {
 
   #MB add max_tension column
   summary <- dplyr::mutate(summary, max_tension = max_tension)
+
+  #Add payout column
+  summary <- dplyr::mutate(summary, payout_at_max = wire_payout)
   #Remove any resting tension <100
   suppressWarnings(
   summary <- dplyr::mutate(summary,
                             max_tension = ifelse(summary$max_tension > 99,
                                         summary$max_tension, as.numeric("NA")))
   )
+
+  #Remove max tension from deployments that don't use the wire
+  suppressWarnings(
+  summary <- dplyr::mutate(summary,
+                           max_tension = ifelse(summary$deployment == "NT" |
+                                                  summary$deployment == "OBS" |
+                                                  summary$deployment == "REEF",
+                                                as.numeric("NA"), summary$max_tension))
+  )
+  summary <- dplyr::mutate(summary,
+                           payout_at_max = ifelse(summary$max_tension == "NA",
+                                                  as.numeric("NA"), summary$payout_at_max))
   summary <- dplyr::select(summary, -dttm_out)
 
 
@@ -237,6 +272,8 @@ for (i in 1:length(sti_t)) {
   summary <- dplyr::relocate(summary, station_distance, .after = tidyselect::last_col())
   #MB add max tension before station distance
   summary <- dplyr::relocate(summary, max_tension, .before = station_distance)
+  # Put payout at max after max tension
+  summary <- dplyr::relocate(summary, payout_at_max, .after = max_tension)
   # Once finished rearranging columns, rename all to have units
 
   sum_units <- c(temp_c = "temp", sal_psu = "sal", chla_fluor = "fluor",

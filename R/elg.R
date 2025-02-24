@@ -18,8 +18,8 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
                      csv_output = NULL,
                      keep = c("dttm","lon","lat","temp","sal","fluor",
                               "cdom","xmiss","wind_sp","wind_dir",
-                              "heading","pitch","roll", "wire_tension", "bot_depth",
-                              "filename")) {
+                              "heading","pitch","roll", "wire_tension",
+                              "wire_payout", "bot_depth", "filename")) {
   #MB add wire_tension to grab max tension
   # TODO: add in minor interpolation for short gaps of missing values
   # collects names if you need to be able to skip data lines
@@ -61,7 +61,6 @@ read_elg <- function(filein, forceGPS = NULL, preCheck = TRUE, skip = 0,
 
   # Reassign names that have dashes in them to be referenced more easily
   names(df) <- stringr::str_replace_all(names(df),"-",".")
-
   # MB add bot_depth
   # MB change "depth" to "bot_depth"
   # Construct a data frame of regular expressions and functions used to match col names
