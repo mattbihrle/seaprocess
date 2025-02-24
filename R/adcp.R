@@ -16,7 +16,10 @@
 read_adcp <- function(adcp_file, calc_echo = FALSE, to_tibble = TRUE) {
 
   # Read the ensemble file using the oce package
+  # Remove 'suppressWarnings for warnings messages
+  suppressWarnings(
   adcp <- oce::read.adp(adcp_file)
+  )
 
   # Use the speed made good components of the boat trajectory to computer true u and v components
   adcp@data$v[,,1] <- adcp@data$v[,,1] + adcp@data$speedMadeGoodEast
