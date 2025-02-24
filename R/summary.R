@@ -171,15 +171,14 @@ for (i in 1:length(sti_t)) {
     dplyr::slice(sti_t[i]:eni_t[i]) |>
     dplyr::filter(payout <= 0) |>
     dplyr::slice_max(order_by = tension)
-  # Ensure there is data before adding
-  #TESTS
+  # Ensure there is data before adding, show warning for two lines of max tension
   if(nrow(tension_peak) > 1){
     warning("Equal max tension occured at multiple times during:
         ", paste(summary$station[i], summary$deployment[i], sep = "-")
             , "
         Seaprocess will record the first instance.")
   }
-  #TESTS
+
   if(nrow(tension_peak > 0)) {
     suppressWarnings(
     max_tension[i] <- tension_peak$tension)
@@ -196,7 +195,7 @@ for (i in 1:length(sti_t)) {
   } else {
 #_________________________________________________________
   #MB add max_tension
-    browser()
+
   max_tension <- rep(NA, length(sti))
   wire_payout <- rep(NA, length(sti))
   for (i in 1:length(sti)) {
