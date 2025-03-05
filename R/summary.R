@@ -75,6 +75,7 @@ create_summary <- function(summary_input, elg_input,
                            force_stations = TRUE, cruiseID = NULL,
                            add_cruiseID = TRUE, magdiff = 60, skipcheck = FALSE,
                            process_lci = FALSE, raw_folder = lci_raw_folder,
+                           keep = c("lat", "lon", "temp", "fluor", "sal", "bot_depth"),
                            ...) {
 
   # read in the summary_input xlsx file
@@ -91,13 +92,13 @@ create_summary <- function(summary_input, elg_input,
                            )
 
   # Test to see whether elg_input is a file or a folder and read elg file(s) accordingly
-  elg <- get_elg(elg_input)
+  elg <- get_elg(elg_input, ...)
 
   # elg <- filter_elg(elg)
 
   # filter out rows for which there is data hand-entered
   summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lat:station_distance,is.na))
-  summary <- dplyr::select(summary, !c(lat,lon,temp,fluor,sal,bot_depth,payout_at_max,max_tension,station_distance))
+  summary <- dplyr::select(summary, !c(keep,payout_at_max,max_tension,station_distance))
 
   # find all the nearest date time values of summary sheet to the elg file and add these indeces
   # TODO: what happens if any of ii are blank or at beginning or end of the elg?
@@ -239,7 +240,8 @@ for (i in 1:length(sti_t)) {
   summary <- dplyr::mutate(summary,
                            max_tension = ifelse(summary$deployment == "NT" |
                                                   summary$deployment == "OBS" |
-                                                  summary$deployment == "REEF",
+                                                  summary$deployment == "REEF" |
+                                                  summary$deployment == "SS",
                                                 as.numeric("NA"), summary$max_tension))
   )
   summary <- dplyr::mutate(summary,
@@ -251,7 +253,7 @@ for (i in 1:length(sti_t)) {
   # extract these values and add to the right of summary
   # TODO: make the outputs selectable when you run the function
   # MB added bot_depth
-  elg_to_add <- dplyr::select(elg[ii,], lat, lon, temp, fluor, sal, bot_depth)
+  elg_to_add <- dplyr::select(elg[ii,], keep)
   summary <- dplyr::bind_cols(summary, elg_to_add)
 
   # add back in the hand entered values
@@ -298,7 +300,7 @@ for (i in 1:length(sti_t)) {
         if(add_cruiseID & !is.null(cruiseID)) {
           csv_output <- add_file_cruiseID(csv_output, cruiseID)
         }
-        readr::write_csv(format_csv_output(summary, ...),csv_output)
+        readr::write_csv(format_csv_output(summary),csv_output)
       } else {
         stop("csv_output does not direct towards a valid existing folder")
       }
@@ -443,16 +445,16 @@ tz <- dplyr::case_when(
 #' @export
 #'
 #' @examples
-get_elg <- function(elg_input) {
+get_elg <- function(elg_input, ...) {
   # TODO: add ability to tune reading elg per options provided in that function
   # MB TODO: a possible place for filter_elg?
   # TODO: find way to store Rdata file in local folder so we don't have the delay of loading
   # TODO: confirm consistency in field names
 
   if(file_test("-f",elg_input)) {
-    elg <- read_elg(elg_input)
+    elg <- read_elg(elg_input, ...)
   } else if(file_test("-d",elg_input)) {
-    elg <- read_elg_fold(elg_input)
+    elg <- read_elg_fold(elg_input, ...)
   } else {
     stop("elg_input is neither a valid filename or folder")
   }
