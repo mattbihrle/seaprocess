@@ -316,7 +316,8 @@ read_cnv_latlon <- function(cnv_file) {
 
   # show the lines of output for when there is no lon or no lat
   if(is.na(lon)|is.na(lat)) {
-    show(r)
+     show(r)
+    warning("Unable to parse lat and/or lon from ", cnv_file)
     # a<-readline('Press enter key to continue...')
   }
 
