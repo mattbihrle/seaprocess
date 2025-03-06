@@ -6,8 +6,8 @@
 #'
 #' @param summary_input The input datasheet that includes the relevent station
 #'   and deployment metadata
-#' @param elg The cruise elg file (or folder of files) for extracting continuous
-#'   data from
+#' @param elg_input The cruise elg file (or folder of files) for extracting
+#'   continuous data from
 #' @param csv_folder The directory path to output the csv file. Set to NULL for
 #'   no csv output.
 #' @param csv_filename The csv filename to output the data
@@ -23,11 +23,20 @@
 #' @param skipcheck toggles whether to check through the summary data to make
 #'   sure all required fields (deployment, date, time in, zd) all have values.
 #'   Defaults to FALSE, set to TRUE to bypass this step.
-#'  @param process_lci optional to reroute the summary function to process wire
-#'  data from the lci90 raw file. Also requires the parameter `raw_folder`
-#'  @param raw_folder location of the .RAW file for the LCI90 created by SCS.
-#'  The function will automatically look for a filename containing "LCI90-raw"
-#' @param ... optional arguments passed to format_csv_output
+#' @param process_lci optional to reroute the summary function to process wire
+#'   data from the LCI90 raw file (RCS) or the Hydrowinch Tension Files folder
+#'   (CC). Also requires the parameter `raw_folder`
+#' @param raw_folder location of the .RAW file for the LCI90 created by SCS. The
+#'   function will automatically look for a filename containing "LCI90-raw" on
+#'   RCS or, on CC, it will look for all files in the defined folder except for
+#'   files/folders called "archive files."
+#' @param keep a character vector of all the variables from the elg file to add
+#'   to the summary datasheet. Default is lat, lon, fluor, sal, bottom depth.
+#'   Removing the original variables may cause an error but more can be added by
+#'   incorporating the name from the elg file *without* units. Eg.
+#'   'xmiss_counts' would be 'xmiss', 'cdom_fluor' would be 'cdom'.
+#' @param ... optional arguments passed to read_elg like forceGPS. See
+#'   `?read_elg` for more information.
 #'
 #' @return A tibble containing the combined data frames. If csv_folder is set to
 #'   a valid output path then a formatted csv file is output also.
@@ -35,25 +44,25 @@
 #' @export
 #'
 #' @details During deployments at SEA, we maintain paper data sheets which
-#' recorded station metadata and data from that deployment. These are a vital
-#' component for our data accuracy and redundancy.
+#'   recorded station metadata and data from that deployment. These are a vital
+#'   component for our data accuracy and redundancy.
 #'
-#' In creating electronic datasheets for deployments it is desirable to combine
-#' hand-entered station metadata (station number, station type, zone
-#' description, etc.) with electronically recorded data (location, surface
-#' conditions, etc.) to provide an accurate record of the deployment without the
-#' need to re-enter hand-recorded values of the electronic data.
+#'   In creating electronic datasheets for deployments it is desirable to
+#'   combine hand-entered station metadata (station number, station type, zone
+#'   description, etc.) with electronically recorded data (location, surface
+#'   conditions, etc.) to provide an accurate record of the deployment without
+#'   the need to re-enter hand-recorded values of the electronic data.
 #'
-#' To do this, [create_summary()] takes in an excel sheet with the bare minimum
-#' of hand-entered data:
+#'   To do this, [create_summary()] takes in an excel sheet with the bare
+#'   minimum of hand-entered data:
 #'
 #' * Station number
 #' * Deployment type
 #' * Deployment date/time in (and out)
 #' * Zone description (time zone)
 #'
-#' [create_summary()] combines this data with the electronically recorded
-#' "event" data which records (amongst other things):
+#'   [create_summary()] combines this data with the electronically recorded
+#'   "event" data which records (amongst other things):
 #'
 #' * Time
 #' * Location
@@ -61,11 +70,11 @@
 #' * Surface Salinity
 #' * etc.
 #'
-#' The event data is typically stored in a file with an extension elg.
-#' [read_elg()] deals with reading this data in and formatting it properly.
+#'   The event data is typically stored in a file with an extension elg.
+#'   [read_elg()] deals with reading this data in and formatting it properly.
 #'
-#' Once the two data frames are read in to R, they are combined using the UTC
-#' time that exists in both data frames.
+#'   Once the two data frames are read in to R, they are combined using the UTC
+#'   time that exists in both data frames.
 #'
 #' @md
 #'
@@ -232,7 +241,14 @@ create_summary <- function(summary_input, elg_input,
   summary <- dplyr::relocate(summary, max_tension, .before = station_distance)
   # Put payout at max after max tension
   summary <- dplyr::relocate(summary, payout_at_max, .after = max_tension)
+
+  # Rearrange make sure the summary columns are in front
+
+  summary <- dplyr::relocate(summary, any_of(c("dttm", keep, "max_tension",
+                                               "payout_at_max", "station_distance")),
+                                                .after = general_locale)
   # Once finished rearranging columns, rename all to have units
+
 
   sum_units <- c(temp_c = "temp", sal_psu = "sal", chla_fluor = "fluor",
                  station_distance_m = "station_distance", bot_depth_m = "bot_depth")
