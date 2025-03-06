@@ -74,7 +74,7 @@ create_summary <- function(summary_input, elg_input,
                            csv_filename = "summary_datasheet.csv",
                            force_stations = TRUE, cruiseID = NULL,
                            add_cruiseID = TRUE, magdiff = 60, skipcheck = FALSE,
-                           process_lci = FALSE, raw_folder = lci_raw_folder,
+                           process_lci = FALSE, raw_folder = NULL,
                            keep = c("lat", "lon", "temp", "fluor", "sal", "bot_depth"),
                            ...) {
 
@@ -141,64 +141,15 @@ create_summary <- function(summary_input, elg_input,
   sti[iii] <- NA
   eni[iii] <- NA
 
-# MB wire logging test additions____________________________________
-if (process_lci) {
-  files <- list.files(raw_folder, pattern = "LCI90-raw", full.names = T)
-  if (length(files) > 0) {
-lci <- readr::read_csv(files, col_names = c("date", "time", "string", "tension",
-                                            "speed", "payout", "ascii"), show_col_types = F)
-
-#create dttm column
-lci <- dplyr::mutate(lci,
-                     dttm = lubridate::mdy_hms(
-                       paste(lci$date,lci$time)))
-#make sure non datetime columns are numeric
-suppressWarnings(
-lci <- dplyr::mutate(lci, dplyr::across(tension:ascii, as.numeric))
-)
-#Loop through and find max tension!
-
-sti_t <- find_near(lci$dttm, summary$dttm)
-eni_t <- find_near(lci$dttm, summary$dttm_out)
-
-max_tension <- rep(NA, length(sti_t))
-wire_payout <- rep(NA, length(sti_t))
-
-for (i in 1:length(sti_t)) {
-  if(is.na(eni_t[i])) {
-    next
-  }
-  tension_peak <- lci |>
-    dplyr::slice(sti_t[i]:eni_t[i]) |>
-    dplyr::filter(payout <= 0) |>
-    dplyr::slice_max(order_by = tension)
-  # Ensure there is data before adding, show warning for two lines of max tension
-  if(nrow(tension_peak) > 1){
-    warning("Equal max tension occured at multiple times during:
-        ", paste(summary$station[i], summary$deployment[i], sep = "-")
-            , "
-        Seaprocess will record the first instance.")
-  }
-
-  if(nrow(tension_peak > 0)) {
-    suppressWarnings(
-    max_tension[i] <- tension_peak$tension)
-    suppressWarnings(
-    wire_payout[i] <- tension_peak$payout)
+  if (process_lci) {
+    wire_info <- process_wire(summary, raw_folder, cruiseID = cruiseID)
   } else {
-    next
-  }
-}
-} else {
-  warning(paste("No raw files found matching 'LCI90-raw.'
-                \n Proceeding to pull max_tension from the event file (RCS Only)."))
-         }
-  } else {
-#_________________________________________________________
-  #MB add max_tension
+  # If not processing wire through raw files, try to do it through the elg file
 
+  # Create empty vectors
   max_tension <- rep(NA, length(sti))
   wire_payout <- rep(NA, length(sti))
+  # loop through and find max tensions and payout at that time
   for (i in 1:length(sti)) {
     if(is.na(eni[i])) {
       next
@@ -206,8 +157,37 @@ for (i in 1:length(sti_t)) {
     max_tension[i] <- max(elg$wire_tension[sti[i]:eni[i]])
     wire_payout[i] <- elg$wire_payout[max(elg$wire_tension[sti[i]:eni[i]])]
   }
-}
+  # Put new vectors into a list to match output from `process_wire`
+  wire_info <- list(max_tension = max_tension, wire_payout = wire_payout)
+  }
 
+  #MB add max_tension column
+  summary <- dplyr::mutate(summary, max_tension = wire_info$max_tension)
+
+  #Add payout column
+  summary <- dplyr::mutate(summary, payout_at_max = wire_info$wire_payout)
+  #Remove any resting tension <100
+  suppressWarnings(
+    summary <- dplyr::mutate(summary,
+                             max_tension = ifelse(summary$max_tension > 99,
+                                                  summary$max_tension, as.numeric("NA")))
+  )
+
+  #Remove max tension from deployments that don't use the wire
+  suppressWarnings(
+    summary <- dplyr::mutate(summary,
+                             max_tension = ifelse(summary$deployment == "NT" |
+                                                    summary$deployment == "OBS" |
+                                                    summary$deployment == "REEF" |
+                                                    summary$deployment == "SS",
+                                                  as.numeric("NA"), summary$max_tension))
+  )
+  #Remove payout at max if max_tension is NA
+  summary <- dplyr::mutate(summary,
+                           payout_at_max = ifelse(summary$max_tension == "NA",
+                                                  as.numeric("NA"), summary$payout_at_max))
+
+  # Calculate tow length--------------------------------------------------------
   tow_length <- rep(NA, length(sti))
   for (i in 1:length(sti)) {
     if(is.na(eni[i])) {
@@ -223,36 +203,13 @@ for (i in 1:length(sti_t)) {
   #add tow length in meters to data
   summary <- dplyr::mutate(summary, station_distance = tow_length*1000)
 
-  #MB add max_tension column
-  summary <- dplyr::mutate(summary, max_tension = max_tension)
-
-  #Add payout column
-  summary <- dplyr::mutate(summary, payout_at_max = wire_payout)
-  #Remove any resting tension <100
-  suppressWarnings(
-  summary <- dplyr::mutate(summary,
-                            max_tension = ifelse(summary$max_tension > 99,
-                                        summary$max_tension, as.numeric("NA")))
-  )
-
-  #Remove max tension from deployments that don't use the wire
-  suppressWarnings(
-  summary <- dplyr::mutate(summary,
-                           max_tension = ifelse(summary$deployment == "NT" |
-                                                  summary$deployment == "OBS" |
-                                                  summary$deployment == "REEF" |
-                                                  summary$deployment == "SS",
-                                                as.numeric("NA"), summary$max_tension))
-  )
-  summary <- dplyr::mutate(summary,
-                           payout_at_max = ifelse(summary$max_tension == "NA",
-                                                  as.numeric("NA"), summary$payout_at_max))
+  # Remove variables we dont need
   summary <- dplyr::select(summary, -dttm_out)
 
 
-  # extract these values and add to the right of summary
-  # TODO: make the outputs selectable when you run the function
-  # MB added bot_depth
+  # extract these values and add to the right of summary, add variables to "keep"
+  # to have additional variables in the summary output.
+  # TODO: make outputs selectable
   elg_to_add <- dplyr::select(elg[ii,], keep)
   summary <- dplyr::bind_cols(summary, elg_to_add)
 
@@ -565,25 +522,32 @@ summary_check <- function(summary = summary, skipcheck = FALSE) {
 #' @export
 #'
 #' @examples
-process_wire <- function(data, ship = NULL, raw_folder = NULL) {
-  browser()
-  # make ship id lowercase
-  ship <- stringr::str_to_lower(ship)
+process_wire <- function(data, raw_folder = NULL, cruiseID = NULL) {
+
+  # create ship ID from cruise ID
+  ship <- cruise2ship(cruiseID)
   # Proceed only if a tension folder is defined
   if (!is.null(raw_folder)) {
+
     # RCS file read----------------------------------------------------------------
     if(ship == "rcs") {
       files <- list.files(raw_folder, pattern = "LCI90-raw", full.names = T)
       if (length(files) > 0) {
-        lci <- readr::read_csv(files, show_col_types = F, col_types = "Dtcnnnc",
+        suppressWarnings(
+        lci <- readr::read_csv(files, show_col_types = F, col_types = "ctcnnnc",
                                col_names = c("date", "time", "string", "tension",
                                              "speed", "payout", "ascii"))
+        )
+
+        #create dttm column
+        lci <- dplyr::mutate(lci, dttm = lubridate::mdy_hms(paste(lci$date,lci$time)))
 
         #Swap payout to be positive numbers when gear is in the water
-        lci <- dplyr::mutate(lci, payout = payout * -1)
+        lci <- dplyr::mutate(lci, payout = lci$payout * -1)
       } else {
         warning(paste("No files found matching the string: 'LCI90-raw'.",
                       "Proceeding to pull max tension and payout from event file (RCS Only)"))
+        return()
       }
     }
 
@@ -593,24 +557,27 @@ process_wire <- function(data, ship = NULL, raw_folder = NULL) {
       files <- list.files(raw_folder, full.names = T, pattern = ".*[^a|A.* f|Files.*]$")
 
       if (length(files) > 0) {
-        lci <- readr::read_csv(files, col_names = c("RD", "dttm", "tension", "misc",
+        suppressWarnings(
+          lci <- readr::read_csv(files, col_names = c("RD", "dttm", "tension", "misc",
                                                     "misc2", "speed", "payout", "checksum"),
                                col_types = "cTnccnnc", show_col_types = F, skip = 2,
                                skip_empty_rows = T)
+        )
         # Remove rows that have an NA
         lci <- tidyr::drop_na(lci)
       }
       else {
         warning("Could not find any filenames that do not match 'archive files.'
 Please hand enter max tension into station summary sheet.")
+        return()
       }
     }
 
     # Loop to find max tension------------------------------------------------------
 
     # Create vector of rows that match start and end time.
-    sti_t <- seaprocess::find_near(lci$dttm, data$dttm)
-    eni_t <- seaprocess::find_near(lci$dttm, data$time_out)
+    sti_t <- find_near(lci$dttm, data$dttm)
+    eni_t <- find_near(lci$dttm, data$dttm_out)
     # Create blank vectors to fill
     max_tension <- rep(NA, length(sti_t))
     wire_payout <- rep(NA, length(sti_t))
@@ -630,7 +597,7 @@ Please hand enter max tension into station summary sheet.")
       # Show warning for two lines of max tension
       if(nrow(tension_peak) > 1){
         warning("Equal max tension occured at multiple times during:
-        ", paste(summary$station[i], summary$deployment[i], sep = "-")
+        ", paste(data$station[i], data$deployment[i], sep = "-")
                 , "
         Seaprocess will record the first instance.")
       }
@@ -653,8 +620,8 @@ Please hand enter max tension into station summary sheet.")
     }
     return()
   }
-  # Create a list of variables
-  wire_info <- list(max_tenion = max_tension, wire_payout = wire_payout)
+  # Create a list containing the variables we want
+  wire_info <- list(max_tension = max_tension, wire_payout = wire_payout)
   # Send this out to summary input
   return(wire_info)
 }
