@@ -71,18 +71,15 @@ initialize_master <- function(path, cruiseID = NULL,
       # Make blank any line with '#RCS' and the first line below it
       ii <- stringr::str_which(lines, "\\#RCS")
       lines <- lines[-c(ii, ii + 1)]
-
-      #Remove the process_lci parameters from 'create_summary'
-      #find the line below 'Create Summary'
-      ii <- stringr::str_which(lines, "# Create Summary datasheet") + 1
-      # Input the function we want
-      lines[ii] <-
-        stringr::str_replace(lines[ii], ".*", "create_summary(summary_input, elg_folder, cruiseID = cruiseID)")
-      # Replace anything below it with white space
-      lines <- lines[-c(ii + 1)]
     }
 
     if (select_ship == "RCS") {
+      # Make blank any line with #CC and the first line below it
+      ii <- stringr::str_which(lines, "\\#CC")
+      lines <- lines[-c(ii, ii + 1)]
+    }
+
+    if (select_ship == "CC") {
       ii <- stringr::str_which(lines, "\\#RCS")
       lines <- lines[-ii]
     }
