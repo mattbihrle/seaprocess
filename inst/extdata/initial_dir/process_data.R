@@ -46,8 +46,9 @@ ros_folder <- "<enter-location-of-ros-folder>"
 adcp_folder <- "<enter-location-of-adcp-folder>"
 calc_folder <- "<enter-location-of-calc-folder>"
 #RCS
-raw_folder <- "<enter-location-of-lci_raw-folder>"
-
+raw_folder <- "<enter-location-of-lci-raw-folder>"
+#CC
+raw_folder <- "<enter-location-of-hydrowinch-tension-files>"
 # Datasheets
 #
 # These are stored within this project under the "datasheets" folder.
