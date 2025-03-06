@@ -136,3 +136,38 @@ center_longitude <- function(elg) {
   return(centered_longitudes)
 }
 
+#' Cruise ID to ship name
+#'
+#' Takes a standard cruise ID and looks for an S or C at the beginning to create
+#' a variable called "ship." Used to change processing based on other ship needs
+#' since we use cruiseID in all functions.
+#'
+#'
+#' @param cruiseID string formatted as "C___" or S___"
+#'
+#' @return
+#' @export
+#'
+#' @examples
+cruise2ship <- function (cruiseID) {
+  #make cruiseid lowercase
+
+  cruiseID <- stringr::str_to_lower(cruiseID)
+
+  # Look for a C or R
+  if (stringr::str_detect(cruiseID, "^c")) {
+    ship = "cc"
+    return(ship)
+  }
+  if (stringr::str_detect(cruiseID, "^s")) {
+    ship = "rcs"
+    return(ship)
+  }
+  if (stringr::str_detect(cruiseID, "^g")) {
+    ship = "gene"
+    } else {
+    warning("Unable to parse ship name from cruiseID.")
+  }
+return()
+}
+
