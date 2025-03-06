@@ -540,4 +540,121 @@ summary_check <- function(summary = summary, skipcheck = FALSE) {
 }
 
 
+#' Process Wire Info
+#'
+#' A function that works inside `create_summary()` to take a folder with raw
+#' tension files, read it into R and find the tension peak and wire payout at
+#' that peak for each deployment. It does this by aligning time in and time out
+#' from the station summary sheet with the times in the tension files. This
+#' means that on CC we must keep the LCI 90 time accurate and on RCS we must
+#' keep the datalogger computer time accurate.
+#'
+#' NOTE: on CC the function will try to read anything in the raw folder EXCEPT a
+#' file with the name "archive files." On RCS it is looking for specifically the
+#' string "LCI90-raw." If you are having trouble with this function try renaming
+#' the files or reach out to the office.
+#'
+#' @param data dataframe that has a dttm and dttm_out column
+#' @param ship either "RCS" or "CC" used for dealing with the different file
+#'   names and tension logging methods between both boats.
+#' @param raw_folder folder path to where the raw tension files are stored. On
+#'   RCS this is typically on the datalogger computer with the name "LCI90-raw,
+#'   on CC this is the Hydrowinch Tension Files folder.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+process_wire <- function(data, ship = NULL, raw_folder = NULL) {
+  browser()
+  # make ship id lowercase
+  ship <- stringr::str_to_lower(ship)
+  # Proceed only if a tension folder is defined
+  if (!is.null(raw_folder)) {
+    # RCS file read----------------------------------------------------------------
+    if(ship == "rcs") {
+      files <- list.files(raw_folder, pattern = "LCI90-raw", full.names = T)
+      if (length(files) > 0) {
+        lci <- readr::read_csv(files, show_col_types = F, col_types = "Dtcnnnc",
+                               col_names = c("date", "time", "string", "tension",
+                                             "speed", "payout", "ascii"))
 
+        #Swap payout to be positive numbers when gear is in the water
+        lci <- dplyr::mutate(lci, payout = payout * -1)
+      } else {
+        warning(paste("No files found matching the string: 'LCI90-raw'.",
+                      "Proceeding to pull max tension and payout from event file (RCS Only)"))
+      }
+    }
+
+    # CC file read------------------------------------------------------------------
+    if(ship =="cc") {
+      # Read all lci files in the raw folder except for "archive files"
+      files <- list.files(raw_folder, full.names = T, pattern = ".*[^a|A.* f|Files.*]$")
+
+      if (length(files) > 0) {
+        lci <- readr::read_csv(files, col_names = c("RD", "dttm", "tension", "misc",
+                                                    "misc2", "speed", "payout", "checksum"),
+                               col_types = "cTnccnnc", show_col_types = F, skip = 2,
+                               skip_empty_rows = T)
+        # Remove rows that have an NA
+        lci <- tidyr::drop_na(lci)
+      }
+      else {
+        warning("Could not find any filenames that do not match 'archive files.'
+Please hand enter max tension into station summary sheet.")
+      }
+    }
+
+    # Loop to find max tension------------------------------------------------------
+
+    # Create vector of rows that match start and end time.
+    sti_t <- seaprocess::find_near(lci$dttm, data$dttm)
+    eni_t <- seaprocess::find_near(lci$dttm, data$time_out)
+    # Create blank vectors to fill
+    max_tension <- rep(NA, length(sti_t))
+    wire_payout <- rep(NA, length(sti_t))
+
+    for (i in 1:length(sti_t)) {
+      if(is.na(eni_t[i])) {
+        next
+      }
+      # Between the start and end time, take only positive payout values
+      # and find the maximum
+      tension_peak <- lci |>
+        dplyr::slice(sti_t[i]:eni_t[i]) |>
+        dplyr::filter(payout >= 0) |>
+        dplyr::slice_max(order_by = tension)
+
+
+      # Show warning for two lines of max tension
+      if(nrow(tension_peak) > 1){
+        warning("Equal max tension occured at multiple times during:
+        ", paste(summary$station[i], summary$deployment[i], sep = "-")
+                , "
+        Seaprocess will record the first instance.")
+      }
+      # Ensure there is data before adding
+      if(nrow(tension_peak > 0)) {
+        suppressWarnings(max_tension[i] <- tension_peak$tension)
+        suppressWarnings(wire_payout[i] <- tension_peak$payout)
+      } else {
+        next
+      }
+    }
+    # Alternatives if there are no raw files to work with-------------------------
+  } else {
+    if (ship == "rcs") {
+      warning(paste("No raw_folder defined. Proceeding to pull tension and payout from event file."))
+    }
+    if (ship == "cc") {
+      warning("No raw_folder defined. Please hand enter max tension into station summary sheet.")
+
+    }
+    return()
+  }
+  # Create a list of variables
+  wire_info <- list(max_tenion = max_tension, wire_payout = wire_payout)
+  # Send this out to summary input
+  return(wire_info)
+}
