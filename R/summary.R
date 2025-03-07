@@ -30,11 +30,12 @@
 #'   function will automatically look for a filename containing "LCI90-raw" on
 #'   RCS or, on CC, it will look for all files in the defined folder except for
 #'   files/folders called "archive files."
-#' @param keep a character vector of all the variables from the elg file to add
-#'   to the summary datasheet. Default is lat, lon, fluor, sal, bottom depth.
-#'   Removing the original variables may cause an error but more can be added by
-#'   incorporating the name from the elg file *without* units. Eg.
-#'   'xmiss_counts' would be 'xmiss', 'cdom_fluor' would be 'cdom'.
+#' @param keep a character vector of all the variables from the elg file that
+#'   could be added to the summary datasheet. Default is all of the values from
+#'   [read_elg(()] except 'dttm'. If needed, add additional names from the elg
+#'   file *without* units. Eg. 'xmiss_counts' would be 'xmiss', 'cdom_fluor'
+#'   would be 'cdom'. `create_summary` will try to match column names from this
+#'   list with the summary_input sheet.
 #' @param ... optional arguments passed to read_elg like forceGPS. See
 #'   `?read_elg` for more information.
 #'
@@ -84,8 +85,10 @@ create_summary <- function(summary_input, elg_input,
                            force_stations = TRUE, cruiseID = NULL,
                            add_cruiseID = TRUE, magdiff = 60, skipcheck = FALSE,
                            process_lci = FALSE, raw_folder = NULL,
-                           keep = c("lat", "lon", "temp", "fluor", "sal", "bot_depth"),
-                           ...) {
+                           keep = c("lat", "lon", "temp", "fluor", "sal", "bot_depth",
+                                    "cdom", "xmiss", "wind_sp","wind_dir",
+                                    "heading", "pitch", "roll", "wire_tension",
+                                    "filename"), ...) {
 
   # read in the summary_input xlsx file
   summary <- readxl::read_excel(summary_input, col_types = "text")
@@ -105,9 +108,20 @@ create_summary <- function(summary_input, elg_input,
 
   # elg <- filter_elg(elg)
 
-  # filter out rows for which there is data hand-entered
-  summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(lat:station_distance,is.na))
-  summary <- dplyr::select(summary, !c(keep,payout_at_max,max_tension,station_distance))
+  # Test for column names-------------------------------------------------------
+
+  #Use 'keep' and wire and station values to create a vector of possible column names
+  sum_val <- c(keep, "max_tension","payout_at_max", "station_distance")
+
+  # Retain the column names that are actually present in the summary sheet
+  # This way we can avoid errors if some of these columns are missing
+  sum_col <- sum_val[which(sum_val %in% colnames(summary))]
+
+  # filter out rows that have data hand-entered
+  summary_hand_enter <- dplyr::filter(summary, !dplyr::if_all(any_of(sum_col),is.na))
+
+  # remove the columns that can be autofilled--these are added back in later
+  summary <- dplyr::select(summary, !any_of(sum_col))
 
   # find all the nearest date time values of summary sheet to the elg file and add these indeces
   # TODO: what happens if any of ii are blank or at beginning or end of the elg?
@@ -149,82 +163,125 @@ create_summary <- function(summary_input, elg_input,
   eni <- find_near(elg$dttm, summary$dttm_out)
   sti[iii] <- NA
   eni[iii] <- NA
-
+# Wire processing---------------------------------------------------------------
   if (process_lci) {
     wire_info <- process_wire(summary, raw_folder, cruiseID = cruiseID)
-  } else {
+
+  }
+  if (!process_lci & (any(sum_col == "max_tension") | any(sum_col == "payout_at_max"))) {
   # If not processing wire through raw files, try to do it through the elg file
 
+    if (cruise2ship(cruiseID) == "rcs"){
+      elg <- dplyr::mutate(elg, wire_payout = wire_payout * -1)
+    }
   # Create empty vectors
   max_tension <- rep(NA, length(sti))
   wire_payout <- rep(NA, length(sti))
   # loop through and find max tensions and payout at that time
-  for (i in 1:length(sti)) {
-    if(is.na(eni[i])) {
-      next
-    }
-    max_tension[i] <- max(elg$wire_tension[sti[i]:eni[i]])
-    wire_payout[i] <- elg$wire_payout[max(elg$wire_tension[sti[i]:eni[i]])]
+    for (i in 1:length(sti)) {
+      if(is.na(eni[i])) {
+        next
+      }
+      tension_peak <- elg |>
+        dplyr::slice(sti[i]:eni[i]) |>
+        dplyr::filter(wire_payout >= 0) |>
+        dplyr::slice_max(order_by = wire_tension)
+
+      # Show warning for two lines of max tension
+      if(nrow(tension_peak) > 1){
+        warning("Equal max tension occured at multiple times during:
+        ", paste(summary$station[i], summary$deployment[i], sep = "-")
+                , "
+        Seaprocess will record the first instance.")
+      }
+      # Ensure there is data before adding
+      if(nrow(tension_peak > 0)) {
+        suppressWarnings(max_tension[i] <- tension_peak$wire_tension)
+        suppressWarnings(wire_payout[i] <- tension_peak$wire_payout)
+      } else {
+        next
+      }
+
+      # max_tension[i] <- max(elg$wire_tension[sti[i]:eni[i]])
+      # wire_payout[i] <- elg$wire_payout[max(elg$wire_tension[sti[i]:eni[i]])]
   }
   # Put new vectors into a list to match output from `process_wire`
-  wire_info <- list(max_tension = max_tension, wire_payout = wire_payout)
-  }
-
+    wire_info <- list(max_tension = max_tension, wire_payout = wire_payout)
+}
+  # Once we have tension and payout, check colnames to see if we should add it
+    if (any(sum_col == "max_tension")) {
   #MB add max_tension column
   summary <- dplyr::mutate(summary, max_tension = wire_info$max_tension)
 
-  #Add payout column
-  summary <- dplyr::mutate(summary, payout_at_max = wire_info$wire_payout)
   #Remove any resting tension <100
   suppressWarnings(
     summary <- dplyr::mutate(summary,
                              max_tension = ifelse(summary$max_tension > 99,
                                                   summary$max_tension, as.numeric("NA")))
   )
-
   #Remove max tension from deployments that don't use the wire
-  suppressWarnings(
+    suppressWarnings(
     summary <- dplyr::mutate(summary,
                              max_tension = ifelse(summary$deployment == "NT" |
                                                     summary$deployment == "OBS" |
                                                     summary$deployment == "REEF" |
                                                     summary$deployment == "SS",
                                                   as.numeric("NA"), summary$max_tension))
-  )
-  #Remove payout at max if max_tension is NA
-  summary <- dplyr::mutate(summary,
-                           payout_at_max = ifelse(summary$max_tension == "NA",
-                                                  as.numeric("NA"), summary$payout_at_max))
+    )
+        if (any(sum_col == "payout_at_max")) {
+
+      #Add payout column
+      summary <- dplyr::mutate(summary, payout_at_max = wire_info$wire_payout)
+
+
+      #Remove payout at max if max_tension is NA
+      summary <- dplyr::mutate(summary,
+                               payout_at_max = ifelse(summary$max_tension == "NA",
+                                                      as.numeric("NA"), summary$payout_at_max))
+      }
+        } else {
+    # If no max tension, but payout listed, make a blank column to aid joining later
+    summary <- dplyr::mutate(summary, payout_at_max = as.numeric(NA))
+      }
 
   # Calculate tow length--------------------------------------------------------
-  tow_length <- rep(NA, length(sti))
-  for (i in 1:length(sti)) {
-    if(is.na(eni[i])) {
-      next
-    }
-    tow_length[i] <- tail(
+  if (any(sum_col == "station_distance")) {
+    tow_length <- rep(NA, length(sti))
+    for (i in 1:length(sti)) {
+      if(is.na(eni[i])) {
+        next
+      }
+      tow_length[i] <- tail(
       oce::geodDist(
         elg$lon[sti[i]:eni[i]],
         elg$lat[sti[i]:eni[i]],
         alongPath = TRUE),1)
-  }
+    }
 
   #add tow length in meters to data
   summary <- dplyr::mutate(summary, station_distance = tow_length*1000)
-
+  }
   # Remove variables we dont need
   summary <- dplyr::select(summary, -dttm_out)
 
 
-  # extract these values and add to the right of summary, add variables to "keep"
+  # extract these values and add to the right of summary, add variables from "keep"
   # to have additional variables in the summary output.
   # TODO: make outputs selectable
-  elg_to_add <- dplyr::select(elg[ii,], keep)
+  elg_to_add <- dplyr::select(elg[ii,], any_of(sum_col))
   summary <- dplyr::bind_cols(summary, elg_to_add)
 
-  # add back in the hand entered values
+  # add back in the hand entered values and make sure they are numeric
   if(nrow(summary_hand_enter)>0) {
-    summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(lat:station_distance,as.numeric))
+    summary_hand_enter <- dplyr::mutate(summary_hand_enter,dplyr::across(any_of(sum_col),as.numeric))
+  # Check to be sure all columns in summary hand enter are present in summary
+    missing_col <- colnames(summary)[which(!colnames(summary) %in% colnames(summary_hand_enter))]
+   # Force a stop if the columns don't align
+
+     if (length(missing_col > 0)) {
+      stop(missing_col, " missing as a column in station summary sheet.
+Either remove from 'keep' in create_summary or add as a column in station summary sheet.")
+    }
     #add in all calculated values where there is an NA
     summary_hand_enter <-
       dplyr::rows_patch(summary_hand_enter, summary,
@@ -236,16 +293,15 @@ create_summary <- function(summary_input, elg_input,
 
   # sort by station and relocate distance to end
   summary <- dplyr::arrange(summary, dttm)
-  summary <- dplyr::relocate(summary, station_distance, .after = tidyselect::last_col())
-  #MB add max tension before station distance
-  summary <- dplyr::relocate(summary, max_tension, .before = station_distance)
-  # Put payout at max after max tension
-  summary <- dplyr::relocate(summary, payout_at_max, .after = max_tension)
+  # MB comment out block here
+  # summary <- dplyr::relocate(summary, station_distance, .after = tidyselect::last_col())
+  # #MB add max tension before station distance
+  # summary <- dplyr::relocate(summary, max_tension, .before = station_distance)
+  # # Put payout at max after max tension
+  # summary <- dplyr::relocate(summary, payout_at_max, .after = max_tension)
 
   # Rearrange make sure the summary columns are in front
-
-  summary <- dplyr::relocate(summary, any_of(c("dttm", keep, "max_tension",
-                                               "payout_at_max", "station_distance")),
+  summary <- dplyr::relocate(summary, any_of(c("dttm", sum_col)),
                                                 .after = general_locale)
   # Once finished rearranging columns, rename all to have units
 
