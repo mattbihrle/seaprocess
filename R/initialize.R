@@ -66,22 +66,37 @@ initialize_master <- function(path, cruiseID = NULL,
   ## TODO add cruise metadata contents
   lines <- readr::read_lines(file.path(path,"process_data.R"))
 
-  # Make ship specific changes to process_data.R
+  # Make ship-specific changes to process_data.R
     if (select_ship == "CC") {
       # Make blank any line with '#RCS' and the first line below it
       ii <- stringr::str_which(lines, "\\#RCS")
       lines <- lines[-c(ii, ii + 1)]
+      # Delete the rcs_obs_input.xls file from the copied directory
+      rcs_obs <- file.path(path, "datasheets", "rcs_obs_input.xls")
+      if (file.exists(rcs_obs)) {
+        file.remove(rcs_obs)
+      }
+      # Lastly, delete the #CC tag
+      ii <- stringr::str_which(lines,"\\#CC")
+        if (length(ii) > 0) {
+          lines <- lines[-ii]
+        }
     }
 
     if (select_ship == "RCS") {
-      # Make blank any line with #CC and the first line below it
+      # Deleted any line with #CC and the first line below it
       ii <- stringr::str_which(lines, "\\#CC")
       lines <- lines[-c(ii, ii + 1)]
-    }
-
-    if (select_ship == "CC") {
-      ii <- stringr::str_which(lines, "\\#RCS")
-      lines <- lines[-ii]
+      # Delete the cc_obs_input.xls file from the copied directory
+      cc_obs <- file.path(path, "datasheets", "cc_obs_input.xls")
+      if (file.exists(cc_obs)) {
+        file.remove(cc_obs)
+      }
+      # Lastly, delete the #RCS tag
+      ii <- stringr::str_which(lines,"\\#RCS")
+      if (length(ii) > 0) {
+        lines <- lines[-ii]
+      }
     }
 
   # Remove and edit datasheet lines if not needed
@@ -90,8 +105,6 @@ initialize_master <- function(path, cruiseID = NULL,
       # Remove datasheet line from process data script
       ii <- stringr::str_which(lines, "# Neuston datasheet")
       lines <- lines[-c(ii:(ii + 2))]
-      # Remove excel sheet from project directory
-      list.files()
     }
 
     if(!meter) {
@@ -117,15 +130,11 @@ initialize_master <- function(path, cruiseID = NULL,
                                         "ros_input = ros_folder",
                                         "niskin_on_wire = T, ctd_folder = ctd_folder")
     }
-    if(free_ctd) {
-      ii <- stringr::str_which(lines, "# Bottle datasheet")
-      lines <- lines[-c(ii:(ii + 5))]
-    }
 
     if(!obs) {
       ii <- stringr::str_which(lines, "# Obs")
       #Loop from bottom of lines to top removing three lines associated with #Obs
-      for (i in length(ii):1){
+      for (i in length(ii):1) {
         lines <- lines[-c(ii[i]:(ii[i]+2))]
       }
     }
@@ -159,6 +168,4 @@ initialize_master <- function(path, cruiseID = NULL,
                  list.files(file.path(path, "eoc"), full.names = T, recursive = F, pattern = "*.R"))
   new_names <- file.path(dirname(old_names),paste0(cruiseID,"_",basename(old_names)))
   file.rename(old_names, new_names)
-
-
 }
