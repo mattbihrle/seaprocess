@@ -81,6 +81,33 @@ computers/people who might want to revisit this data.
 
 ## Datasheets
 
+### ![](images/summary_input_example-02.png)Station Summary Sheet
+
+The station summary sheet is the "key" to filling in our deployment
+sheets. As it is loaded in you will notice some light grey, and darker
+grey cells.![](images/clipboard-646812498.png)
+
+The first set of light grey cells is essential for SeaProcess to run.
+Take care not to edit these.
+
+![](images/station_metadata-01.png)
+
+The second set of darker grey cells are cells that can be autofilled
+when running `create_summary()` . These cells align with the standard
+metadata on our paper datasheets and for most trips you won't need to
+change these cells. However, if a chief scientist wants to keep track of
+transmissometer data, for example you can add that. Just add a column
+with a name that matches the variable you want from the elg.csv file
+**without** units. For example, if you want to add transmissometer data,
+the elg output lists that as "xmiss_counts." Adding a column labelled
+"xmiss" will add the elg data to your summary sheet, and then your
+deployment sheet.
+
+Similarly, you can remove columns like "max_tension" if you are using a
+separate summary sheet for surface stations or 6 minute obs.
+
+### Deployment Datasheets
+
 The R script will automatically create datasheets for our most common
 deployments (ctd, niskin bottles, surface stations, neuston nets, meter
 nets, and secchi discs), and autofills the file paths. Double check that
@@ -133,18 +160,22 @@ add a new column.
             set `odv_export = FALSE` withing `create_datasheet()`
 
 **Pro-Tip:** The `create_summary` function will work to fill metadata
-for any datasheet that has at least the same columns as the autocreated
-"summary_input" sheet. For example, if you have a datasheet with blank
-columns "temp," "sal," chla," etc and additional columns. This means we
-can have a single datasheet for observational data or surface station
-data instead of separate summary sheets for each. To do this for an obs
-sheet: - Make a copy of the "summary_input.xls", and rename it
-"<cruiseID>\_obs_input.xls." - Keep the columns already present and add
-the additional columns you want. - In the `process_data.R` script first
-define the file path:
-`obs_input <- "datasheets/"<cruiseID>_obs_input.xls"` - The create a new
-line with `create_summary()` instead of `create_datasheet()`:
-`create_summary(summary_input = obs_input, elg_folder, cruiseID = cruiseID, csv_filename = "obs_datasheet.csv")`
+for any column names that match the 'keep' vector in `read_elg()`. For
+example, if you have a datasheet with blank columns "temp," "sal,"
+fluor," etc and additional columns. This means we can have a single
+datasheet for observational data or surface station data instead of
+separate summary sheets for each. To do this for an obs sheet:
+
+-   Make a copy of the "summary_input.xls", and rename it
+    "<cruiseID>\_obs_input.xls." - Keep the metadata columns you want
+    and add the additional columns as needed.
+
+-   In the `process_data.R` script first define the file path:
+    `obs_input <- "datasheets/"<cruiseID>_obs_input.xls"`
+
+    -   The create a new line with `create_summary()` instead of
+        `create_datasheet()`:
+        `create_summary(summary_input = obs_input, elg_folder, cruiseID = cruiseID, csv_filename = "obs_datasheet.csv")`
 
 ## Calculation Sheets
 
@@ -203,7 +234,10 @@ if something is not working.
 # Station Plots
 
 Within the `station_plots` folder are three scripts (as of 1/23/2025) to
-create quick maps of station locations.
+create quick maps of station locations. To create plots, read the
+instructions to setup the file and then either run the entire script or
+use one of the `source(station_plots)` lines at the bottom of your
+`process_data.R` script.
 
 ## Setup
 
@@ -283,8 +317,8 @@ elsewhere.
     cruise.
 
 -   `create_summary` has an option to autofill max tension from either
-    the event file created by SCS or the .RAW file created by SCS (RCS
-    only).
+    the event file created by SCS or the .RAW file created by SCS OR the
+    folder of Hydrowinch tension files on CC.
 
     -   To process wire tension through the raw file define where the
         .raw file is found (`lci_raw_folder <- "W://"`) and add the

@@ -24,6 +24,8 @@ process_wire_log(
 \item{add_cruiseID}{Option to append cruiseID to the file name.}
 }
 \description{
-Experimental. Cycles through all output csv sheets and compiles wire log data for submission to UNOLS wire pool.Outputs to an EOC folder.
-*Important* the function must see "max_wire_out_m" as a column name to include that deployment sheet in the final output.
+Experimental. Cycles through all output csv sheets and compiles wire log data
+for submission to UNOLS wire pool. Outputs to an EOC folder.
+*Important* the function must see "max_wire_out_m" as a column name to
+ include that deployment sheet in the final output.
 }

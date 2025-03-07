@@ -11,7 +11,8 @@ read_elg(
   skip = 0,
   csv_output = NULL,
   keep = c("dttm", "lon", "lat", "temp", "sal", "fluor", "cdom", "xmiss", "wind_sp",
-    "wind_dir", "heading", "pitch", "roll", "wire_tension", "bot_depth", "filename")
+    "wind_dir", "heading", "pitch", "roll", "wire_tension", "wire_payout", "bot_depth",
+    "filename")
 )
 }
 \arguments{

@@ -4,7 +4,7 @@
 \alias{get_elg}
 \title{Get elg data from file or folder}
 \usage{
-get_elg(elg_input)
+get_elg(elg_input, ...)
 }
 \arguments{
 \item{elg_input}{}

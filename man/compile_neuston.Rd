@@ -7,9 +7,10 @@
 compile_neuston(data)
 }
 \description{
-This function combines metadata from the station summary with the hand entered
-data from 'neuston_input.' Additionally it calculates biodensity (mL/m2) by dividing
-zooplankton biovolume (mL) by station distance (m).
+This function combines metadata from the station summary with the hand
+entered data from 'neuston_input.' Additionally it calculates biodensity
+(mL/m2) by dividing zooplankton biovolume (mL) by station distance (m), and
+calculates Shannon-Wiener Diversity using the "vegan" package.
 }
 \details{
 For more information on station distance calculation see \link[oce]{geodDist}

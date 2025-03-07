@@ -12,6 +12,7 @@ create_datasheet(
   csv_filename = "datasheet.csv",
   odv_folder = "output/odv",
   odv_filename = "datasheet.txt",
+  odv_export = TRUE,
   cruiseID = NULL,
   add_cruiseID = TRUE,
   add_deployment_type = TRUE,
@@ -43,6 +44,11 @@ no csv output.}
 no odv output.}
 
 \item{odv_filename}{The odv .txt filename to output the data}
+
+\item{odv_export}{Logical defaults to TRUE. Will try to create an ODV
+formatted datasheet. If the data type is not neuston, meter, bottle,
+hydrocast, or CTD-- Seaprocess will use the format_gen_odv() function to
+make an odv output.}
 
 \item{cruiseID}{Optional string specifying cruise ID (i.e. "S301")}
 
@@ -104,4 +110,7 @@ cases:
 \item "meter" for meter net datasheets
 \item "\if{html}{\out{<custom>}}" for custom datasheets you've created and given a unique code to in station summary
 }
+
+See "Introduction to SeaProcess" vignette for more information about
+processing specific to neuston tows and meter nets.
 }
