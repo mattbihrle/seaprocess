@@ -34,15 +34,9 @@ Label: Niskins on the Wire
 Default: Off
 Position: right
 
-Parameter: free_ctd
-Widget: CheckboxInput
-Label: Free CTDs only (no bottles)
-Default: Off
-Position: right
-
 Parameter: obs
 Widget: CheckboxInput
-Label: Obs Data (Creates separate summary sheet)
+Label: Obs Data
 Default: Off
 Position: right
 
