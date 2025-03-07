@@ -49,6 +49,7 @@ calc_folder <- "<enter-location-of-calc-folder>"
 raw_folder <- "<enter-location-of-lci-raw-folder>"
 #CC
 raw_folder <- "<enter-location-of-hydrowinch-tension-files>"
+
 # Datasheets
 #
 # These are stored within this project under the "datasheets" folder.
@@ -64,9 +65,11 @@ bottle_input <- "datasheets/bottle_input.xls"
 secchi_input <- "datasheets/secchi_input.xls"
 other_input <- ""
 
-# Obs Datasheets
-obs_input <- "datasheets/obs_input.xls"
-obs_summary_input <- "datasheets/obs_summary_input.xls"
+# Obs Datasheet
+#CC
+obs_input <- "datasheets/cc_obs_input.xls"
+#RCS
+obs_input <- "datasheets/rcs_obs_input.xls"
 
 
 # Process non-datasheet data sources --------------------------------------
@@ -113,13 +116,10 @@ create_datasheet(bottle_input, data_type = "bottle",
 create_datasheet(secchi_input, data_type = "SD",
                  cruiseID = cruiseID)
 
-# Obs Summary Input
-create_summary(obs_summary_input, elg_folder, cruiseID = cruiseID,
-               csv_filename = "obs_summary_datasheet.csv")
-
 # Obs datasheet
-create_datasheet(obs_input, summary_input = "output/csv/<cruiseID>_obs_summary_datasheet.csv",
-                 data_type = "OBS", cruiseID = cruiseID)
+create_summary(obs_input, elg_folder, cruiseID = cruiseID,
+               csv_filename = "obs_datasheet.csv")
+
 
 # Station Plots-----------------------------------------------------------------
 
