@@ -588,7 +588,7 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
   output <- dplyr::arrange(output, desc(bottle), .by_group = T)
   output <- dplyr::ungroup(output)
   #Remove max_tension
-  output <- dplyr::mutate(output, max_tension = NULL)
+  output <- dplyr::mutate(output, max_tension = NULL, payout_at_max = NULL)
   # if (process_calc == TRUE){
   #   output <- read_calc_fold_mb(calc_folder, output)
   # }
