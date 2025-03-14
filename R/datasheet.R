@@ -106,7 +106,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
     }
     data_type <- c("HC","SS")
 
-  } else if (data_type == "neuston") {
+  } else if (data_type == "neuston" | data_type == "NT") {
 
     if(add_deployment_type) {
       csv_filename <- paste0("neuston_", csv_filename)
@@ -125,7 +125,7 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
       odv_filename <- paste0("ctd_", odv_filename)
     }
     odv_export <- FALSE
-  } else if (data_type == "meter") {
+  } else if (data_type == "meter" | data_type == "MN") {
 
     if(add_deployment_type) {
       csv_filename <- paste0("meter_", csv_filename)
