@@ -81,7 +81,7 @@ computers/people who might want to revisit this data.
 
 ## Datasheets
 
-### ![](images/summary_input_example-02.png)Station Summary Sheet
+### Station Summary Sheet
 
 The station summary sheet is the "key" to filling in our deployment
 sheets. As it is loaded in you will notice some light grey, and darker
@@ -116,7 +116,7 @@ the paths are correct, however you should not need to change anything.
 If you need to add variables to a datasheet for a specific project, just
 add a new column.
 
-## Adding Datasheets
+### Adding Datasheets
 
 1.  To create a new datasheet, go to RData/[Your cruise]/datasheets.
     Here you should see a "<cruiseID>\_template_input.xls" excel sheet.
@@ -176,6 +176,24 @@ separate summary sheets for each. To do this for an obs sheet:
     -   The create a new line with `create_summary()` instead of
         `create_datasheet()`:
         `create_summary(summary_input = obs_input, elg_folder, cruiseID = cruiseID, csv_filename = "obs_datasheet.csv")`
+
+### ODV
+
+`create_datasheet()` makes ODV outputs for a few deployment
+types--neuston tows, meter nets, ctd profiles, bottle data, adcp, and
+elg data. For other datasheets, `create_datasheet()` uses the
+`format_gen_odv()` function. This function takes a dataset, an output
+filename, and looks through a table of variables to match with ODV
+formatted names. For an obs ODV, use the lines:
+
+```{r}
+create_summary(summary_input = obs_input, elg_folder, 
+               cruiseID= cruiseID,
+               csv_filename = "obs_datasheet.csv")|>
+  format_gen_odv("output/odv/obs_datasheet.txt", cruiseID = cruiseID)
+```
+
+ODV can also accept csv files as inputs if SeaProcess hasn't created a txt file for your deployment sheet. 
 
 ## Calculation Sheets
 
