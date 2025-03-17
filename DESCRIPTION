@@ -1,7 +1,7 @@
 Package: seaprocess
 Type: Package
 Title: Onboard Processing of SEA Data Streams
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: c(person("Ben", "Harden", email = "bharden@sea.edu", role = "aut"),
             person("Matt", "Bihrle", email = "mbihrle@sea.edu", role = "cre"))
 Description: A selection of tools for the data workflows onboard the two Sea Education Association Sailing School Vessels.

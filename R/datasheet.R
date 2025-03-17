@@ -125,7 +125,8 @@ create_datasheet <- function(data_input, summary_input = "output/csv/summary_dat
       odv_filename <- paste0("ctd_", odv_filename)
     }
     odv_export <- FALSE
-  } else if (data_type == "meter" | data_type == "MN") {
+  } else if (data_type == "meter" | data_type == "MN" | data_type == "TT" |
+             data_type == "2MN") {
 
     if(add_deployment_type) {
       csv_filename <- paste0("meter_", csv_filename)
