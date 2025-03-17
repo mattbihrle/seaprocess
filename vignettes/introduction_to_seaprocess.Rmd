@@ -33,7 +33,7 @@ The goals of this package are to:
 -   To document the process for others interested in how SEA processes it's data
 -   To simplify many of SEA's historic data processing routines.
 
-\#> Overview process diagram
+![Overview of eventual processing flow.](images/SP_overview.png)
 
 # Processing Philosophy
 
@@ -184,7 +184,7 @@ With these inputs, the function reads in the elg information, looks at all the d
 -   wire_tension: recorded from SCS (currently RCS only)
 -   payout_at_max: wire payout at moment of max tension (currently RCS only)
 
-These columns are match the typical metadata header on SEA's paper datasheets. However, it is possible to replace these variables or add other metadata variables. See `?create_summary()` or "Setup and EOC" vignette for more information. 
+These columns are match the typical metadata header on SEA's paper datasheets. However, it is possible to replace these variables or add other metadata variables. See `?create_summary()` or "Setup and EOC" vignette for more information.
 
 An example of these code in action and the output can be seen here.
 
