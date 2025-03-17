@@ -156,8 +156,8 @@ add a new column.
             autocreated datasheets, this argument will only work with
             custom datasheets.
         -   SeaProcess will try to create an ODV formatted output for
-            any addition datasheets created. If this causes an issue,
-            set `odv_export = FALSE` withing `create_datasheet()`
+            any additional datasheets created. If this causes an issue,
+            set `odv_export = FALSE` within `create_datasheet()`
 
 **Pro-Tip:** The `create_summary` function will work to fill metadata
 for any column names that match the 'keep' vector in `read_elg()`. For
@@ -186,7 +186,7 @@ elg data. For other datasheets, `create_datasheet()` uses the
 filename, and looks through a table of variables to match with ODV
 formatted names. For an obs ODV, use the lines:
 
-```{r}
+```{r, eval = FALSE}
 create_summary(summary_input = obs_input, elg_folder, 
                cruiseID= cruiseID,
                csv_filename = "obs_datasheet.csv")|>

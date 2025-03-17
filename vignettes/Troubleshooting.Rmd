@@ -69,6 +69,8 @@ datasheets will look like: "datasheets/S314_neuston_input.xls" Paths to
 things outside of your cruise project will need to start with a drive
 letter. "C:/", Y:/" etc.
 
+Remember! in R your slashes need to be `/` not `\`
+
 ### Double Check Your Data Entry
 
 Most errors will crop up here. R is very picky with formatting. Things
@@ -99,14 +101,14 @@ save you many hours of sleep!
 
 ### Debug Your Problem Line
 
-If the problem is not resolved on the users side, we can take a couple
+If the problem is not resolved on the user's side, we can take a couple
 different paths to look at what is happening "under the hood" with
 SeaProcess.
 
 #### Comment out Unneeded Lines
 
-To access debugging in Rstudio we need to "source" or run the entire
-script at once. However, if Rstudio encounters an error it will stop
+To access debugging in RStudio we need to "source" or run the entire
+script at once. However, if RStudio encounters an error it will stop
 processing and might never make it to your problem line. To avoid this
 "comment out" any unneeded lines containing functions by putting a `#`
 infront of them.
@@ -201,26 +203,41 @@ expand this list!
 **Fix:** The file R is trying to write to might be open. Ensure it is
 closed and try again.
 
-**Message:** "Error in `dplyr::rows_patch()` at seaprocess/R/calcsheet.R:203:3:                  
-! Can't convert from `y$no3` \<double\> to `x$no3` \<logical\> due to loss of precision."
+**Message:** "Error in `dplyr::rows_patch()` at
+seaprocess/R/calcsheet.R:203:3:\
+! Can't convert from `y$no3` \<double\> to `x$no3` \<logical\> due to
+loss of precision."
 
-**Fix:** When a column shows up as *logical* it often means that the column is all "NAs." A quick fix for this is to put a "0" in a cell that would otherwise be blank. Let the office know you are having this problem and they can edit how the datasheet is read into R. 
+**Fix:** When a column shows up as *logical* it often means that the
+column is all "NAs." A quick fix for this is to put a "0" in a cell that
+would otherwise be blank. Let the office know you are having this
+problem and they can edit how the datasheet is read into R.
 
-**Message:** "Error in utils::unzip(zip_path, list = TRUE) : 
-  zip file 'C:/~$CalcNO3_VGriess_July23Update - Copy.xlsx' cannot be opened"
-  
-  **Fix:** The file name with a tilde is a temporary file that may not be visible. Close the file it is referring to and run the script again. 
-  
+**Message:** "Error in utils::unzip(zip_path, list = TRUE) : zip file
+'C:/\~\$CalcNO3_VGriess_July23Update - Copy.xlsx' cannot be opened"
+
+**Fix:** The file name with a tilde is a temporary file that may not be
+visible. Close the file it is referring to and run the script again.
+
 # Common Warning Messages
 
-Make sure to note the warning messages that show up, but remember that most of the time they can be safely ignored. 
+Make sure to note the warning messages that show up, but remember that
+most of the time they can be safely ignored.
 
-**Message:** "Warning messages:
-Unknown or uninitialised column: `station`. "
+**Message:** "Warning messages: Unknown or uninitialised column:
+`station`. "
 
-**Description:** This message shows up when the odv formatting function couldn't find the column described. Think about whether that column is needed in your data. For example: we don't track stations in our ADCP data so this warning can be ignored for ADCP data. For HC data, you may see SeaProcess show a warning about CDOM or beam_atten (beam attenuation). If you don't have the CDOM or Xmiss attached to the ctd, it can be safely ignored. 
+**Description:** This message shows up when the odv formatting function
+couldn't find the column described. Think about whether that column is
+needed in your data. For example: we don't track stations in our ADCP
+data so this warning can be ignored for ADCP data. For HC data, you may
+see SeaProcess show a warning about CDOM or beam_atten (beam
+attenuation). If you don't have the CDOM or Xmiss attached to the ctd,
+it can be safely ignored.
 
-**Message:** "In read.adp.rdi(file, encoding = encoding, processingLog = processingLog..."
+**Message:** "In read.adp.rdi(file, encoding = encoding, processingLog =
+processingLog..."
 
-**Description:** This message has a couple of variants and will occur during all adcp processing. The warnings do not affect the data output and can be safely ignored. 
-
+**Description:** This message has a couple of variants and will occur
+during all adcp processing. The warnings do not affect the data output
+and can be safely ignored.
