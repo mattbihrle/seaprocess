@@ -153,13 +153,21 @@ initialize_master <- function(path, cruiseID = NULL,
    # write this to file
   readr::write_lines(lines, file.path(path,"process_data.R"))
 
-  #Add cruiseID to the process_eoc script
+  # Edit the process_eoc script-------------------------------------------------
+  # read in process_eoc
   lines_eoc <- readr::read_lines(file.path(path,"/eoc/process_eoc.R"))
 
   # add cruiseID as master processing param
   ii <- stringr::str_which(lines_eoc, "^cruiseID \\<-")
   lines_eoc[ii] <- stringr::str_replace(lines_eoc[ii], '\\"\\"', paste0('\\"',cruiseID,'\\"'))
+
+  # add cruiseID to session info script (and any others with <cruiseID>)
+  ii <- stringr::str_which(lines_eoc, "<cruiseID>")
+  lines_eoc[ii] <- stringr::str_replace_all(lines_eoc[ii], "<cruiseID>", paste0(cruiseID))
+
+  # write new process_eoc.R
   readr::write_lines(lines_eoc, file.path(path,"/eoc/process_eoc.R"))
+
 
   ## TODO append cruise ID to all files
   cruise <- basename(path)
