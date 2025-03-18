@@ -32,10 +32,10 @@
 #'   files/folders called "archive files."
 #' @param keep a character vector of all the variables from the elg file that
 #'   could be added to the summary datasheet. Default is all of the values from
-#'   [read_elg(()] except 'dttm'. If needed, add additional names from the elg
-#'   file *without* units. Eg. 'xmiss_counts' would be 'xmiss', 'cdom_fluor'
+#'   [read_elg()] except 'dttm'. If needed, add additional names from the elg
+#'   file *without* units to this vector and your summary sheet. Eg. 'xmiss_counts' would be 'xmiss', 'cdom_fluor'
 #'   would be 'cdom'. `create_summary` will try to match column names from this
-#'   list with the summary_input sheet.
+#'   list with the column names in the summary_input sheet.
 #' @param ... optional arguments passed to read_elg like forceGPS. See
 #'   `?read_elg` for more information.
 #'

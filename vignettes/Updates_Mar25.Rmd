@@ -43,6 +43,7 @@ On CC, as long as Marine Techs create the same tension files using teraterm, Sea
 ## Improved Customization
 
 -   Incorporated ability to preserve column names on custom datasheets.
+    (see `?create_datasheet()`
 
 -   Created a folder of R scripts that will create station plots for all deployments [(Figures 1 and 2).
 
@@ -54,7 +55,7 @@ On CC, as long as Marine Techs create the same tension files using teraterm, Sea
 
 -   Expanded the “Initialize Cruise…” Wizard so users can customize the process data script without needing to edit it by hand (Figure 4).
 
--   Added option to customize which variables are pulled from the elg file for deployment metadata.
+-   Added option to customize which variables are pulled from the elg file for deployment metadata (see [Setup and EOC](Setup_and_EOC.html) "Station Summary Sheet") for more information.
 
     -   Eg. Can automatically append xmiss data or wind speed from the elg to all datasheets if desired
 
