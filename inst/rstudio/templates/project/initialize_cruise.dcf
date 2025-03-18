@@ -40,35 +40,5 @@ Label: Obs Data
 Default: Off
 Position: right
 
-Parameter: nitrates
-Widget: CheckboxInput
-Label: Nitrates
-Default: Off
-Position: right
-
-Parameter: alk
-Widget: CheckboxInput
-Label: Alkalinity
-Default: Off
-Position: right
-
-Parameter: chla
-Widget: CheckboxInput
-Label: Extracted Chlorophyll-a
-Default: Off
-Position: right
-
-Parameter: ph
-Widget: CheckboxInput
-Label: pH
-Default: Off
-Position: right
-
-Parameter: phos
-Widget: CheckboxInput
-Label: Phosphates
-Default: Off
-Position: right
-
 
 

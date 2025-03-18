@@ -19,7 +19,7 @@ initialize_example <- function(path, ...) {
 initialize_master <- function(path, cruiseID = NULL,
                               initial_folder =  "initial_dir", select_ship,
                               neuston, meter, secchi, obs, niskins_on_wire, ctd,
-                              free_ctd, nitrates, alk, chla, ph, phos,
+                              free_ctd,
                               ...) {
   if(is.null(cruiseID)) {
     cruiseID <- basename(path)
@@ -62,11 +62,7 @@ initialize_master <- function(path, cruiseID = NULL,
       dir.create(file.path(path,"output","odv","meter"))
     }
   }
-browser()
-  # Edit files in calc sheets folder -------------------------------------------
-  if (!nitrates) {
-    file.remove()
-  }
+
   ## TODO add cruise metadata contents
   lines <- readr::read_lines(file.path(path,"process_data.R"))
 
