@@ -41,6 +41,15 @@ adcp_folder <- "raw/adcp"
 
 # Finally, run through ALL of "<cruise_ID>_process_data.R" once more to ensure
 # there are no issues.
+# Once this is done:
+# Print Session Info------------------------------------------------------------
+
+# Set cruiseID and run this line to log package versions used to analyze data in
+# this script. This should be run at EOC, but will not do any harm if it is
+# regularly run with the rest of the processing script.
+
+source("eoc/<cruiseID>_session_info.R")
+
 
 
 # Step two: Create a wire log for UNOLS reporting. Running the function

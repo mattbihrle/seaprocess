@@ -96,12 +96,12 @@ The second set of darker grey cells are cells that can be autofilled
 when running `create_summary()` . These cells align with the standard
 metadata on our paper datasheets and for most trips you won't need to
 change these cells. However, if a chief scientist wants to keep track of
-transmissometer data, for example you can add that. Just add a column
+transmissometer data, for example, you can add that. Just add a column
 with a name that matches the variable you want from the elg.csv file
 **without** units. For example, if you want to add transmissometer data,
 the elg output lists that as "xmiss_counts." Adding a column labelled
-"xmiss" will add the elg data to your summary sheet, and then your
-deployment sheet.
+"xmiss" will add the elg data to your summary sheet, and subsiquently
+your deployment sheet.
 
 Similarly, you can remove columns like "max_tension" if you are using a
 separate summary sheet for surface stations or 6 minute obs.
@@ -294,8 +294,9 @@ revert.
 The `eoc_process.R` script will lead you through the necessary steps to
 copy the needed files over to the "raw" folder. As of Jan-2025 this is
 the elg files, averaged cnvs and ros files, and LTAs. It will also
-create a wire log output for submission to UNOLS. **Please read and
-follow all steps.**
+create a wire log output for submission to UNOLS, and a log of the
+package versions used on your cruise. **Please read and follow all steps
+carefully.**
 
 The primary goal of this script is setup your cruise's RData folder to
 contain all of the raw data and scripts used to create outputs on your

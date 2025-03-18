@@ -130,11 +130,3 @@ create_summary(obs_input, elg_folder, cruiseID = cruiseID,
 # source("plot_scripts/StationPlotsNoBathymetry.R")
 # source("plot_scripts/StationPlots.R")
 # source("plot_scripts/ft_plots.R")
-
-# Print Session Info------------------------------------------------------------
-
-# Set cruiseID and run this line to log package versions used to analyze data in
-# this script. This should be run at EOC, but will not do any harm if it is
-# regularly run with the rest of the processing script.
-
-source("eoc/<cruiseID>_session_info.R")
