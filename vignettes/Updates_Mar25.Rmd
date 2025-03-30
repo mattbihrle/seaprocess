@@ -76,3 +76,6 @@ On CC, as long as Marine Techs create the same tension files using teraterm, Sea
     -   This aligned the calculations in the package with the variables output by SBE Data Processing
 
 -   For ODV outputs of the profiling transmissometer, changed “Transmittance” to “Beam Attenuation” so it matches the data coming out of SBE Data Processing
+
+-   Created a "session_info.R" script in the eoc folder that, if run at EOC will save a text file with information on package version numbers when the script was last run.
+    -   This will allow future scientists a way to track exactly how the data was processed.

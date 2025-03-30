@@ -177,7 +177,7 @@ process_ctd <- function(ctd_folder, cruiseID = NULL,
     #MB add lines to rename ctd for output
 
     #first create a vector of all possible names
-    units <- c(oxygen_mL.L = "oxygen", oxygen_uM.kg = "oxygen2",
+    units <- c(oxygen_mL.L = "oxygen2", oxygen_uM.kg = "oxygen",
       pressure_db = "pres", salinity_psu = "sal",
       temperature_c = "temp", chla_fluor = "fluor",
       theta_c = "theta", sigtheta_kg.m3 = "sigtheta", par_mE.m2.s = "par")
