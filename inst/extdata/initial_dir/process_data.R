@@ -92,7 +92,7 @@ process_adcp(adcp_folder, cruiseID = cruiseID)
 
 # Create Summary datasheet
 create_summary(summary_input, elg_folder, cruiseID = cruiseID,
-               process_lci = TRUE, raw_folder = lci_raw_folder)
+               process_lci = TRUE, raw_folder = raw_folder)
 
 # CTD datasheet
 create_datasheet(ctd_input, data_type = "CTD",

@@ -58,10 +58,10 @@ files/folders called "archive files."}
 
 \item{keep}{a character vector of all the variables from the elg file that
 could be added to the summary datasheet. Default is all of the values from
-\code{\link[=read_elg(]{read_elg(()}} except 'dttm'. If needed, add additional names from the elg
-file \emph{without} units. Eg. 'xmiss_counts' would be 'xmiss', 'cdom_fluor'
+\code{\link[=read_elg]{read_elg()}} except 'dttm'. If needed, add additional names from the elg
+file \emph{without} units to this vector and your summary sheet. Eg. 'xmiss_counts' would be 'xmiss', 'cdom_fluor'
 would be 'cdom'. \code{create_summary} will try to match column names from this
-list with the summary_input sheet.}
+list with the column names in the summary_input sheet.}
 
 \item{...}{optional arguments passed to read_elg like forceGPS. See
 \code{?read_elg} for more information.}
