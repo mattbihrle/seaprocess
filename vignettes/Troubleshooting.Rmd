@@ -84,9 +84,9 @@ to check: - Are all dates and times using the exact same formatting?
 
 -   Do the station summary and datasheet match?
 
-If you have questions about data entry or formatting see [Using Sea
-Process](Using_Seaprocess.html), ask your 1st Marine Tech, or shoot a
-quick email to the office!
+If you have questions about data entry or formatting see
+[Intro_and_Data_Entry_SeaProcess](Intro_and_Data_Entry_SeaProcess.html),
+ask your 1st Marine Tech, or shoot a quick email to the office!
 
 ### Double Check Again!
 

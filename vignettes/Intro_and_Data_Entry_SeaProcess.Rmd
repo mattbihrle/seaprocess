@@ -1,5 +1,5 @@
 ---
-title: "Using SeaProcess"
+title: "Intro and Data Entry SeaProcess"
 author: "Matt Bihrle"
 date: "13-Jan-2025"
 output:
@@ -7,7 +7,7 @@ output:
     toc: true
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{Using SeaProcess}
+  %\VignetteIndexEntry{Intro and Data Entry SeaProcess}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -190,4 +190,4 @@ Once a chemical run requiring a calc_sheet has been completed double check "<cru
 -   Formatting is SO important. Data entry should be faster within SeaProcess but requires a little extra care.
 -   Paper datasheets are still ***vital*** to our data integrity. Ensure students are filling out datasheet accurately and as Marine Techs we are carefully double checking all portions of each datasheet.
 
-For deeper information on setting up a cruise project see: [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html) For information on what is happening in the background while datasheets are processing see: [introduction to seaprocess](introduction_to_seaprocess.html)
+For deeper information on setting up a cruise project see: [Setup and EOC SeaProcess](Setup_and_EOC_SeaProcess.html) For information on what is happening in the background while datasheets are processing see: [SeaProcess_Background](SeaProcess_Background.html) .

@@ -372,11 +372,10 @@ elsewhere.
 
 ```{r, eval = FALSE}
 library(seaprocess)
-vignette("introduction_to_seaprocess")
+vignette("SeaProcess_Background")
 ```
 
-or click here: [Introduction To
-SeaProcess](introduction_to_seaprocess.html)
+or click here: [SeaProcess_Background](SeaProcess_Background.html)
 
 -   For more information on variables included in the packages call:
 

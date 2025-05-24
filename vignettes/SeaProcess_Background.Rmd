@@ -1,5 +1,5 @@
 ---
-title: "Introduction to SeaProcess"
+title: "SeaProcess Background"
 author: Ben Harden edited MBB
 date: lubridate::today()
 output: 
@@ -7,7 +7,7 @@ output:
     toc: true
     number_sections: false
 vignette: >
-  %\VignetteIndexEntry{Introduction to SeaProcess}
+  %\VignetteIndexEntry{SeaProcess Background}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
