@@ -1,0 +1,31 @@
+---
+title: "Updates_May25_1.2.2"
+author: "Matt Bihrle"
+date: "17-03-2025"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Updates_May25_1.2.2}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Patch Updates:
+
+## Update Oxygen Units
+- Fixed previous error of oxygen units (mL/L and umul/kg) being swapped.
+
+## Updated documentation
+- Changed name of a vignette aimed at new scientists to "Intro and Data Entry"
+- Updated "Package Management" vignette with miniCRAN information for updating packages. 
+- Fixed small setup issue with the lci90 file path
+
