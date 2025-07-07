@@ -43,6 +43,8 @@ initialize_master <- function(path, cruiseID = NULL,
     dir.create(file.path(path,"raw","ctd"))
     dir.create(file.path(path,"raw","adcp"))
     dir.create(file.path(path,"raw","event"))
+  } else {
+    warning("Raw directory already exists. Raw directory not created.")
   }
 
   # Create output paths
@@ -61,6 +63,8 @@ initialize_master <- function(path, cruiseID = NULL,
     if (meter) {
       dir.create(file.path(path,"output","odv","meter"))
     }
+  } else {
+    warning("Output directory already exists, output folder not created.")
   }
 
   ## TODO add cruise metadata contents
