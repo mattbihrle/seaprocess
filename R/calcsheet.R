@@ -248,7 +248,6 @@ if(any(colnames(output) == names)) {
 read_calc_fold_mb <- function(calc_folder, output) {
 
 
-
   #a loop that reads all the excel files in the specified folder and calls the read_calc_file() function on each one.
   calc_files <- list.files(calc_folder,pattern = '\\.xls$|\\.xlsx$')
   if(length(calc_files) > 0) {
