@@ -1,0 +1,38 @@
+---
+title: "Updates_July25_1.3.2"
+author: "Matt Bihrle"
+date: "07-07-2025"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Updates_July25_1.3.2}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Patch Updates:
+
+## Fixed Labelling Errors
+
+-   Updated labelling of surface temperature, salinity, and chla metadata values by adding "surf\_" prefix (eg. `temp_c` becomes `surf_temp_c`). This will help delineate which values are coming from where for data such as ctd datasheets that record surface temperature and a profiling temperature. *This may cause incompatibilities with previous cruises.* You may see errors that say `"surf_temp_c" not found.` To fix labelling incompatibilities, be sure to run the entire process_data script with the new package version (1.3.2).
+-   This patch will hopefully fix an error with the ODV file SeaProcess creates where the surface chla value was incorrectly input as the profiling chla values.
+
+## Updated `process_eoc` Function
+
+-   Updated the required arguments for the `process_eoc` function so marine techs can delete arguments they don't need--like ros files during a cruise that didn't use the carousel.
+
+## Expanded Warnings
+-   Added two warnings when creating a cruise project that will alert users when there is already a raw folder or output folder created.
+-   Suppressed a warning in ctd processing that salinity was calculated using temperature and conductivity and pressure from oce. 
+
+## Incorporated `format_csv_output` for Sig figs
+-   Discovered a labelling inconsistency that was bypassing a function that edited metadata to a desired number of decimal places. Fixing the labelling so now lat, lon, temp, sal, chla, depth will all round to a specific number of decimal places. This number can be updated by changing arguments for `format_csv_output`.
