@@ -253,7 +253,8 @@ if (process_calc == TRUE){
   ##to rename if we need to
   units <- c(po4_uM = "po4", no3_uM = "no3", chla_ug.L = "chla", alk_meq.L = "alk",
              depth_m = "depth", temperature_c = "temperature", pressure_db = "pressure",
-             chla_fluor_v = "fluorescence", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
+             chla_fluor_v = "fluorescence", cdom_fluor = "fluorescence2", cdom_fluor = "cdom",
+             beamAttenuation = "beam_atten", par_mE.m2.s = "par", oxygen_uM.kg = "oxygen",
              oxygen_mL.L = "oxygen2", salinity_psu = "salinity", theta_c = "theta",
              sigma_kg.m3 = "sigma", sigtheta_kg.m3 = "sigtheta")
 
@@ -542,9 +543,9 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
       data_add <- dplyr::mutate(data_add,
                                 bottle = bottle_lines$bottle,
                                 depth = 0,
-                                temperature = bottle_lines$temp_c,
+                                temperature = bottle_lines$surf_temp_c,
                                 pressure = 0,
-                                salinity = bottle_lines$sal_psu,
+                                salinity = bottle_lines$surf_sal_psu,
                                 theta = oce::swTheta(salinity = salinity,
                                                      temperature = temperature,
                                                      pressure = pressure),
@@ -560,9 +561,9 @@ compile_bottle <- function(data, ros_input = NULL, ctd_folder = NULL, calc_folde
     } else {
       data_add <- tibble::tibble(bottle = "SS",
                                  depth = 0,
-                                 temperature = bottle_lines$temp_c,
+                                 temperature = bottle_lines$surf_temp_c,
                                  pressure = 0,
-                                 salinity = bottle_lines$sal_psu,
+                                 salinity = bottle_lines$surf_sal_psu,
                                  theta = oce::swTheta(salinity = salinity,
                                                       temperature = temperature,
                                                       pressure = pressure),

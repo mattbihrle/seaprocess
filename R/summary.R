@@ -306,7 +306,7 @@ Either remove from 'keep' in create_summary or add as a column in station summar
   # Once finished rearranging columns, rename all to have units
 
 
-  sum_units <- c(temp_c = "temp", sal_psu = "sal", chla_fluor = "fluor",
+  sum_units <- c(surf_temp_c = "temp", surf_sal_psu = "sal", surf_chla_fluor = "fluor",
                  station_distance_m = "station_distance", bot_depth_m = "bot_depth")
 
   summary <- dplyr::rename(summary, (any_of(sum_units)))
@@ -373,11 +373,11 @@ format_csv_output <- function(df, dttm_format = "%Y-%m-%dT%H:%M", dttm_suffix = 
   df <- format_decimal(df, "lat", ll_dec)
 
   # Format temp, sal and fluor to set decimal lengths
-  df <- format_decimal(df, "temp", temp_dec)
-  df <- format_decimal(df, "sal", sal_dec)
-  df <- format_decimal(df, "fluor", fluor_dec)
+  df <- format_decimal(df, "surf_temp_c", temp_dec)
+  df <- format_decimal(df, "surf_sal_psu", sal_dec)
+  df <- format_decimal(df, "surf_chla_fluor", fluor_dec)
   # MB change depth to bot_depth
-  df <- format_decimal(df, "bot_depth", 1)
+  df <- format_decimal(df, "bot_depth_m", 1)
 
   return(df)
 }

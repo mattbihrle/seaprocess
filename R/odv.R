@@ -208,9 +208,9 @@ format_neuston_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp_c,
-                                `Salinity [PSU]` = data$sal_psu,
-                                `Fluorescence` = data$chla_fluor)
+                                `Temperature [~^oC]` = data$surf_temp_c,
+                                `Salinity [PSU]` = data$surf_sal_psu,
+                                `Fluorescence` = data$surf_chla_fluor)
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
@@ -239,9 +239,9 @@ format_meter_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp_c,
-                                `Salinity [PSU]` = data$sal_psu,
-                                `Fluorescence` = data$chla_fluor)
+                                `Temperature [~^oC]` = data$surf_temp_c,
+                                `Salinity [PSU]` = data$surf_sal_psu,
+                                `Fluorescence` = data$surf_chla_fluor)
 
   # Add the rest of the data
   # TODO create look-up sheet to find real names
@@ -279,12 +279,12 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
                                 `Chl a [ug/L]` = data$chla_ug.L,
                                 `Alkalinity [meq/L]` = data$alk_meq.L,
                                 `Potential Density[Kg/m~^3]` = data$sigtheta_kg.m3,
-                                `Chl a Fluorescence [V]` = data$chla_fluor,
+                                `Chl a Fluorescence [V]` = data$chla_fluor_v,
                                 `Oxygen,SBE43[~$m~#mol/kg]` = data$oxygen_uM.kg,
                                 `Oxygen [mL/L]` = data$oxygen_mL.L,
-                                `CDOM Fluorescence [mg/m~^3]` = data$cdom,
+                                `CDOM Fluorescence [mg/m~^3]` = data$cdom_fluor,
                                 `PAR Irradience [~$m~#E/m~^2/s]` = data$par_mE.m2.s,
-                                `Beam Attenuation [1/m]` = data$beam_atten)
+                                `Beam Attenuation [1/m]` = data$beamAttenuation)
 
   # Add the rest of the data skipping depth column
   # TODO create look-up sheet to find real names
@@ -298,12 +298,12 @@ format_bottle_odv <- function(data, file = NULL, cruiseID = NULL) {
   "chla_ug.L",
   "alk_meq.L",
   "sigma_kg.m3",
-  "chla_fluor",
+  "chla_fluor_v",
   "oxygen_uM.kg",
   "oxygen_mL.L",
- "cdom",
+ "cdom_fluor",
   "par_mE.m2.s",
-  "beam_atten")
+  "beamAttenuation")
   ii <- which(colnames(data) == "bottle")
   ii2 <- which(colnames(data) == "depth_m")
 
@@ -412,9 +412,9 @@ format_gen_odv <- function(data,file,cruiseID = NULL) {
 
   odv_out <- tibble::add_column(odv_out,
                                 `Depth [m]` = 0,
-                                `Temperature [~^oC]` = data$temp_c,
-                                `Salinity [PSU]` = data$sal_psu,
-                                `Fluorescence` = data$chla_fluor)
+                                `Temperature [~^oC]` = data$surf_temp_c,
+                                `Salinity [PSU]` = data$surf_sal_psu,
+                                `Fluorescence` = data$surf_chla_fluor)
 
   odv_lookup <- c("sys_date"= "System Date",
                   "sys_time"= "System Time",
@@ -441,6 +441,7 @@ format_gen_odv <- function(data,file,cruiseID = NULL) {
                   "fluor_1min"= "Rel. Fluorescence, 1 min avg",
                   "fluor_60min"= "Rel. Fluorescence, 60 min avg",
                   "cdom"= "CDOM [counts]",
+                  "cdom_fluor" = "CDOM [counts]",
                   "cdom_1min"= "CDOM, 1 min avg [counts]",
                   "cdom_60min"= "CDOM, 60 min avg [counts]",
                   "xmiss"= "Transmissometer [counts]",
@@ -475,12 +476,13 @@ format_gen_odv <- function(data,file,cruiseID = NULL) {
                   "oxygen_uM.kg"= "Oxygen,SBE43[~$m~#mol/kg]",
                   "oxygen_mL.L"= "Oxygen [mL/L]" ,
                   "par_mE.m2.s"= "PAR Irradience [~$m~#E/m~^2/s]" ,
-                  "beam_atten.*"= "Beam Attenuation [1/m]")
+                  "beam_atten.*"= "Beam Attenuation [1/m]",
+                  "beamAttenuation"= "Beam Attenuation [1/m]")
 
 
   # get names from datasheet, skip dttm, lat, lon; n, filename_first, filename_last if binned
   datasheet_names <- names(data)[! names(data) %in% c("station", "date", "time_in",
-                                                      "time_out", "zd", "dttm","lon","lat","n", "temp_c", "sal_psu", "chla_fluor", "filename_first","filename_last")]
+                                                      "time_out", "zd", "dttm","lon","lat","n", "surf_temp_c", "surf_sal_psu", "surf_chla_fluor", "filename_first","filename_last")]
 
   odv_names <- stringr::str_replace_all(datasheet_names, odv_lookup)
 
