@@ -25,7 +25,9 @@ read_ctd <- function(cnv_file, pmin = 1, p = 1, to_tibble = TRUE,
 # Initial read ------------------------------------------------------------
   # Read CTD data from file
   ctd_safe <- purrr::possibly(oce::read.ctd, NULL)
+  suppressWarnings(
   ctd <- ctd_safe(cnv_file,...)
+  )
   if(is.null(ctd)) {
     warning(paste0("No data found in ", cnv_file, " upon opening.
                     Check cnv file for data. Returning NULL."))
@@ -344,8 +346,9 @@ read_cnv_latlon <- function(cnv_file) {
 read_ros <- function(ros_file) {
 
   # read ros file using oce package
+  suppressWarnings(
   ros <- oce::read.ctd(ros_file)
-
+)
   # convert data to a tibble
   ros_df <- tibble::as_tibble(ros@data)
 
