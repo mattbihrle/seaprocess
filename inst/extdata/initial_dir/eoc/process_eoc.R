@@ -8,6 +8,10 @@
 
 library(seaprocess)
 
+# TODO set the working directory to have the correct cruise number
+wd <- "Data/RData/S323"
+setwd(wd) # Set working directory to the cruise project
+
 cruiseID <- ""
 
 # Then, move the raw data. Step one is to tell the function where to find raw
