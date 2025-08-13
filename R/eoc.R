@@ -23,6 +23,9 @@
 #' @export
 #'
 #' @examples
+
+# TODO: UPDATE THIS
+setwd("Data/RData/S323")
 eoc_process <- function (elg_folder = NULL, ctd_folder = NULL,
                          ros_folder = NULL, adcp_folder = NULL,
                          adcp_file_type = "LTA" ) {
