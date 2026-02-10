@@ -4,9 +4,14 @@
 # generate plots. If you want to change the formatting or create a plot for a
 # different variable, copy and paste the script somewhere else and edit away!
 
+# If you would like to make the plots interactive, uncomment the library(plotly)
+# line here and below each chunk of code where it says "# Make interactive."
+# Plots will show up in the 'Viewer' and you will be able to zoom in and out and
+# view each data point.
+
 library(ggOceanMaps)
 library(seaprocess)
-
+# library(plotly)
 #--------------------------------##SETUP##---------------------------------------
 
 # Set Cruise ID
@@ -42,7 +47,7 @@ limits <- plot_limits(elg)
 
 Map.SST <- ggOceanMaps::basemap(limits=limits, shapefiles="DecimalDegree", rotate = T, bathy.style = "rcb", legends = F) +
   labs(x = "Long", y = "Lat") +
-  ggspatial::geom_spatial_point(data = elg, aes(x = lon, y = lat, color = temp), size = 1) +
+  ggspatial::geom_spatial_point(data = elg, aes(x = lon, y = lat, color = temp_c), size = 1) +
   scale_color_gradient(low="blue", high="red") +
   ggtitle(paste(cruiseID, "Surface Temp (C)", sep = " - "),
           subtitle = paste(date_start, date_end, sep = " - ")) +
@@ -69,6 +74,9 @@ Map.SST <- ggOceanMaps::basemap(limits=limits, shapefiles="DecimalDegree", rotat
 # Show the plot
 Map.SST
 
+# # Make interactive
+#   plotly_build(Map.SST)
+
 # Save the plot
 ggsave(paste(cruiseID, "surface_temp.jpg", sep = "_"), plot = Map.SST,
        scale = 4, path = plots_output)
@@ -78,7 +86,7 @@ ggsave(paste(cruiseID, "surface_temp.jpg", sep = "_"), plot = Map.SST,
 Map.SSS <- ggOceanMaps::basemap(limits=limits, shapefiles="DecimalDegree",
                                 rotate = T, bathy.style = "rcb", legends = F) +
   labs(x = "Long", y = "Lat") +
-  ggspatial::geom_spatial_point(data = elg, aes(x = lon, y = lat, color = sal), size = 1) +
+  ggspatial::geom_spatial_point(data = elg, aes(x = lon, y = lat, color = sal_psu), size = 1) +
   scale_color_gradient(low="green", high="red")+
   #scale_color_viridis()+
   #scale_color_viridis_c()+
@@ -106,6 +114,10 @@ Map.SSS <- ggOceanMaps::basemap(limits=limits, shapefiles="DecimalDegree",
 
 # Show the plot
 Map.SSS
+
+# # Make interactive
+#   plotly_build(Map.SSS)
+
 # Save the plot
 ggsave(paste(cruiseID, "surface_sal.jpg", sep = "_"), plot = Map.SSS,
        scale = 4, path = plots_output)
@@ -115,7 +127,7 @@ Map.SSF <- ggOceanMaps::basemap(limits=plot_limits(elg),
                                 shapefiles="DecimalDegree",
                                 rotate = T, bathy.style = "rcb", legends = F) +
   labs(x = "Long", y = "Lat") +
-  ggspatial::geom_spatial_point(data = elg, aes(x = lon, y = lat, color = fluor), size = 1) +
+  ggspatial::geom_spatial_point(data = elg, aes(x = lon, y = lat, color = chla_fluor), size = 1) +
   scale_color_gradient(low="blue", high="red")+
   ggtitle(paste(cruiseID, "Surface Chla Fluorescence"),
           subtitle = paste(date_start, date_end, sep = " - ")) +
@@ -141,6 +153,10 @@ Map.SSF <- ggOceanMaps::basemap(limits=plot_limits(elg),
 
 # Show the plot
 Map.SSF
+
+# # Make interactive
+# plotly_build(Map.SSF)
+
 # Save the plot
 ggsave(paste(cruiseID, "surface_fluor.jpg", sep = "_"), plot = Map.SSF,
        scale = 4, path = plots_output)
